@@ -2,16 +2,15 @@ package controllers
 
 import (
 	"github.com/udistrital/administrativa_mid_api/models"
+	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
-	"encoding/json"
 )
 
 // InformacionProveedorController operations for InformacionProveedor
 type InformacionProveedorController struct {
 	beego.Controller
 }
-
 
 // URLMapping ...
 func (c *InformacionProveedorController) URLMapping() {
@@ -30,14 +29,14 @@ func (c *InformacionProveedorController) ContratoPersona() {
 	var v []models.ContratoGeneral
 	var datos string
 	if err2 := json.Unmarshal(c.Ctx.Input.RequestBody, &datos); err2 == nil {
-		query:="?query="+datos
+		query := "?query=" + datos
 		fmt.Println(query)
 		if err := getJson("http://"+beego.AppConfig.String("UrlcrudArgo")+":"+beego.AppConfig.String("PortcrudArgo")+"/"+beego.AppConfig.String("NscrudArgo")+"/contrato_general/"+query, &v); err == nil {
-				c.Data["json"] = v
+			c.Data["json"] = v
 		} else {
 			c.Data["json"] = err.Error()
 		}
-	}else{
+	} else {
 		c.Data["json"] = err2.Error()
 		fmt.Println(err2)
 	}
