@@ -29,7 +29,7 @@ func (c *InformacionProveedorController) ContratoPersona() {
 	var v []models.ContratoGeneral
 	var datos string
 	if err2 := json.Unmarshal(c.Ctx.Input.RequestBody, &datos); err2 == nil {
-		query := "?limit=0&query=" + datos
+		query := "?limit=-1&query=" + datos
 		fmt.Println(query)
 		if err := getJson("http://"+beego.AppConfig.String("UrlcrudArgo")+":"+beego.AppConfig.String("PortcrudArgo")+"/"+beego.AppConfig.String("NscrudArgo")+"/contrato_general/"+query, &v); err == nil {
 			c.Data["json"] = v
