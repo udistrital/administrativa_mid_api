@@ -19,6 +19,24 @@ func init() {
 				&controllers.InformacionProveedorController{},
 			),
 		),
+
+		beego.NSNamespace("/calculo_salario",
+			beego.NSInclude(
+				&controllers.CalculoSalarioController{},
+			),
+		),
+
+		beego.NSNamespace("/validar_contrato",
+			beego.NSInclude(
+				&controllers.ValidarContratoController{},
+			),
+		),
+
+		beego.NSNamespace("/cancelacion_valida",
+			beego.NSInclude(
+				&controllers.CancelacionValidaController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }
