@@ -31,22 +31,27 @@ func (c *InformacionProveedorController) Contrato_proveedor() {
 	var informacion_proveedor []models.InformacionProveedor
 	var datos []models.ContratoGeneral
 	var contrato_proveedor []models.ContratoProveedor
+  var temp models.ContratoProveedor
 
 	if err2 := json.Unmarshal(c.Ctx.Input.RequestBody, &datos); err2 == nil {
 /*		query := "?limit=-1&query=" + datos
 		fmt.Println(query)*/
-		queryPersonaNatural := "?query=Id:"+strconv.Itoa(datos[7].Contratista)
+		//
 
-		queryInformacionProveedor := "?query=NumDocumento:"+strconv.Itoa(datos[7].Contratista)
+		cedula := strconv.Itoa(datos[0].Contratista)
+		fmt.Println(cedula)
+		queryPersonaNatural := "?query=Id:"+cedula
+		queryInformacionProveedor := "?query=NumDocumento:"+cedula
+
+
 		if err := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudArgo")+"/informacion_persona_natural/"+queryPersonaNatural, &persona_natural); err == nil {
 		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudArgo")+"/informacion_proveedor/"+queryInformacionProveedor, &informacion_proveedor); err2 == nil {
-			fmt.Println("persona NATURAL")
-			fmt.Println(persona_natural[0])
-			fmt.Println("informacion PROVEEDOR")
-			fmt.Println(informacion_proveedor[0])
-			contrato_proveedor[0].InformacionProveedor = informacion_proveedor[0]
-			contrato_proveedor[0].InformacionPersonaNatural = persona_natural[0]
-			c.Data["json"] = contrato_proveedor[0]
+
+			temp.InformacionProveedor = informacion_proveedor[0]
+			temp.InformacionPersonaNatural = persona_natural[0]
+			contrato_proveedor = append(contrato_proveedor, temp)
+
+			c.Data["json"] = contrato_proveedor
 		}else {
 			c.Data["json"] = err2.Error()
 		}
@@ -58,6 +63,7 @@ func (c *InformacionProveedorController) Contrato_proveedor() {
 		c.Data["json"] = err2.Error()
 		fmt.Println(err2)
 	}
+	fmt.Println("ACAASDA3Q4234453645#$%$%")
 	fmt.Println(c)
 	c.ServeJSON()
 }

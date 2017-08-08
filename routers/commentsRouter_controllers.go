@@ -12,5 +12,4 @@ func init() {
 			Router: `/contrato_proveedor`,
 			AllowHTTPMethods: []string{"post"},
 			Params: nil})
-
 }
