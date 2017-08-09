@@ -89,7 +89,7 @@ func CargarEscalafon(idPersona string) (e string) {
 	escalafon := ""
 	var v []models.CategoriaPersona
 
-	if err := getJson("http://localhost:8089/v1/categoria_persona/?query=PersonaId%3A"+idPersona, &v); err == nil {
+	if err := getJson("http://10.20.0.254/hvapi/v1/categoria_persona/?query=PersonaId%3A"+idPersona, &v); err == nil {
 		escalafon=v[0].IdTipoCategoria.NombreCategoria
 	}else{
 	}
@@ -99,7 +99,7 @@ func CargarEscalafon(idPersona string) (e string) {
 func CargarVinculacionDocente(idVinculacion string) (a models.VinculacionDocente) {
 	var v []models.VinculacionDocente
 
-	if err := getJson("http://localhost:8080/v1/vinculacion_docente/?query=Id%3A"+idVinculacion, &v); err == nil {
+	if err := getJson("http://10.20.0.254/administrativa_api/v1/vinculacion_docente/?query=Id%3A"+idVinculacion, &v); err == nil {
 	} else {
 	}
 	return v[0]
@@ -108,7 +108,7 @@ func CargarVinculacionDocente(idVinculacion string) (a models.VinculacionDocente
 func CargarPuntoSalarial() (p models.PuntoSalarial) {
 	var v []models.PuntoSalarial
 
-	if err := getJson("http://localhost:8086/v1/punto_salarial/?sortby=Vigencia&order=desc&limit=1", &v); err == nil {
+	if err := getJson("http://10.20.0.254/core_api/v1/punto_salarial/?sortby=Vigencia&order=desc&limit=1", &v); err == nil {
 	} else {
 	}
 	return v[0]
@@ -117,7 +117,7 @@ func CargarPuntoSalarial() (p models.PuntoSalarial) {
 func CargarSalarioMinimo() (p models.SalarioMinimo) {
 	var v []models.SalarioMinimo
 
-	if err := getJson("http://localhost:8086/v1/salario_minimo/?sortby=Vigencia&order=desc&limit=1", &v); err == nil {
+	if err := getJson("http://10.20.0.254/core_api/v1/salario_minimo/?sortby=Vigencia&order=desc&limit=1", &v); err == nil {
 	} else {
 	}
 	return v[0]
@@ -140,7 +140,7 @@ func CargarReglasBase() (reglas string) {
 func EsDocentePlanta(idPersona string) (docentePlanta bool){
 	var v bool
 
-	if err := getJson("http://localhost:8083/v1/docente_planta/"+idPersona, &v); err == nil {	
+	if err := getJson("http://10.20.2.17:8085/v1/docente_planta/"+idPersona, &v); err == nil {	
 	} else {
 	}
 	return v
