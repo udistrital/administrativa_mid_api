@@ -2,6 +2,7 @@ package models
 
 
 type ContratoProveedor struct {
-  InformacionProveedor  *InformacionProveedor
-  ContratoGeneral       *ContratoGeneral
+  InformacionProveedor  InformacionProveedor
+  InformacionPersonaNatural       InformacionPersonaNatural
+  ContratoGeneral ContratoGeneral
 }

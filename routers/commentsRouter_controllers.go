@@ -8,10 +8,11 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:InformacionProveedorController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:InformacionProveedorController"],
 		beego.ControllerComments{
-			Method: "ContratoPersona",
-			Router: `/contratoPersona`,
+			Method: "Contrato_proveedor",
+			Router: `/contrato_proveedor`,
 			AllowHTTPMethods: []string{"post"},
 			Params: nil})
+<<<<<<< HEAD
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:CalculoSalarioController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:CalculoSalarioController"],
 		beego.ControllerComments{
@@ -41,4 +42,6 @@ func init() {
 			AllowHTTPMethods: []string{"post"},
 			Params: nil})
 
+=======
+>>>>>>> issue/2
 }
