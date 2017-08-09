@@ -31,7 +31,7 @@ func (c *CancelacionValidaController) ValidarCancelacion() {
 func CargarVinculacionesDocente(idResolucion string) (c []models.VinculacionDocente){
 	var vinculacionesDocente []models.VinculacionDocente
 
-	if err := getJson("http://localhost:8080/v1/vinculacion_docente/?query=IdResolucion.Id%3A"+idResolucion+"&limit=0", &vinculacionesDocente); err == nil {
+	if err := getJson("http://10.20.0.254/administrativa_api/v1/vinculacion_docente/?query=IdResolucion.Id%3A"+idResolucion+"&limit=0", &vinculacionesDocente); err == nil {
 		fmt.Println(vinculacionesDocente)
 	} else {
 	}
