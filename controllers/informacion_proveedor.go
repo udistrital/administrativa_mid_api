@@ -3,7 +3,6 @@ package controllers
 import (
 	"github.com/udistrital/administrativa_mid_api/models"
 	"encoding/json"
-	"fmt"
 	"strconv"
 	"github.com/astaxie/beego"
 )
@@ -34,36 +33,32 @@ func (c *InformacionProveedorController) Contrato_proveedor() {
   var temp models.ContratoProveedor
 
 	if err2 := json.Unmarshal(c.Ctx.Input.RequestBody, &datos); err2 == nil {
-/*		query := "?limit=-1&query=" + datos
-		fmt.Println(query)*/
-		//
+		for x := 0; x < len(datos); x++ {
 
-		cedula := strconv.Itoa(datos[0].Contratista)
-		fmt.Println(cedula)
-		queryPersonaNatural := "?query=Id:"+cedula
-		queryInformacionProveedor := "?query=NumDocumento:"+cedula
+			cedula := strconv.Itoa(datos[x].Contratista)
 
+			queryPersonaNatural := "?query=Id:"+cedula
+			queryInformacionProveedor := "?query=NumDocumento:"+cedula
 
-		if err := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudArgo")+"/informacion_persona_natural/"+queryPersonaNatural, &persona_natural); err == nil {
-		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudArgo")+"/informacion_proveedor/"+queryInformacionProveedor, &informacion_proveedor); err2 == nil {
+			if err := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudArgo")+"/informacion_persona_natural/"+queryPersonaNatural, &persona_natural); err == nil {
+			if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudArgo")+"/informacion_proveedor/"+queryInformacionProveedor, &informacion_proveedor); err2 == nil {
 
-			temp.InformacionProveedor = informacion_proveedor[0]
-			temp.InformacionPersonaNatural = persona_natural[0]
-			contrato_proveedor = append(contrato_proveedor, temp)
+				temp.InformacionProveedor = informacion_proveedor[0]
+				temp.InformacionPersonaNatural = persona_natural[0]
+				temp.ContratoGeneral = datos[x]
+				contrato_proveedor = append(contrato_proveedor, temp)
 
-			c.Data["json"] = contrato_proveedor
-		}else {
-			c.Data["json"] = err2.Error()
-		}
+				c.Data["json"] = contrato_proveedor
+			}else {
+				c.Data["json"] = err2.Error()
+			}
 
-		}else {
-			c.Data["json"] = err.Error()
+			}else {
+				c.Data["json"] = err.Error()
+			}
 		}
 	} else {
 		c.Data["json"] = err2.Error()
-		fmt.Println(err2)
 	}
-	fmt.Println("ACAASDA3Q4234453645#$%$%")
-	fmt.Println(c)
 	c.ServeJSON()
 }
