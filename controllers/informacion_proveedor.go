@@ -30,11 +30,11 @@ func (c *InformacionProveedorController) Contrato_proveedor() {
 	var informacion_proveedor []models.InformacionProveedor
 	var datos []models.ContratoGeneral
 	var contrato_proveedor []models.ContratoProveedor
-  	var temp models.ContratoProveedor
+  var temp models.ContratoProveedor
 
 	if err2 := json.Unmarshal(c.Ctx.Input.RequestBody, &datos); err2 == nil {
 		for x := 0; x < len(datos); x++ {
-			
+
 			cedula := strconv.Itoa(datos[x].Contratista)
 			queryPersonaNatural := "?query=Id:"+cedula
 			queryInformacionProveedor := "?query=NumDocumento:"+cedula
@@ -47,7 +47,10 @@ func (c *InformacionProveedorController) Contrato_proveedor() {
 					temp.ContratoGeneral = datos[x]
 					contrato_proveedor = append(contrato_proveedor, temp)
 				}
-				
+
+
+
+				c.Data["json"] = contrato_proveedor
 			}else {
 				c.Data["json"] = err2.Error()
 			}
@@ -56,10 +59,8 @@ func (c *InformacionProveedorController) Contrato_proveedor() {
 				c.Data["json"] = err.Error()
 			}
 		}
-		c.Data["json"] = contrato_proveedor
 	} else {
 		c.Data["json"] = err2.Error()
 	}
-	
 	c.ServeJSON()
 }
