@@ -47,10 +47,7 @@ func (c *InformacionProveedorController) Contrato_proveedor() {
 					temp.ContratoGeneral = datos[x]
 					contrato_proveedor = append(contrato_proveedor, temp)
 				}
-
-
-
-				c.Data["json"] = contrato_proveedor
+				
 			}else {
 				c.Data["json"] = err2.Error()
 			}
@@ -59,6 +56,7 @@ func (c *InformacionProveedorController) Contrato_proveedor() {
 				c.Data["json"] = err.Error()
 			}
 		}
+		c.Data["json"] = contrato_proveedor
 	} else {
 		c.Data["json"] = err2.Error()
 	}
