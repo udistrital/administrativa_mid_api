@@ -8,8 +8,8 @@
 package routers
 
 import (
-	"github.com/udistrital/administrativa_mid_api/controllers"
 	"github.com/astaxie/beego"
+	"github.com/udistrital/administrativa_mid_api/controllers"
 )
 
 func init() {
@@ -35,6 +35,12 @@ func init() {
 		beego.NSNamespace("/cancelacion_valida",
 			beego.NSInclude(
 				&controllers.CancelacionValidaController{},
+			),
+		),
+
+		beego.NSNamespace("/validarCambioEstado",
+			beego.NSInclude(
+				&controllers.CambioEstadoContratoValidoController{},
 			),
 		),
 	)

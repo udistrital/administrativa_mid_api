@@ -12,6 +12,7 @@ func init() {
 			Router:           `/contrato_proveedor`,
 			AllowHTTPMethods: []string{"post"},
 			Params:           nil})
+
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:CalculoSalarioController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:CalculoSalarioController"],
 		beego.ControllerComments{
 			Method:           "CalcularSalarioPrecontratacion",
@@ -39,4 +40,12 @@ func init() {
 			Router:           `/:idResolucion`,
 			AllowHTTPMethods: []string{"post"},
 			Params:           nil})
+
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:CambioEstadoContratoValidoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:CambioEstadoContratoValidoController"],
+		beego.ControllerComments{
+			Method:           "ValidarCambioEstado",
+			Router:           `/`,
+			AllowHTTPMethods: []string{"post"},
+			Params:           nil})
+
 }
