@@ -34,7 +34,7 @@ func (c *CalculoSalarioController) CalcularSalarioContratacion() {
 	predicados = predicados + `categoria(` + strconv.Itoa(vinculacionDocente.IdPersona) + `,` + strings.ToLower(escalafon) + `, 2016).` + "\n"
 	predicados = predicados + `vinculacion(` + strconv.Itoa(vinculacionDocente.IdPersona) + `,` + strings.ToLower(vinculacionDocente.IdDedicacion.NombreDedicacion) + `,2016).` + "\n"
 	predicados = predicados + `horas(` + strconv.Itoa(vinculacionDocente.IdPersona) + `,` + strconv.Itoa(vinculacionDocente.NumeroHorasSemanales*vinculacionDocente.NumeroSemanas) + `,2016).` + "\n"
-	reglasbase := CargarReglasBase("CVDE")
+	reglasbase := CargarReglasBase("CDVE")
 	reglasbase = reglasbase + predicados
 	//fmt.Println(reglasbase)
 	m := NewMachine().Consult(reglasbase)
@@ -71,7 +71,7 @@ func (c *CalculoSalarioController) CalcularSalarioPrecontratacion() {
 	predicados = predicados + `categoria(` + idPersonaStr + `,` + strings.ToLower(categoria) + `, 2016).` + "\n"
 	predicados = predicados + `vinculacion(` + idPersonaStr + `,` + strings.ToLower(vinculacion) + `, 2016).` + "\n"
 	predicados = predicados + `horas(` + idPersonaStr + `,` + strconv.Itoa(numHoras*numSemanas) + `, 2016).` + "\n"
-	reglasbase := CargarReglasBase("CVDE")
+	reglasbase := CargarReglasBase("CDVE")
 	reglasbase = reglasbase + predicados
 	m := NewMachine().Consult(reglasbase)
 	var a string

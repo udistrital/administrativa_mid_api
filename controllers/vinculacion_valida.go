@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-
 	"github.com/astaxie/beego"
 	. "github.com/mndrix/golog"
 )
@@ -18,13 +17,20 @@ func (c *ValidarContratoController) URLMapping() {
 	c.Mapping("ValidarContrato", c.ValidarContrato)
 }
 
+// ValidarContrato ...
+// @Title ValidarContrato
+// @Description create ValidarContrato
+// @Success 201 {int} models.ContratoGeneral
+// @Failure 403 body is empty
+// @router /:dedicacion/:numHoras [post]
 func (c *ValidarContratoController) ValidarContrato() {
 	dedicacion := c.Ctx.Input.Param(":dedicacion")
 	numHorasStr := c.Ctx.Input.Param(":numHoras")
 
-	reglasbase := CargarReglasBase("CVDE")
+	reglasbase := CargarReglasBase("CDVE")
 
 	m := NewMachine().Consult(reglasbase)
+	fmt.Println(reglasbase);
 
 	var a string
 	contratos := m.ProveAll(`cumple_tiempo(` + strings.ToLower(dedicacion) + `,` + numHorasStr + `,X).`)
