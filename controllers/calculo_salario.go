@@ -57,6 +57,12 @@ func (c *CalculoSalarioController) CalcularSalarioContratacion() {
 
 }
 
+// CalcularSalarioPrecontratacion ...
+// @Title CalcularSalarioPrecontratacion
+// @Description create CalcularSalarioPrecontratacion
+// @Success 201 {int} models.ContratoGeneral
+// @Failure 403 body is empty
+// @router Precontratacion/:nivelAcademico/:idProfesor/:numHoras/:numSemanas/:categoria/:dedicacion [post]
 func (c *CalculoSalarioController) CalcularSalarioPrecontratacion() {
 	nivelAcademico := c.Ctx.Input.Param(":nivelAcademico")
 	idPersonaStr := c.Ctx.Input.Param(":idProfesor")
