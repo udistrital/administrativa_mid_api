@@ -37,6 +37,7 @@ func (c *CalculoSalarioController) CalcularSalarioContratacion() {
 	if EsDocentePlanta(strconv.Itoa(vinculacionDocente.IdPersona)) && strings.ToLower(vinculacionDocente.IdResolucion.NivelAcademico) == "posgrado" {
 		escalafon = escalafon + "ud"
 	}
+
 	predicados := `valor_punto(` + strconv.Itoa(CargarPuntoSalarial().ValorPunto) + `, 2016).` + "\n"
 	predicados = predicados + `categoria(` + strconv.Itoa(vinculacionDocente.IdPersona) + `,` + strings.ToLower(escalafon) + `, 2016).` + "\n"
 	predicados = predicados + `vinculacion(` + strconv.Itoa(vinculacionDocente.IdPersona) + `,` + strings.ToLower(vinculacionDocente.IdDedicacion.NombreDedicacion) + `,2016).` + "\n"
@@ -74,7 +75,8 @@ func (c *CalculoSalarioController) CalcularSalarioPrecontratacion() {
 	vinculacion := c.Ctx.Input.Param(":dedicacion")
 	if EsDocentePlanta(idPersonaStr) && strings.ToLower(nivelAcademico) == "posgrado" {
 		categoria = categoria + "ud"
-	}
+	}	
+
 	var predicados string
 	if strings.ToLower(nivelAcademico) == "posgrado" {
 		predicados = `valor_salario_minimo(` + strconv.Itoa(CargarSalarioMinimo().Valor) + `,2016).` + "\n"

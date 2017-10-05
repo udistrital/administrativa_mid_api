@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/udistrital/administrativa_mid_api/models"
-	"encoding/json"
+	"encoding/json"	
 	"strconv"
 	"github.com/astaxie/beego"
 )
@@ -24,7 +24,6 @@ func (c *InformacionProveedorController) URLMapping() {
 // @Success 201 {int} models.ContratoGeneral
 // @Failure 403 body is empty
 // @router /contratoPersona [post]
-
 func (c *InformacionProveedorController) Contrato_proveedor() {
 	var persona_natural []models.InformacionPersonaNatural
 	var informacion_proveedor []models.InformacionProveedor
