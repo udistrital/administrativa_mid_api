@@ -16,6 +16,12 @@ func (c *CancelacionValidaController) URLMapping() {
 	c.Mapping("ValidarCancelacion", c. ValidarCancelacion)
 }
 
+// ValidarCancelacion ...
+// @Title ValidarCancelacion
+// @Description create ValidarCancelacion
+// @Success 201 {int} models.ContratoGeneral
+// @Failure 403 body is empty
+// @router /:idResolucion [post]
 func (c *CancelacionValidaController) ValidarCancelacion() {
 	idResolucionStr := c.Ctx.Input.Param(":idResolucion")
 	vinculaciones := CargarVinculacionesDocente(idResolucionStr)
