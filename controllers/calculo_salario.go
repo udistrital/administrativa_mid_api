@@ -21,6 +21,13 @@ func (c *CalculoSalarioController) URLMapping() {
 	c.Mapping("CalcularSalarioPrecontratacion", c.CalcularSalarioPrecontratacion)
 }
 
+
+// CalcularSalarioContratacion ...
+// @Title CalcularSalarioContratacion
+// @Description create CalcularSalarioContratacion
+// @Success 201 {int} models.ContratoGeneral
+// @Failure 403 body is empty
+// @router Contratacion/:idVinculacion [get]
 func (c *CalculoSalarioController) CalcularSalarioContratacion() {
 	idVinculacionStr := c.Ctx.Input.Param(":idVinculacion")
 	fmt.Println(idVinculacionStr)
