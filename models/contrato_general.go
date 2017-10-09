@@ -10,6 +10,7 @@ import (
 	"github.com/astaxie/beego/orm"
 )
 
+
 type ContratoGeneral struct {
 	Id                           string           		`orm:"column(numero_contrato);pk"`
 	VigenciaContrato             int              		`orm:"column(vigencia)"`

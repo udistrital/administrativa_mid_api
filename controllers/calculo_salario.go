@@ -33,8 +33,10 @@ func (c *CalculoSalarioController) CalcularSalarioContratacion() {
 	fmt.Println(idVinculacionStr)
 	vinculacionDocente := CargarVinculacionDocente(idVinculacionStr)
 	escalafon := CargarEscalafon(strconv.Itoa(vinculacionDocente.IdPersona))
-	fmt.Println(escalafon)
+	
 	if EsDocentePlanta(strconv.Itoa(vinculacionDocente.IdPersona)) && strings.ToLower(vinculacionDocente.IdResolucion.NivelAcademico) == "posgrado" {
+		fmt.Println("AAAAAAAAAAAAAAAAAAAAADASDQWEEEEEEEEEEEEE")
+		fmt.Println(EsDocentePlanta(strconv.Itoa(vinculacionDocente.IdPersona)))
 		escalafon = escalafon + "ud"
 	}
 
@@ -73,6 +75,17 @@ func (c *CalculoSalarioController) CalcularSalarioPrecontratacion() {
 	numSemanas, _ := strconv.Atoi(numSemanasStr)
 	categoria := c.Ctx.Input.Param(":categoria")
 	vinculacion := c.Ctx.Input.Param(":dedicacion")
+
+
+	fmt.Println(nivelAcademico)
+	fmt.Println(idPersonaStr)
+	fmt.Println(numHorasStr)
+	fmt.Println(numHoras)
+	fmt.Println(numSemanasStr)
+	fmt.Println(numSemanas)
+	fmt.Println(categoria)
+	fmt.Println(vinculacion)
+
 	if EsDocentePlanta(idPersonaStr) && strings.ToLower(nivelAcademico) == "posgrado" {
 		categoria = categoria + "ud"
 	}	
@@ -145,10 +158,11 @@ func CargarSalarioMinimo() (p models.SalarioMinimo) {
 }
 
 func EsDocentePlanta(idPersona string) (docentePlanta bool) {
-	var v bool
-
-	if err := getJson("http://10.20.2.17:8085/v1/docente_planta/"+idPersona, &v); err == nil {
+	var v []models.DocentePlanta
+	if err := getJson("http://10.20.0.127/urano/index.php?data=B-7djBQWvIdLAEEycbH1n6e-3dACi5eLUOb63vMYhGq0kPBs7NGLYWFCL0RSTCu1yTlE5hH854MOgmjuVfPWyvdpaJDUOyByX-ksEPFIrrQQ7t1p4BkZcBuGD2cgJXeD&documento="+idPersona, &v); err == nil {
+		fmt.Println(v[0].Nombres)
 	} else {
+		fmt.Println("false")
 	}
-	return v
+	return true
 }

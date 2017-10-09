@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"fmt"
-	//"strconv"
-	//"strings"
+	"strconv"
+	"strings"
 	"github.com/astaxie/beego"
 	. "github.com/mndrix/golog"
 )
@@ -28,23 +28,17 @@ func (c *ValidarContratoController) ValidarContrato() {
 	numHorasStr := c.Ctx.Input.Param(":numHoras")
 
 	reglasbase := CargarReglasBase("CDVE")
-
 	m := NewMachine().Consult(reglasbase)
-	//fmt.Println(reglasbase);
-	fmt.Println(dedicacion)
-	fmt.Println(numHorasStr)
-	fmt.Println(reglasbase)
-	fmt.Println(m)
 	
-/*	var a string
+	var a string
+
 	contratos := m.ProveAll(`cumple_tiempo(` + strings.ToLower(dedicacion) + `,` + numHorasStr + `,X).`)
 	for _, solution := range contratos {
 		a = fmt.Sprintf("%s", solution.ByName_("X"))
 	}
-	fmt.Println(a)
 	validez, _ := strconv.Atoi(a)
-*/
-//	c.Data["json"] = validez
+
+	c.Data["json"] = validez
 
 	c.ServeJSON()
 }

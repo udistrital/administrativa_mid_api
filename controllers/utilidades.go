@@ -81,9 +81,7 @@ func CargarReglasBase(dominio string) (reglas string) {
 	//carga de reglas desde el ruler
 	var reglasbase string = ``
 	var v []models.Predicado
-
-	fmt.Println(dominio)
-	if err := getJson("http://10.20.0.159/ruler/v1/predicado/?query=Dominio.Nombre:"+dominio+"&limit=0", &v); err == nil {
+	if err := getJson("http://10.20.0.254/ruler/v1/predicado/?query=Dominio.Nombre:"+dominio+"&limit=-1", &v); err == nil {
 
 		reglasbase = reglasbase + FormatoReglas(v) //funcion general para dar formato a reglas cargadas desde el ruler
 		} else {
