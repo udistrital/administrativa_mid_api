@@ -161,8 +161,9 @@ func EsDocentePlanta(idPersona string) (docentePlanta bool) {
 	var v []models.DocentePlanta
 	if err := getJson("http://10.20.0.127/urano/index.php?data=B-7djBQWvIdLAEEycbH1n6e-3dACi5eLUOb63vMYhGq0kPBs7NGLYWFCL0RSTCu1yTlE5hH854MOgmjuVfPWyvdpaJDUOyByX-ksEPFIrrQQ7t1p4BkZcBuGD2cgJXeD&documento="+idPersona, &v); err == nil {
 		fmt.Println(v[0].Nombres)
+		return true
 	} else {
 		fmt.Println("false")
+		return false
 	}
-	return true
 }
