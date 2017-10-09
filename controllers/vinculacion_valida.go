@@ -5,7 +5,8 @@ import (
 	"strconv"
 	"strings"
 	"github.com/astaxie/beego"
-	."github.com/udistrital/administrativa_mid_api/mndrix/golog"
+	. "github.com/mndrix/golog"
+	//."github.com/udistrital/administrativa_mid_api/mndrix/golog"
 )
 
 type ValidarContratoController struct {
