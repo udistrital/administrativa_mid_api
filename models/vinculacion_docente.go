@@ -7,7 +7,7 @@ import (
 type VinculacionDocente struct {
 	FechaRegistro        time.Time                  `orm:"column(fecha_registro);type(date)"`
 	Estado               bool                       `orm:"column(estado)"`
-	IdProyectoCurricular int16                      `orm:"column(id_proyecto_curricular)"`
+	IdProyectoCurricular int                     `orm:"column(id_proyecto_curricular)"`
 	IdDedicacion         *Dedicacion                `orm:"column(id_dedicacion);rel(fk)"`
 	IdResolucion         *ResolucionVinculacionDocente `orm:"column(id_resolucion);rel(fk)"`
 	IdSalarioMinimo      int                       `orm:"column(id_salario_minimo);null"`

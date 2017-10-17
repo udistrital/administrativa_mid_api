@@ -7,8 +7,8 @@ import (
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/administrativa_mid_api/models"
-	//. "github.com/mndrix/golog"
-	."github.com/udistrital/golog"
+	. "github.com/mndrix/golog"
+	//."github.com/udistrital/golog"
 )
 
 // CambioEstadoContratoValidoController operations for CambioEstadoContratoValido

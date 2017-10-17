@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/astaxie/beego"
-	//. "github.com/mndrix/golog"
-	."github.com/udistrital/golog"
+	. "github.com/mndrix/golog"
+	//."github.com/udistrital/golog"
 	"github.com/udistrital/administrativa_mid_api/models"
 )
 
@@ -33,16 +33,21 @@ func (c *CalculoSalarioController) CalcularSalarioContratacion() {
 	idVinculacionStr := c.Ctx.Input.Param(":idVinculacion")
 	fmt.Println(idVinculacionStr)
 	vinculacionDocente := CargarVinculacionDocente(idVinculacionStr)
+	fmt.Println("aca va el putazo de la primera funcion")
+	fmt.Println(vinculacionDocente)
 	escalafon := CargarEscalafon(strconv.Itoa(vinculacionDocente.IdPersona))
-	
+	fmt.Println("21132312132")
+	fmt.Println(vinculacionDocente.IdPersona)
+	fmt.Println("21132312132")
 	if EsDocentePlanta(strconv.Itoa(vinculacionDocente.IdPersona)) && strings.ToLower(vinculacionDocente.IdResolucion.NivelAcademico) == "posgrado" {
-		fmt.Println("AAAAAAAAAAAAAAAAAAAAADASDQWEEEEEEEEEEEEE")
 		fmt.Println(EsDocentePlanta(strconv.Itoa(vinculacionDocente.IdPersona)))
 		escalafon = escalafon + "ud"
 	}
 
 	predicados := `valor_punto(` + strconv.Itoa(CargarPuntoSalarial().ValorPunto) + `, 2016).` + "\n"
 	predicados = predicados + `categoria(` + strconv.Itoa(vinculacionDocente.IdPersona) + `,` + strings.ToLower(escalafon) + `, 2016).` + "\n"
+	fmt.Println("MADRAZOOOOOOOOOO ENTRE LOS PREDICADOS DE MIERDA")
+	fmt.Println(vinculacionDocente.IdDedicacion.NombreDedicacion)
 	predicados = predicados + `vinculacion(` + strconv.Itoa(vinculacionDocente.IdPersona) + `,` + strings.ToLower(vinculacionDocente.IdDedicacion.NombreDedicacion) + `,2016).` + "\n"
 	predicados = predicados + `horas(` + strconv.Itoa(vinculacionDocente.IdPersona) + `,` + strconv.Itoa(vinculacionDocente.NumeroHorasSemanales*vinculacionDocente.NumeroSemanas) + `,2016).` + "\n"
 	reglasbase := CargarReglasBase("CDVE")
@@ -76,7 +81,6 @@ func (c *CalculoSalarioController) CalcularSalarioPrecontratacion() {
 	numSemanas, _ := strconv.Atoi(numSemanasStr)
 	categoria := c.Ctx.Input.Param(":categoria")
 	vinculacion := c.Ctx.Input.Param(":dedicacion")
-
 
 	fmt.Println(nivelAcademico)
 	fmt.Println(idPersonaStr)
@@ -121,23 +125,30 @@ func CargarEscalafon(idPersona string) (e string) {
 
 	if err := getJson("http://10.20.0.254/hvapi/v1/categoria_persona/?query=PersonaId%3A"+idPersona, &v); err == nil {
 		escalafon = v[0].IdTipoCategoria.NombreCategoria
+		fmt.Println(escalafon)
 	} else {
+		fmt.Println(err)
 	}
 	return escalafon
 }
 
 func CargarVinculacionDocente(idVinculacion string) (a models.VinculacionDocente) {
 	var v []models.VinculacionDocente
-
+	fmt.Println("putazo numero 2")
 	fmt.Println(idVinculacion)
 
-	if err := getJson("http://10.20.0.254/administrativa_api/v1/vinculacion_docente/?query=Id%3A"+idVinculacion, &v); err == nil {
-		fmt.Println(v)
+	if err := getJson("http://10.20.2.121:8080/v1/vinculacion_docente/?query=Id:"+idVinculacion, &v); err == nil {
+		fmt.Println(v[0])
+		fmt.Println("putazo if de error models")
+		fmt.Println(v[0])
 		return v[0]
 	} else {
+		fmt.Println("aca estoy escalafon gonoorea")
 		fmt.Println(err.Error())
 	}
-	return models.VinculacionDocente{}
+	fmt.Println("putazo return models")
+	fmt.Println(v)
+	return 
 }
 
 func CargarPuntoSalarial() (p models.PuntoSalarial) {
