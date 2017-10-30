@@ -71,50 +71,56 @@ func (c *CalculoSalarioController) CalcularSalarioContratacion() {
 // @Description create CalcularSalarioPrecontratacion
 // @Success 201 {int} models.ContratoGeneral
 // @Failure 403 body is empty
-// @router Precontratacion/:nivelAcademico/:idProfesor/:numHoras/:numSemanas/:categoria/:dedicacion [post]
+// @router Precontratacion/:id_resolucion/:nivel_academico [post]
 func (c *CalculoSalarioController) CalcularSalarioPrecontratacion() {
-	nivelAcademico := c.Ctx.Input.Param(":nivelAcademico")
-	idPersonaStr := c.Ctx.Input.Param(":idProfesor")
-	numHorasStr := c.Ctx.Input.Param(":numHoras")
-	numHoras, _ := strconv.Atoi(numHorasStr)
-	numSemanasStr := c.Ctx.Input.Param(":numSemanas")
-	numSemanas, _ := strconv.Atoi(numSemanasStr)
-	categoria := c.Ctx.Input.Param(":categoria")
-	vinculacion := c.Ctx.Input.Param(":dedicacion")
+	id_resolucion:= c.Ctx.Input.Param(":id_resolucion")
+	nivel_academico:= c.Ctx.Input.Param(":nivel_academico")
 
-	fmt.Println(nivelAcademico)
-	fmt.Println(idPersonaStr)
-	fmt.Println(numHorasStr)
-	fmt.Println(numHoras)
-	fmt.Println(numSemanasStr)
-	fmt.Println(numSemanas)
-	fmt.Println(categoria)
-	fmt.Println(vinculacion)
+	var categoria string
+	var docentes_precontratados []models.DocentePrecontratado
+	fmt.Println(id_resolucion)
 
-	if EsDocentePlanta(idPersonaStr) && strings.ToLower(nivelAcademico) == "posgrado" {
-		categoria = categoria + "ud"
-	}	
+	if err := getJson("http://10.20.0.254/administrativa_amazon_api/v1/precontratado/"+id_resolucion, &docentes_precontratados); err == nil {
 
-	var predicados string
-	if strings.ToLower(nivelAcademico) == "posgrado" {
-		predicados = `valor_salario_minimo(` + strconv.Itoa(CargarSalarioMinimo().Valor) + `,2016).` + "\n"
-	} else if strings.ToLower(nivelAcademico) == "pregrado" {
-		predicados = `valor_punto(` + strconv.Itoa(CargarPuntoSalarial().ValorPunto) + `, 2016).` + "\n"
+	}else {
+		fmt.Println(err)
 	}
-	predicados = predicados + `categoria(` + idPersonaStr + `,` + strings.ToLower(categoria) + `, 2016).` + "\n"
-	predicados = predicados + `vinculacion(` + idPersonaStr + `,` + strings.ToLower(vinculacion) + `, 2016).` + "\n"
-	predicados = predicados + `horas(` + idPersonaStr + `,` + strconv.Itoa(numHoras*numSemanas) + `, 2016).` + "\n"
-	reglasbase := CargarReglasBase("CDVE")
-	reglasbase = reglasbase + predicados
-	m := NewMachine().Consult(reglasbase)
-	var a string
-	contratos := m.ProveAll(`valor_contrato(` + strings.ToLower(nivelAcademico) + `,` + idPersonaStr + `,2016,X).`)
-	for _, solution := range contratos {
-		a = fmt.Sprintf("%s", solution.ByName_("X"))
+
+	for x, docente := range docentes_precontratados {
+		docentes_precontratados[x].NombreCompleto= docente.PrimerNombre + " " + docente.SegundoNombre + " " + docente.PrimerApellido + " " + docente.SegundoApellido;
+
+		if EsDocentePlanta(strconv.Itoa(docente.Id)) && strings.ToLower(nivel_academico) == "posgrado" {
+			categoria = categoria + "ud"
+		}else{
+			categoria = docente.Categoria
+		}
+
+		var predicados string
+		if strings.ToLower(nivel_academico) == "posgrado" {
+			predicados = `valor_salario_minimo(` + strconv.Itoa(CargarSalarioMinimo().Valor) + `,2016).` + "\n"
+		} else if strings.ToLower(nivel_academico) == "pregrado" {
+			predicados = `valor_punto(` + strconv.Itoa(CargarPuntoSalarial().ValorPunto) + `, 2016).` + "\n"
+		}
+
+		predicados = predicados + `categoria(` + strconv.Itoa(docente.Id) + `,` + strings.ToLower(categoria) + `, 2016).` + "\n"
+		predicados = predicados + `vinculacion(` + strconv.Itoa(docente.Id) + `,` + strings.ToLower(docente.Dedicacion) + `, 2016).` + "\n"
+		predicados = predicados + `horas(` + strconv.Itoa(docente.Id) + `,` + strconv.Itoa(docente.HorasSemanales*docente.Semanas) + `, 2016).` + "\n"
+		reglasbase := CargarReglasBase("CDVE")
+		reglasbase = reglasbase + predicados
+		m := NewMachine().Consult(reglasbase)
+		var a string
+		contratos := m.ProveAll(`valor_contrato(` + strings.ToLower(nivel_academico) + `,` + strconv.Itoa(docente.Id) + `,2016,X).`)
+		for _, solution := range contratos {
+			a = fmt.Sprintf("%s", solution.ByName_("X"))
+		}
+		f, _ := strconv.ParseFloat(a, 64)
+		salario := int(f)
+		docentes_precontratados[x].ValorContrato = salario
+
+
 	}
-	f, _ := strconv.ParseFloat(a, 64)
-	salario := int(f)
-	c.Data["json"] = salario
+
+	c.Data["json"] = docentes_precontratados
 	c.ServeJSON()
 
 }
@@ -148,7 +154,7 @@ func CargarVinculacionDocente(idVinculacion string) (a models.VinculacionDocente
 	}
 	fmt.Println("putazo return models")
 	fmt.Println(v)
-	return 
+	return
 }
 
 func CargarPuntoSalarial() (p models.PuntoSalarial) {
@@ -175,7 +181,7 @@ func EsDocentePlanta(idPersona string) (docentePlanta bool) {
 		fmt.Println(v[0].Nombres)
 		return true
 	} else {
-		fmt.Println("false")
+		//fmt.Println("false")
 		return false
 	}
 }
