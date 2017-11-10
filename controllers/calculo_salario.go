@@ -7,8 +7,8 @@ import (
 
 	"github.com/astaxie/beego"
 	//. "github.com/mndrix/golog"
-	."github.com/udistrital/golog"
 	"github.com/udistrital/administrativa_mid_api/models"
+	. "github.com/udistrital/golog"
 )
 
 // PreliquidacionController operations for Preliquidacion
@@ -21,7 +21,6 @@ func (c *CalculoSalarioController) URLMapping() {
 	c.Mapping("CalcularSalarioContratacion", c.CalcularSalarioContratacion)
 	c.Mapping("CalcularSalarioPrecontratacion", c.CalcularSalarioPrecontratacion)
 }
-
 
 // CalcularSalarioContratacion ...
 // @Title CalcularSalarioContratacion
@@ -73,8 +72,8 @@ func (c *CalculoSalarioController) CalcularSalarioContratacion() {
 // @Failure 403 body is empty
 // @router Precontratacion/:id_resolucion/:nivel_academico [post]
 func (c *CalculoSalarioController) CalcularSalarioPrecontratacion() {
-	id_resolucion:= c.Ctx.Input.Param(":id_resolucion")
-	nivel_academico:= c.Ctx.Input.Param(":nivel_academico")
+	id_resolucion := c.Ctx.Input.Param(":id_resolucion")
+	nivel_academico := c.Ctx.Input.Param(":nivel_academico")
 
 	var categoria string
 	var docentes_precontratados []models.DocentePrecontratado
@@ -82,16 +81,16 @@ func (c *CalculoSalarioController) CalcularSalarioPrecontratacion() {
 
 	if err := getJson("http://10.20.0.254/administrativa_amazon_api/v1/precontratado/"+id_resolucion, &docentes_precontratados); err == nil {
 
-	}else {
+	} else {
 		fmt.Println(err)
 	}
 
 	for x, docente := range docentes_precontratados {
-		docentes_precontratados[x].NombreCompleto= docente.PrimerNombre + " " + docente.SegundoNombre + " " + docente.PrimerApellido + " " + docente.SegundoApellido;
+		docentes_precontratados[x].NombreCompleto = docente.PrimerNombre + " " + docente.SegundoNombre + " " + docente.PrimerApellido + " " + docente.SegundoApellido
 
 		if EsDocentePlanta(strconv.Itoa(docente.Id)) && strings.ToLower(nivel_academico) == "posgrado" {
 			categoria = categoria + "ud"
-		}else{
+		} else {
 			categoria = docente.Categoria
 		}
 
@@ -117,7 +116,6 @@ func (c *CalculoSalarioController) CalcularSalarioPrecontratacion() {
 		salario := int(f)
 		docentes_precontratados[x].ValorContrato = salario
 
-
 	}
 
 	c.Data["json"] = docentes_precontratados
@@ -129,7 +127,7 @@ func CargarEscalafon(idPersona string) (e string) {
 	escalafon := ""
 	var v []models.CategoriaPersona
 
-	if err := getJson("http://10.20.0.254/hvapi/v1/categoria_persona/?query=PersonaId%3A"+idPersona, &v); err == nil {
+	if err := getJson("http://10.20.0.254/administrativa_amazon_api/v1/escalafon_persona/?query=PersonaId%3A"+idPersona, &v); err == nil {
 		escalafon = v[0].IdTipoCategoria.NombreCategoria
 		fmt.Println(escalafon)
 	} else {
@@ -143,7 +141,7 @@ func CargarVinculacionDocente(idVinculacion string) (a models.VinculacionDocente
 	fmt.Println("putazo numero 2")
 	fmt.Println(idVinculacion)
 
-	if err := getJson("http://10.20.2.121:8080/v1/vinculacion_docente/?query=Id:"+idVinculacion, &v); err == nil {
+	if err := getJson("http://10.20.0.254/administrativa_amazon_api/v1/vinculacion_docente/?query=Id:"+idVinculacion, &v); err == nil {
 		fmt.Println(v[0])
 		fmt.Println("putazo if de error models")
 		fmt.Println(v[0])
@@ -160,7 +158,7 @@ func CargarVinculacionDocente(idVinculacion string) (a models.VinculacionDocente
 func CargarPuntoSalarial() (p models.PuntoSalarial) {
 	var v []models.PuntoSalarial
 
-	if err := getJson("http://10.20.0.254/core_api/v1/punto_salarial/?sortby=Vigencia&order=desc&limit=1", &v); err == nil {
+	if err := getJson("http://10.20.0.254/core_amazon_crud/v1/punto_salarial/?sortby=Vigencia&order=desc&limit=1", &v); err == nil {
 	} else {
 	}
 	return v[0]
@@ -169,7 +167,7 @@ func CargarPuntoSalarial() (p models.PuntoSalarial) {
 func CargarSalarioMinimo() (p models.SalarioMinimo) {
 	var v []models.SalarioMinimo
 
-	if err := getJson("http://10.20.0.254/core_api/v1/salario_minimo/?sortby=Vigencia&order=desc&limit=1", &v); err == nil {
+	if err := getJson("http://10.20.0.254/core_amazon_crud/v1/salario_minimo/?sortby=Vigencia&order=desc&limit=1", &v); err == nil {
 	} else {
 	}
 	return v[0]
