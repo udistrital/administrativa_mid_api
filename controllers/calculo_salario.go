@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-
 	"github.com/astaxie/beego"
 	//. "github.com/mndrix/golog"
 	"github.com/udistrital/administrativa_mid_api/models"
@@ -34,7 +33,6 @@ func (c *CalculoSalarioController) CalcularSalarioContratacion() {
 	vinculacionDocente := CargarVinculacionDocente(idVinculacionStr)
 	fmt.Println(vinculacionDocente)
 	escalafon := CargarEscalafon(strconv.Itoa(vinculacionDocente.IdPersona))
-	fmt.Println("ESCALAFON 1")
 	fmt.Println(escalafon)
 	if EsDocentePlanta(strconv.Itoa(vinculacionDocente.IdPersona)) && strings.ToLower(vinculacionDocente.IdResolucion.NivelAcademico) == "posgrado" {
 		fmt.Println(EsDocentePlanta(strconv.Itoa(vinculacionDocente.IdPersona)))
@@ -43,7 +41,6 @@ func (c *CalculoSalarioController) CalcularSalarioContratacion() {
 
 	predicados := `valor_punto(` + strconv.Itoa(CargarPuntoSalarial().ValorPunto) + `, 2016).` + "\n"
 	predicados = predicados + `categoria(` + strconv.Itoa(vinculacionDocente.IdPersona) + `,` + strings.ToLower(escalafon) + `, 2016).` + "\n"
-	fmt.Println("MADRAZOOOOOOOOOO ENTRE LOS PREDICADOS DE MIERDA")
 	fmt.Println(vinculacionDocente.IdPersona)
 	fmt.Println(vinculacionDocente.IdDedicacion.NombreDedicacion)
 	fmt.Println(vinculacionDocente.IdDedicacion.NombreDedicacion)
@@ -60,7 +57,6 @@ func (c *CalculoSalarioController) CalcularSalarioContratacion() {
 	}
 	f, _ := strconv.ParseFloat(a, 64)
 	salario := int(f)
-	fmt.Println("asaXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
 	fmt.Println(salario)
 	c.Data["json"] = salario
 	c.ServeJSON()
@@ -76,13 +72,13 @@ func (c *CalculoSalarioController) CalcularSalarioContratacion() {
 func (c *CalculoSalarioController) CalcularSalarioPrecontratacion() {
 	id_resolucion := c.Ctx.Input.Param(":id_resolucion")
 	nivel_academico := c.Ctx.Input.Param(":nivel_academico")
-
+	var a string
 	var categoria string
 	var docentes_precontratados []models.DocentePrecontratado
 	fmt.Println(id_resolucion)
 
 	if err := getJson("http://10.20.0.254/administrativa_amazon_api/v1/precontratado/"+id_resolucion, &docentes_precontratados); err == nil {
-
+		fmt.Println(docentes_precontratados)
 	} else {
 		fmt.Println(err)
 	}
@@ -109,7 +105,7 @@ func (c *CalculoSalarioController) CalcularSalarioPrecontratacion() {
 		reglasbase := CargarReglasBase("CDVE")
 		reglasbase = reglasbase + predicados
 		m := NewMachine().Consult(reglasbase)
-		var a string
+		
 		contratos := m.ProveAll(`valor_contrato(` + strings.ToLower(nivel_academico) + `,` + strconv.Itoa(docente.Id) + `,2016,X).`)
 		for _, solution := range contratos {
 			a = fmt.Sprintf("%s", solution.ByName_("X"))
@@ -123,7 +119,7 @@ func (c *CalculoSalarioController) CalcularSalarioPrecontratacion() {
 	salario := int(f)
 	
 	fmt.Println(salario)
-	c.Data["json"] = salario
+	c.Data["json"] = docentes_precontratados
 	c.ServeJSON()
 
 }

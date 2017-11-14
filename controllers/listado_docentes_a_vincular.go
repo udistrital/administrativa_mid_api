@@ -8,7 +8,7 @@ import (
 	"github.com/astaxie/beego"
 	//. "github.com/mndrix/golog"
 	"github.com/udistrital/administrativa_mid_api/models"
-	//. "github.com/udistrital/golog"
+	. "github.com/udistrital/golog"
 )
 
 //ListarDocentesVinculacionController operations for Preliquidacion
