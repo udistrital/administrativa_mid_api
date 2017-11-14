@@ -43,7 +43,7 @@ func init() {
 		beego.ControllerComments{
 			Method: "ValidarContrato",
 			Router: `/:dedicacion/:numHoras`,
-			AllowHTTPMethods: []string{"post"},
+			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
 

@@ -33,12 +33,10 @@ func (c *CalculoSalarioController) CalcularSalarioContratacion() {
 	idVinculacionStr := c.Ctx.Input.Param(":idVinculacion")
 	fmt.Println(idVinculacionStr)
 	vinculacionDocente := CargarVinculacionDocente(idVinculacionStr)
-	fmt.Println("aca va el putazo de la primera funcion")
 	fmt.Println(vinculacionDocente)
 	escalafon := CargarEscalafon(strconv.Itoa(vinculacionDocente.IdPersona))
-	fmt.Println("21132312132")
-	fmt.Println(vinculacionDocente.IdPersona)
-	fmt.Println("21132312132")
+	fmt.Println("ESCALAFON 1")
+	fmt.Println(escalafon)
 	if EsDocentePlanta(strconv.Itoa(vinculacionDocente.IdPersona)) && strings.ToLower(vinculacionDocente.IdResolucion.NivelAcademico) == "posgrado" {
 		fmt.Println(EsDocentePlanta(strconv.Itoa(vinculacionDocente.IdPersona)))
 		escalafon = escalafon + "ud"
@@ -47,6 +45,8 @@ func (c *CalculoSalarioController) CalcularSalarioContratacion() {
 	predicados := `valor_punto(` + strconv.Itoa(CargarPuntoSalarial().ValorPunto) + `, 2016).` + "\n"
 	predicados = predicados + `categoria(` + strconv.Itoa(vinculacionDocente.IdPersona) + `,` + strings.ToLower(escalafon) + `, 2016).` + "\n"
 	fmt.Println("MADRAZOOOOOOOOOO ENTRE LOS PREDICADOS DE MIERDA")
+	fmt.Println(vinculacionDocente.IdPersona)
+	fmt.Println(vinculacionDocente.IdDedicacion.NombreDedicacion)
 	fmt.Println(vinculacionDocente.IdDedicacion.NombreDedicacion)
 	predicados = predicados + `vinculacion(` + strconv.Itoa(vinculacionDocente.IdPersona) + `,` + strings.ToLower(vinculacionDocente.IdDedicacion.NombreDedicacion) + `,2016).` + "\n"
 	predicados = predicados + `horas(` + strconv.Itoa(vinculacionDocente.IdPersona) + `,` + strconv.Itoa(vinculacionDocente.NumeroHorasSemanales*vinculacionDocente.NumeroSemanas) + `,2016).` + "\n"
@@ -61,6 +61,8 @@ func (c *CalculoSalarioController) CalcularSalarioContratacion() {
 	}
 	f, _ := strconv.ParseFloat(a, 64)
 	salario := int(f)
+	fmt.Println("asaXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+	fmt.Println(salario)
 	c.Data["json"] = salario
 	c.ServeJSON()
 
@@ -114,6 +116,8 @@ func (c *CalculoSalarioController) CalcularSalarioPrecontratacion() {
 	}
 	f, _ := strconv.ParseFloat(a, 64)
 	salario := int(f)
+	
+	fmt.Println(salario)
 	c.Data["json"] = salario
 	c.ServeJSON()
 
@@ -121,10 +125,18 @@ func (c *CalculoSalarioController) CalcularSalarioPrecontratacion() {
 
 func CargarEscalafon(idPersona string) (e string) {
 	escalafon := ""
-	var v []models.CategoriaPersona
-
-	if err := getJson("http://10.20.0.254/hvapi/v1/categoria_persona/?query=PersonaId%3A"+idPersona, &v); err == nil {
-		escalafon = v[0].IdTipoCategoria.NombreCategoria
+	idnatural:= ""
+	var v []models.EscalafonPersona
+	var x []models.InformacionProveedor
+	fmt.Println(idPersona)
+	if err := getJson("http://10.20.0.254/administrativa_amazon_api/v1/informacion_proveedor?query=NumDocumento:"+idPersona, &x); err == nil {
+		idnatural = strconv.Itoa(x[0].Id)
+		fmt.Println(idnatural)
+	} else {
+		fmt.Println(err)
+	}
+	if err := getJson("http://10.20.0.254/administrativa_amazon_api/v1/escalafon_persona?query=IdPersonaNatural:"+idnatural, &v); err == nil {
+		escalafon = v[0].IdEscalafon.NombreEscalafon
 		fmt.Println(escalafon)
 	} else {
 		fmt.Println(err)
@@ -137,7 +149,7 @@ func CargarVinculacionDocente(idVinculacion string) (a models.VinculacionDocente
 	fmt.Println("putazo numero 2")
 	fmt.Println(idVinculacion)
 
-	if err := getJson("http://10.20.2.121:8080/v1/vinculacion_docente/?query=Id:"+idVinculacion, &v); err == nil {
+	if err := getJson("http://10.20.0.254/administrativa_amazon_api/v1/vinculacion_docente/?query=Id:"+idVinculacion, &v); err == nil {
 		fmt.Println(v[0])
 		fmt.Println("putazo if de error models")
 		fmt.Println(v[0])

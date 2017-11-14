@@ -1,0 +1,280 @@
+swagger: "2.0"
+info:
+  title: beego Test API
+  description: beego has a very cool tools to autogenerate documents for your API
+  version: 1.0.0
+  termsOfService: http://beego.me/
+  contact:
+    email: astaxie@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+basePath: /v1
+paths:
+  /calculo_salarioContratacion/{idVinculacion}:
+    get:
+      tags:
+      - calculo_salario
+      description: create CalcularSalarioContratacion
+      operationId: CalculoSalarioController.CalcularSalarioContratacion
+      responses:
+        "201":
+          description: '{int} models.ContratoGeneral'
+        "403":
+          description: body is empty
+  /calculo_salarioPrecontratacion/{nivelAcademico}/{idProfesor}/{numHoras}/{numSemanas}/{categoria}/{dedicacion}:
+    post:
+      tags:
+      - calculo_salario
+      description: create CalcularSalarioPrecontratacion
+      operationId: CalculoSalarioController.CalcularSalarioPrecontratacion
+      responses:
+        "201":
+          description: '{int} models.ContratoGeneral'
+        "403":
+          description: body is empty
+  /cancelacion_valida/{idResolucion}:
+    post:
+      tags:
+      - cancelacion_valida
+      description: create ValidarCancelacion
+      operationId: CancelacionValidaController.ValidarCancelacion
+      responses:
+        "201":
+          description: '{int} models.ContratoGeneral'
+        "403":
+          description: body is empty
+  /informacion_proveedor/contratoPersona:
+    post:
+      tags:
+      - informacion_proveedor
+      description: create InformacionProveedor
+      operationId: InformacionProveedorController.contratoProveedor
+      parameters:
+      - in: body
+        name: body
+        description: body for ContratoGeneral content
+        required: true
+        schema:
+          $ref: '#/definitions/models.ContratoGeneral'
+      responses:
+        "201":
+          description: '{int} models.ContratoGeneral'
+        "403":
+          description: body is empty
+  /validar_contrato/{dedicacion}/{numHoras}:
+    get:
+      tags:
+      - validar_contrato
+      description: create ValidarContrato
+      operationId: ValidarContratoController.ValidarContrato
+      responses:
+        "201":
+          description: '{int} models.ContratoGeneral'
+        "403":
+          description: body is empty
+definitions:
+  models.ContratoGeneral:
+    title: ContratoGeneral
+    type: object
+    properties:
+      ClaseContratista:
+        type: integer
+        format: int64
+      ClausulaRegistroPresupuestal:
+        type: boolean
+      Condiciones:
+        type: string
+      Contratista:
+        type: integer
+        format: int64
+      Convenio:
+        type: string
+      DependenciaSolicitante:
+        type: string
+      DescripcionFormaPago:
+        type: string
+      Estado:
+        type: boolean
+      FechaRegistro:
+        type: string
+        format: string
+      FormaPago:
+        $ref: '#/definitions/models.Parametros'
+      Id:
+        type: string
+      Justificacion:
+        type: string
+      LugarEjecucion:
+        $ref: '#/definitions/models.LugarEjecucion'
+      ModalidadSeleccion:
+        type: integer
+        format: int64
+      NumeroCdp:
+        type: integer
+        format: int64
+      NumeroConstancia:
+        type: integer
+        format: int64
+      NumeroSolicitudNecesidad:
+        type: integer
+        format: int64
+      ObjetoContrato:
+        type: string
+      Observaciones:
+        type: string
+      OrdenadorGasto:
+        type: integer
+        format: int64
+      OrigenPresupueso:
+        type: integer
+        format: int64
+      OrigenRecursos:
+        type: integer
+        format: int64
+      PlazoEjecucion:
+        type: integer
+        format: int64
+      Procedimiento:
+        type: integer
+        format: int64
+      RegimenContratacion:
+        type: integer
+        format: int64
+      RegistroPresupuestal:
+        type: integer
+        format: int64
+      SedeSolicitante:
+        type: string
+      Supervisor:
+        $ref: '#/definitions/models.SupervisorContrato'
+      TemaGastoInversion:
+        type: integer
+        format: int64
+      TipoCompromiso:
+        type: integer
+        format: int64
+      TipoContrato:
+        $ref: '#/definitions/models.TipoContrato'
+      TipoControl:
+        type: integer
+        format: int64
+      TipoGasto:
+        type: integer
+        format: int64
+      TipoMoneda:
+        type: integer
+        format: int64
+      TipologiaContrato:
+        type: integer
+        format: int64
+      UnidadEjecucion:
+        $ref: '#/definitions/models.Parametros'
+      UnidadEjecutora:
+        type: integer
+        format: int64
+      ValorContrato:
+        type: number
+        format: double
+      ValorContratoMe:
+        type: number
+        format: double
+      ValorTasaCambio:
+        type: number
+        format: double
+      VigenciaContrato:
+        type: integer
+        format: int64
+  models.LugarEjecucion:
+    title: LugarEjecucion
+    type: object
+    properties:
+      Ciudad:
+        type: number
+        format: double
+      Dependencia:
+        type: string
+      Direccion:
+        type: string
+      Id:
+        type: integer
+        format: int64
+      Sede:
+        type: string
+  models.Parametros:
+    title: Parametros
+    type: object
+    properties:
+      CodigoContraloria:
+        type: string
+      Descripcion:
+        type: string
+      EstadoRegistro:
+        type: boolean
+      FechaRegistro:
+        type: string
+        format: string
+      Id:
+        type: integer
+        format: int64
+      RelParametro:
+        $ref: '#/definitions/models.RelacionParametro'
+  models.RelacionParametro:
+    title: RelacionParametro
+    type: object
+    properties:
+      Descripcion:
+        type: string
+      EstadoRegistro:
+        type: boolean
+      FechaRegistro:
+        type: string
+        format: string
+      Id:
+        type: integer
+        format: int64
+  models.SupervisorContrato:
+    title: SupervisorContrato
+    type: object
+    properties:
+      Cargo:
+        type: string
+      DependenciaSupervisor:
+        type: string
+      DigitoVerificacion:
+        type: integer
+        format: int64
+      Documento:
+        type: integer
+        format: int64
+      Estado:
+        type: boolean
+      Id:
+        type: integer
+        format: int64
+      Nombre:
+        type: string
+      SedeSupervisor:
+        type: string
+      Tipo:
+        type: integer
+        format: int64
+  models.TipoContrato:
+    title: TipoContrato
+    type: object
+    properties:
+      Id:
+        type: integer
+        format: int64
+      TipoContrato:
+        type: string
+tags:
+- name: informacion_proveedor
+  description: |
+    InformacionProveedorController operations for InformacionProveedor
+- name: calculo_salario
+  description: |
+    PreliquidacionController operations for Preliquidacion
+- name: validarCambioEstado
+  description: |
+    CambioEstadoContratoValidoController operations for CambioEstadoContratoValido

@@ -23,7 +23,7 @@ func (c *ValidarContratoController) URLMapping() {
 // @Description create ValidarContrato
 // @Success 201 {int} models.ContratoGeneral
 // @Failure 403 body is empty
-// @router /:dedicacion/:numHoras [post]
+// @router /:dedicacion/:numHoras [get]
 func (c *ValidarContratoController) ValidarContrato() {
 	dedicacion := c.Ctx.Input.Param(":dedicacion")
 	numHorasStr := c.Ctx.Input.Param(":numHoras")
