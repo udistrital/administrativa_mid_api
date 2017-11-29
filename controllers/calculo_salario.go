@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"encoding/json"
 	"strconv"
 	"strings"
 	"github.com/astaxie/beego"
@@ -18,8 +19,29 @@ type CalculoSalarioController struct {
 // URLMapping ...
 func (c *CalculoSalarioController) URLMapping() {
 	c.Mapping("CalcularSalarioContratacion", c.CalcularSalarioContratacion)
-	c.Mapping("CalcularSalarioPrecontratacion", c.CalcularSalarioPrecontratacion)
+	c.Mapping("InsertarPrevinculaciones", c.InsertarPrevinculaciones)
 }
+
+
+// InsertarPrevinculaciones ...
+// @Title InsetarPrevinculaciones
+// @Description create InsertarPrevinculaciones
+// @Success 201 {int} models.VinculacionDocente
+// @Failure 403 body is empty
+// @router Contratacion/insertar_previnculaciones [post]
+func (c *CalculoSalarioController) InsertarPrevinculaciones() {
+
+	var v []models.Docente_a_vincular
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+		CalcularSalarioPrecontratacion(v)
+	} else {
+		fmt.Println("ERROR")
+		fmt.Println(err)
+
+	}
+
+}
+
 
 // CalcularSalarioContratacion ...
 // @Title CalcularSalarioContratacion
@@ -63,28 +85,15 @@ func (c *CalculoSalarioController) CalcularSalarioContratacion() {
 
 }
 
-// CalcularSalarioPrecontratacion ...
-// @Title CalcularSalarioPrecontratacion
-// @Description create CalcularSalarioPrecontratacion
-// @Success 201 {int} models.ContratoGeneral
-// @Failure 403 body is empty
-// @router Precontratacion/:id_resolucion/:nivel_academico [post]
-func (c *CalculoSalarioController) CalcularSalarioPrecontratacion() {
-	id_resolucion := c.Ctx.Input.Param(":id_resolucion")
-	nivel_academico := c.Ctx.Input.Param(":nivel_academico")
+func CalcularSalarioPrecontratacion(docentes_a_vincular []models.Docente_a_vincular) {
+	//id_resolucion := 141
+	nivel_academico := "pregrado"
 	var a string
 	var categoria string
-	var docentes_precontratados []models.DocentePrecontratado
-	fmt.Println(id_resolucion)
 
-	if err := getJson("http://10.20.0.254/administrativa_amazon_api/v1/precontratado/"+id_resolucion, &docentes_precontratados); err == nil {
-		fmt.Println(docentes_precontratados)
-	} else {
-		fmt.Println(err)
-	}
 
-	for x, docente := range docentes_precontratados {
-		docentes_precontratados[x].NombreCompleto = docente.PrimerNombre + " " + docente.SegundoNombre + " " + docente.PrimerApellido + " " + docente.SegundoApellido
+	for x, docente := range docentes_a_vincular {
+		//docentes_a_vincular[x].NombreCompleto = docente.PrimerNombre + " " + docente.SegundoNombre + " " + docente.PrimerApellido + " " + docente.SegundoApellido
 
 		if EsDocentePlanta(strconv.Itoa(docente.Id)) && strings.ToLower(nivel_academico) == "posgrado" {
 			categoria = categoria + "ud"
@@ -105,22 +114,22 @@ func (c *CalculoSalarioController) CalcularSalarioPrecontratacion() {
 		reglasbase := CargarReglasBase("CDVE")
 		reglasbase = reglasbase + predicados
 		m := NewMachine().Consult(reglasbase)
-		
+
 		contratos := m.ProveAll(`valor_contrato(` + strings.ToLower(nivel_academico) + `,` + strconv.Itoa(docente.Id) + `,2016,X).`)
 		for _, solution := range contratos {
 			a = fmt.Sprintf("%s", solution.ByName_("X"))
 		}
 		f, _ := strconv.ParseFloat(a, 64)
 		salario := int(f)
-		docentes_precontratados[x].ValorContrato = salario
+		docentes_a_vincular[x].ValorContrato = salario
 
 	}
 	f, _ := strconv.ParseFloat(a, 64)
 	salario := int(f)
-	
+
 	fmt.Println(salario)
-	c.Data["json"] = docentes_precontratados
-	c.ServeJSON()
+
+	fmt.Println(docentes_a_vincular)
 
 }
 

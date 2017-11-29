@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"fmt"
-	//"strconv"
+	"strconv"
 	//"strings"
 	"encoding/json"
 	"github.com/astaxie/beego"
@@ -38,16 +38,58 @@ func (c *ListarDocentesVinculacionController) ListarDocentesCargaHoraria() {
 	tipo_vinculacion := c.GetString("tipo_vinculacion")
 	facultad := c.GetString("facultad")
 
-	fmt.Println(vigencia)
-	fmt.Println(periodo)
-	fmt.Println(tipo_vinculacion)
-	fmt.Println(facultad)
+	docentes_x_carga_horaria := ListarDocentesHorasLectivas(vigencia, periodo, tipo_vinculacion, facultad)
 
-	tipo_vinculacion_old := HomologarDedicacion(tipo_vinculacion)
-	facultad_old := HomologarFacultad(facultad)
+	//BUSCAR CATEGORÍA DE CADA DOCENTE
+	for x, pos := range  docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
+		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].CategoriaNombre,docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDCategoria  = Buscar_Categoria_Docente(vigencia, periodo, pos.DocDocente)
+	}
+
+	//RETORNAR CON ID DE TIPO DE VINCULACION DE NUEVO MODELO
+	for x, pos := range  docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
+		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDTipoVinculacion = HomologarDedicacion_ID("old",pos.IDTipoVinculacion)
+	}
+
+	//RETORNAR FACULTTADES CON ID DE OIKOS, HOMOLOGACION
+	for x, pos := range  docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
+		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDFacultad = HomologarFacultad("old",pos.IDFacultad)
+	}
+
+	//RETORNAR PROYECTOS CURRICUALRES HOMOLOGADOS!!
+	for x, pos := range  docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
+		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDProyecto = HomologarProyectoCurricular("old",pos.IDProyecto)
+	}
+
+	for x, pos := range  docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
+		queryInformacionProveedor := "?query=NumDocumento:"+pos.DocDocente
+		var informacion_proveedor []models.InformacionProveedor
+		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudArgo")+"/informacion_proveedor/"+queryInformacionProveedor, &informacion_proveedor); err2 == nil {
+			if(informacion_proveedor != nil){
+				docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IdProveedor = strconv.Itoa(informacion_proveedor[0].Id)
+			}else{
+				docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IdProveedor = ""
+			}
+
+		}
+		//docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IdProveedor = HomologarProyectoCurricular("old",pos.IDProyecto)
+	}
+
+
+
+
+	c.Ctx.Output.SetStatus(201)
+	c.Data["json"] = 	docentes_x_carga_horaria .CargasLectivas.CargaLectiva
+	c.ServeJSON()
+
+}
+
+func ListarDocentesHorasLectivas(vigencia, periodo, tipo_vinculacion, facultad string)(docentes_a_listar models.ObjetoCargaLectiva){
+
+	tipo_vinculacion_old := HomologarDedicacion_nombre(tipo_vinculacion)
+	facultad_old := HomologarFacultad("new",facultad)
 
 	var temp map[string]interface{}
-	var docentes_a_listar models.ObjetoCargaLectiva
+	var docentes_x_carga models.ObjetoCargaLectiva
 
 	for _, pos := range  tipo_vinculacion_old {
 		if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_academicos.HTTPEndpoint/carga_lectiva/"+vigencia+"/"+periodo+"/"+pos+"/"+facultad_old, &temp); err == nil && temp != nil{
@@ -56,11 +98,11 @@ func (c *ListarDocentesVinculacionController) ListarDocentesCargaHoraria() {
 		 if error_json == nil {
 			 var temp_docentes models.ObjetoCargaLectiva
 			 json.Unmarshal(jsonDocentes, &temp_docentes)
-			 docentes_a_listar.CargasLectivas.CargaLectiva = append(docentes_a_listar.CargasLectivas.CargaLectiva, temp_docentes.CargasLectivas.CargaLectiva...)
-			 c.Ctx.Output.SetStatus(201)
-			 c.Data["json"] = docentes_a_listar.CargasLectivas.CargaLectiva
+			 docentes_x_carga.CargasLectivas.CargaLectiva = append(docentes_x_carga.CargasLectivas.CargaLectiva, temp_docentes.CargasLectivas.CargaLectiva...)
+			 //c.Ctx.Output.SetStatus(201)
+			 //c.Data["json"] = docentes_a_listar.CargasLectivas.CargaLectiva
 		 }else{
-			 c.Data["json"] = error_json.Error()
+			// c.Data["json"] = error_json.Error()
 		 }
 	 }else {
 		 fmt.Println(err)
@@ -68,16 +110,96 @@ func (c *ListarDocentesVinculacionController) ListarDocentesCargaHoraria() {
 	 }
 	 }
 
-
-
-
-	c.ServeJSON()
+	 return docentes_x_carga;
 
 }
 
-func HomologarFacultad(facultad string)(facultad_old string){
+func Buscar_Categoria_Docente(vigencia, periodo, documento_ident string)(categoria_nombre, categoria_id_old string){
+	var temp map[string]interface{}
+	var nombre_categoria string
+	var id_categoria_old string
+
+	if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_urano_pruebas/categoria_docente/"+vigencia+"/"+periodo+"/79708124", &temp); err == nil && temp != nil{
+	 jsonDocentes, error_json := json.Marshal(temp)
+
+	 if error_json == nil {
+		 var temp_docentes models.ObjetoCategoriaDocente
+		 json.Unmarshal(jsonDocentes, &temp_docentes)
+		 nombre_categoria = temp_docentes.CategoriaDocente.Categoria
+		 id_categoria_old = temp_docentes.CategoriaDocente.IDCategoria
+
+	 }else{
+		 fmt.Println(error_json.Error())
+		// c.Data["json"] = error_json.Error()
+	 }
+ }else {
+	 fmt.Println(err)
+
+ }
+
+ return nombre_categoria,id_categoria_old
+}
+
+func HomologacionTotal(){
+
+}
+
+func HomologarProyectoCurricular(tipo, proyecto string)(proyecto_old string){
+	var id_proyecto_old string
+	var comparacion string
+	var resultado string
+	homologacion_proyectos := `[
+						{
+							"old": "20",
+							"new": "72"
+						},
+						{
+							"old": "25",
+							"new": "70"
+						},
+						{
+							"old": "7",
+							"new": "73"
+						},
+						{
+							"old": "5",
+							"new": "74"
+						},
+						{
+							"old": "15",
+							"new": "79"
+						}
+						]`
+
+	 byt := []byte(homologacion_proyectos)
+	 var arreglo_homologacion []models.Homologacion
+	 if err := json.Unmarshal(byt, &arreglo_homologacion); err != nil {
+			 panic(err)
+	 }
+
+
+	 for _, pos := range  arreglo_homologacion{
+		 	if(tipo == "new"){
+				comparacion = pos.New
+				resultado = pos.Old
+			}else{
+				comparacion = pos.Old
+				resultado = pos.New
+			}
+
+			if(comparacion == proyecto){
+				id_proyecto_old = resultado
+		}
+ 	}
+
+	return id_proyecto_old
+}
+
+func HomologarFacultad(tipo, facultad string)(facultad_old string){
 
 	var id_facultad_old string
+	var comparacion string
+	var resultado string
 	homologacion_facultad := `[
 						{
 							"old": "33",
@@ -107,17 +229,25 @@ func HomologarFacultad(facultad string)(facultad_old string){
 			 panic(err)
 	 }
 
+
 	 for _, pos := range  arreglo_homologacion{
-			if(pos.New == facultad){
-				id_facultad_old = pos.Old
+		 	if(tipo == "new"){
+				comparacion = pos.New
+				resultado = pos.Old
+			}else{
+				comparacion = pos.Old
+				resultado = pos.New
+			}
+
+			if(comparacion == facultad){
+				id_facultad_old = resultado
 		}
  	}
-	fmt.Println("resultado homologacion facultad")
-	fmt.Println(id_facultad_old)
+
 	return id_facultad_old
 }
 
-func HomologarDedicacion(dedicacion string)(vinculacion_old []string){
+func HomologarDedicacion_nombre(dedicacion string)(vinculacion_old []string){
 	var id_dedicacion_old []string
 	homologacion_dedicacion := `[
 						{
@@ -153,11 +283,59 @@ func HomologarDedicacion(dedicacion string)(vinculacion_old []string){
 		}
  	}
 
-	fmt.Println("resultado homologacion dedicacion")
-	fmt.Println(id_dedicacion_old)
+
 	return id_dedicacion_old
 }
 
+func HomologarDedicacion_ID(tipo,dedicacion string)(vinculacion_old string){
+	var id_dedicacion_old string
+	var comparacion string
+	var resultado string
+	homologacion_dedicacion := `[
+						{
+							"nombre": "HCP",
+							"old": "5",
+							"new": "1"
+						},
+						{
+							"nombre": "HCS",
+							"old": "4",
+							"new": "2"
+						},
+						{
+							"nombre": "TCO|MTO",
+							"old": "2",
+							"new": "4"
+						},{
+							"nombre": "TCO|MTO",
+							"old": "3",
+							"new": "3"
+						}
+						]`
+
+	 byt := []byte(homologacion_dedicacion)
+	 var arreglo_homologacion []models.HomologacionDedicacion
+	 if err := json.Unmarshal(byt, &arreglo_homologacion); err != nil {
+			 panic(err)
+	 }
+
+	 for _, pos := range  arreglo_homologacion{
+					 if(tipo == "new"){
+					 comparacion = pos.New
+					 resultado = pos.Old
+				 }else{
+					 comparacion = pos.Old
+					 resultado = pos.New
+				 }
+
+				 if(comparacion == dedicacion){
+					 id_dedicacion_old = resultado
+			 }
+ 	}
+
+
+	return id_dedicacion_old
+}
 //err := json.Unmarshal(jsonDocentes, &docentes_a_listar)
 		//fmt.Println(err)
 		//fmt.Println(docentes_a_listar)

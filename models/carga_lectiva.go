@@ -19,8 +19,21 @@ type ObjetoCargaLectiva struct {
 			Periodo               string `json:"periodo"`
 			DocenteApellido       string `json:"docente_apellido"`
 			DocenteNombre       string `json:"docente_nombre"`
+			CategoriaNombre 		string
+			IDCategoria					string
+			IdProveedor					string
 		} `json:"carga_lectiva"`
 	} `json:"cargas_lectivas"`
+}
+
+type ObjetoCategoriaDocente struct {
+	CategoriaDocente struct {
+		Anio           string `json:"anio"`
+		Categoria      string `json:"categoria"`
+		Identificacion string `json:"identificacion"`
+		IDCategoria    string `json:"id_categoria"`
+		Periodo        string `json:"periodo"`
+	} `json:"categoria_docente"`
 }
 
 type Homologacion struct {
