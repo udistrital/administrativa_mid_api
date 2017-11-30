@@ -9,14 +9,6 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:CalculoSalarioController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:CalculoSalarioController"],
 		beego.ControllerComments{
-			Method: "CalcularSalarioContratacion",
-			Router: `Contratacion/:idVinculacion`,
-			AllowHTTPMethods: []string{"get"},
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:CalculoSalarioController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:CalculoSalarioController"],
-		beego.ControllerComments{
 			Method: "InsertarPrevinculaciones",
 			Router: `Contratacion/insertar_previnculaciones`,
 			AllowHTTPMethods: []string{"post"},

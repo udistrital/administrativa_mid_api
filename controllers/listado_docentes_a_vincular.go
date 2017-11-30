@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"fmt"
-	"strconv"
+	//"strconv"
 	//"strings"
 	"encoding/json"
 	"github.com/astaxie/beego"
@@ -47,7 +47,15 @@ func (c *ListarDocentesVinculacionController) ListarDocentesCargaHoraria() {
 
 	//RETORNAR CON ID DE TIPO DE VINCULACION DE NUEVO MODELO
 	for x, pos := range  docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
-		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDTipoVinculacion = HomologarDedicacion_ID("old",pos.IDTipoVinculacion)
+		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDTipoVinculacion, docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].NombreTipoVinculacion  = HomologarDedicacion_ID("old",pos.IDTipoVinculacion)
+		if (docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDTipoVinculacion == "3"){
+			docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].HorasLectivas	= "20"
+			docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].NombreTipoVinculacion = "MTO"
+		}
+		if(docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDTipoVinculacion == "4"){
+			docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].HorasLectivas	= "40"
+			docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].NombreTipoVinculacion = "TCO"
+		}
 	}
 
 	//RETORNAR FACULTTADES CON ID DE OIKOS, HOMOLOGACION
@@ -59,22 +67,6 @@ func (c *ListarDocentesVinculacionController) ListarDocentesCargaHoraria() {
 	for x, pos := range  docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
 		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDProyecto = HomologarProyectoCurricular("old",pos.IDProyecto)
 	}
-
-	for x, pos := range  docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
-		queryInformacionProveedor := "?query=NumDocumento:"+pos.DocDocente
-		var informacion_proveedor []models.InformacionProveedor
-		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudArgo")+"/informacion_proveedor/"+queryInformacionProveedor, &informacion_proveedor); err2 == nil {
-			if(informacion_proveedor != nil){
-				docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IdProveedor = strconv.Itoa(informacion_proveedor[0].Id)
-			}else{
-				docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IdProveedor = ""
-			}
-
-		}
-		//docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IdProveedor = HomologarProyectoCurricular("old",pos.IDProyecto)
-	}
-
-
 
 
 	c.Ctx.Output.SetStatus(201)
@@ -287,8 +279,9 @@ func HomologarDedicacion_nombre(dedicacion string)(vinculacion_old []string){
 	return id_dedicacion_old
 }
 
-func HomologarDedicacion_ID(tipo,dedicacion string)(vinculacion_old string){
+func HomologarDedicacion_ID(tipo,dedicacion string)(vinculacion_old, nombre_vinculacion string){
 	var id_dedicacion_old string
+	var nombre_dedicacion string
 	var comparacion string
 	var resultado string
 	homologacion_dedicacion := `[
@@ -330,11 +323,12 @@ func HomologarDedicacion_ID(tipo,dedicacion string)(vinculacion_old string){
 
 				 if(comparacion == dedicacion){
 					 id_dedicacion_old = resultado
+					 nombre_dedicacion = pos.Nombre
 			 }
  	}
 
 
-	return id_dedicacion_old
+	return id_dedicacion_old, nombre_dedicacion
 }
 //err := json.Unmarshal(jsonDocentes, &docentes_a_listar)
 		//fmt.Println(err)
