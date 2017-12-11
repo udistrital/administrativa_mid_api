@@ -52,49 +52,6 @@ func (c *CalculoSalarioController) InsertarPrevinculaciones() {
 }
 
 
-// CalcularSalarioContratacion ...
-// @Title CalcularSalarioContratacion
-// @Description create CalcularSalarioContratacion
-// @Success 201 {int} models.ContratoGeneral
-// @Failure 403 body is empty
-// @router Contratacion/:idVinculacion [get]
-/*
-func (c *CalculoSalarioController) CalcularSalarioContratacion() {
-	idVinculacionStr := c.Ctx.Input.Param(":idVinculacion")
-	fmt.Println(idVinculacionStr)
-	vinculacionDocente := CargarVinculacionDocente(idVinculacionStr)
-	fmt.Println(vinculacionDocente)
-	escalafon := CargarEscalafon(strconv.Itoa(vinculacionDocente.IdPersona))
-	fmt.Println(escalafon)
-	if EsDocentePlanta(strconv.Itoa(vinculacionDocente.IdPersona)) && strings.ToLower(vinculacionDocente.IdResolucion.NivelAcademico) == "posgrado" {
-		fmt.Println(EsDocentePlanta(strconv.Itoa(vinculacionDocente.IdPersona)))
-		escalafon = escalafon + "ud"
-	}
-
-	predicados := `valor_punto(` + strconv.Itoa(CargarPuntoSalarial().ValorPunto) + `, 2016).` + "\n"
-	predicados = predicados + `categoria(` + strconv.Itoa(vinculacionDocente.IdPersona) + `,` + strings.ToLower(escalafon) + `, 2016).` + "\n"
-	fmt.Println(vinculacionDocente.IdPersona)
-	fmt.Println(vinculacionDocente.IdDedicacion.NombreDedicacion)
-	fmt.Println(vinculacionDocente.IdDedicacion.NombreDedicacion)
-	predicados = predicados + `vinculacion(` + strconv.Itoa(vinculacionDocente.IdPersona) + `,` + strings.ToLower(vinculacionDocente.IdDedicacion.NombreDedicacion) + `,2016).` + "\n"
-	predicados = predicados + `horas(` + strconv.Itoa(vinculacionDocente.IdPersona) + `,` + strconv.Itoa(vinculacionDocente.NumeroHorasSemanales*vinculacionDocente.NumeroSemanas) + `,2016).` + "\n"
-	reglasbase := CargarReglasBase("CDVE")
-	reglasbase = reglasbase + predicados
-	//fmt.Println(reglasbase)
-	m := NewMachine().Consult(reglasbase)
-	var a string
-	contratos := m.ProveAll(`valor_contrato(` + strings.ToLower(vinculacionDocente.IdResolucion.NivelAcademico) + `,` + strconv.Itoa(vinculacionDocente.IdPersona) + `,2016,X).`)
-	for _, solution := range contratos {
-		a = fmt.Sprintf("%s", solution.ByName_("X"))
-	}
-	f, _ := strconv.ParseFloat(a, 64)
-	salario := int(f)
-	fmt.Println(salario)
-	c.Data["json"] = salario
-	c.ServeJSON()
-
-}
-*/
 func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDocente)(docentes_a_insertar []models.VinculacionDocente) {
 	//id_resolucion := 141
 	nivel_academico := docentes_a_vincular[0].NivelAcademico

@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"fmt"
-	//"strconv"
+	"strconv"
 	//"strings"
 	"encoding/json"
 	"github.com/astaxie/beego"
@@ -19,6 +19,37 @@ type ListarDocentesVinculacionController struct {
 // URLMapping ...
 func (c *ListarDocentesVinculacionController) URLMapping() {
 	c.Mapping("ListarDocentesCargaHoraria", c.ListarDocentesCargaHoraria)
+
+}
+
+// ListarDocentesVinculacionController ...
+// @Title ListarDocentesPrevinculados
+// @Description create ListarDocentesPrevinculados
+// @Param id_resolucion query string false "resolucion a consultar"
+// @Success 201 {int} models.VinculacionDocente
+// @Failure 403 body is empty
+// @router /docentes_previnculados [get]
+func (c *ListarDocentesVinculacionController) ListarDocentesPrevinculados(){
+	id_resolucion := c.GetString("id_resolucion")
+	fmt.Println("resolucion a consultar")
+	fmt.Println(id_resolucion)
+	query := "?limit=-1&query=IdResolucion.Id:"+id_resolucion
+	var v []models.VinculacionDocente
+
+	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudArgo")+"/"+beego.AppConfig.String("NscrudArgo")+"/vinculacion_docente"+query, &v); err2 == nil {
+		for x, pos := range  v{
+			documento_identidad,_ := strconv.Atoi(pos.IdPersona)
+			v[x].NombreCompleto = BuscarNombreProveedor(documento_identidad);
+		}
+
+	}else{
+		fmt.Println(err2)
+	}
+
+	c.Ctx.Output.SetStatus(201)
+	c.Data["json"] = 	v
+	c.ServeJSON()
+  //fmt.Println(v)
 
 }
 
@@ -110,7 +141,7 @@ func Buscar_Categoria_Docente(vigencia, periodo, documento_ident string)(categor
 	var temp map[string]interface{}
 	var nombre_categoria string
 	var id_categoria_old string
-
+	//*****ojo, está quemada la cédula por falta de datos*****
 	if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_urano_pruebas/categoria_docente/"+vigencia+"/"+periodo+"/79708124", &temp); err == nil && temp != nil{
 	 jsonDocentes, error_json := json.Marshal(temp)
 
@@ -243,12 +274,12 @@ func HomologarDedicacion_nombre(dedicacion string)(vinculacion_old []string){
 	var id_dedicacion_old []string
 	homologacion_dedicacion := `[
 						{
-							"nombre": "HCP",
+							"nombre": "HCH",
 							"old": "5",
 							"new": "1"
 						},
 						{
-							"nombre": "HCS",
+							"nombre": "HCP",
 							"old": "4",
 							"new": "2"
 						},
@@ -286,12 +317,12 @@ func HomologarDedicacion_ID(tipo,dedicacion string)(vinculacion_old, nombre_vinc
 	var resultado string
 	homologacion_dedicacion := `[
 						{
-							"nombre": "HCP",
+							"nombre": "HCH",
 							"old": "5",
 							"new": "1"
 						},
 						{
-							"nombre": "HCS",
+							"nombre": "HCP",
 							"old": "4",
 							"new": "2"
 						},
@@ -330,6 +361,22 @@ func HomologarDedicacion_ID(tipo,dedicacion string)(vinculacion_old, nombre_vinc
 
 	return id_dedicacion_old, nombre_dedicacion
 }
-//err := json.Unmarshal(jsonDocentes, &docentes_a_listar)
-		//fmt.Println(err)
-		//fmt.Println(docentes_a_listar)
+
+func BuscarNombreProveedor(DocumentoIdentidad int)(nombre_prov string){
+
+		var nom_proveedor string
+		queryInformacionProveedor := "?query=NumDocumento:"+strconv.Itoa(DocumentoIdentidad)
+		var informacion_proveedor []models.InformacionProveedor
+		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudArgo")+"/informacion_proveedor/"+queryInformacionProveedor, &informacion_proveedor); err2 == nil {
+			if(informacion_proveedor != nil){
+				nom_proveedor = informacion_proveedor[0].NomProveedor
+			}else{
+				nom_proveedor = ""
+			}
+
+		}
+
+		return nom_proveedor
+		//docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IdProveedor = HomologarProyectoCurricular("old",pos.IDProyecto)
+
+}

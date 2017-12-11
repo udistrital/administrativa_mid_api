@@ -33,6 +33,14 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:ListarDocentesVinculacionController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:ListarDocentesVinculacionController"],
 		beego.ControllerComments{
+			Method: "ListarDocentesPrevinculados",
+			Router: `/docentes_previnculados`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:ListarDocentesVinculacionController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:ListarDocentesVinculacionController"],
+		beego.ControllerComments{
 			Method: "ListarDocentesCargaHoraria",
 			Router: `/docentes_x_carga_horaria`,
 			AllowHTTPMethods: []string{"get"},
