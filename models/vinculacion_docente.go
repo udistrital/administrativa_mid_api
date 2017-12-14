@@ -23,4 +23,6 @@ type VinculacionDocente struct {
 	Dedicacion				 string
 	ValorContrato      float64
 	NivelAcademico     string
+	Disponibilidad 		   int
+	NumeroDisponibilidad int
 }

@@ -35,6 +35,7 @@ func (c *CalculoSalarioController) InsertarPrevinculaciones() {
 	var id_respuesta interface{}
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+		fmt.Println("docentes a contratar",v)
 		v = CalcularSalarioPrecontratacion(v)
 
 	} else {

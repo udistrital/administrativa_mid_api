@@ -40,6 +40,7 @@ func (c *ListarDocentesVinculacionController) ListarDocentesPrevinculados(){
 		for x, pos := range  v{
 			documento_identidad,_ := strconv.Atoi(pos.IdPersona)
 			v[x].NombreCompleto = BuscarNombreProveedor(documento_identidad);
+			v[x].NumeroDisponibilidad = BuscarNumeroDisponibilidad(pos.Disponibilidad)
 		}
 
 	}else{
@@ -142,7 +143,7 @@ func Buscar_Categoria_Docente(vigencia, periodo, documento_ident string)(categor
 	var nombre_categoria string
 	var id_categoria_old string
 	//*****ojo, está quemada la cédula por falta de datos*****
-	if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_urano_pruebas/categoria_docente/"+vigencia+"/"+periodo+"/79708124", &temp); err == nil && temp != nil{
+	if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_urano_pruebas/categoria_docente/"+vigencia+"/1/79708124", &temp); err == nil && temp != nil{
 	 jsonDocentes, error_json := json.Marshal(temp)
 
 	 if error_json == nil {
@@ -377,6 +378,27 @@ func BuscarNombreProveedor(DocumentoIdentidad int)(nombre_prov string){
 		}
 
 		return nom_proveedor
+		//docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IdProveedor = HomologarProyectoCurricular("old",pos.IDProyecto)
+
+}
+
+
+func BuscarNumeroDisponibilidad(IdCDP int)(numero_disp int){
+
+		var temp []models.Disponibilidad
+		var numero_disponibilidad int
+		if err2 := getJson("http://10.20.0.254/financiera_api/v1/disponibilidad?limit=-1&query=Id:"+strconv.Itoa(IdCDP), &temp); err2 == nil {
+			if(temp != nil){
+				numero_disponibilidad = int(temp[0].NumeroDisponibilidad)
+			
+			}else{
+				numero_disponibilidad = 0
+			}
+
+		}else{
+			fmt.Println("error en json",err2)
+		}
+		return numero_disponibilidad
 		//docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IdProveedor = HomologarProyectoCurricular("old",pos.IDProyecto)
 
 }
