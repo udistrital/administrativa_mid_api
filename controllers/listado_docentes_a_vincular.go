@@ -36,7 +36,7 @@ func (c *ListarDocentesVinculacionController) ListarDocentesPrevinculados(){
 	query := "?limit=-1&query=IdResolucion.Id:"+id_resolucion
 	var v []models.VinculacionDocente
 
-	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudArgo")+"/"+beego.AppConfig.String("NscrudArgo")+"/vinculacion_docente"+query, &v); err2 == nil {
+	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudArgo")+"/vinculacion_docente"+query, &v); err2 == nil {
 		for x, pos := range  v{
 			documento_identidad,_ := strconv.Atoi(pos.IdPersona)
 			v[x].NombreCompleto = BuscarNombreProveedor(documento_identidad);
@@ -44,7 +44,7 @@ func (c *ListarDocentesVinculacionController) ListarDocentesPrevinculados(){
 		}
 
 	}else{
-		fmt.Println(err2)
+		fmt.Println("Error de cosulta en vinculacion",err2)
 	}
 
 	c.Ctx.Output.SetStatus(201)
@@ -387,10 +387,10 @@ func BuscarNumeroDisponibilidad(IdCDP int)(numero_disp int){
 
 		var temp []models.Disponibilidad
 		var numero_disponibilidad int
-		if err2 := getJson("http://10.20.0.254/financiera_api/v1/disponibilidad?limit=-1&query=Id:"+strconv.Itoa(IdCDP), &temp); err2 == nil {
+		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudArgo")+"/disponibilidad?limit=-1&query=Id:"+strconv.Itoa(IdCDP), &temp); err2 == nil {
 			if(temp != nil){
 				numero_disponibilidad = int(temp[0].NumeroDisponibilidad)
-			
+
 			}else{
 				numero_disponibilidad = 0
 			}

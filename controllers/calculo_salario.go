@@ -44,7 +44,8 @@ func (c *CalculoSalarioController) InsertarPrevinculaciones() {
 
 	}
 
-	if err := sendJson("http://"+beego.AppConfig.String("UrlcrudArgo")+"/"+beego.AppConfig.String("NscrudArgo")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &id_respuesta, &v); err == nil {
+	if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudArgo")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &id_respuesta, &v); err == nil {
+		fmt.Println("er",id_respuesta)
 		c.Data["json"] = "OK"
 	} else {
 		c.Data["json"] = "Error al insertar docentes"
