@@ -44,7 +44,7 @@ func (c *CalculoSalarioController) InsertarPrevinculaciones() {
 
 	}
 
-	if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudArgo")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &id_respuesta, &v); err == nil {
+	if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &id_respuesta, &v); err == nil {
 		fmt.Println("er",id_respuesta)
 		c.Data["json"] = "OK"
 	} else {
@@ -107,18 +107,20 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 func CargarPuntoSalarial() (p models.PuntoSalarial) {
 	var v []models.PuntoSalarial
 
-	if err := getJson("http://10.20.0.254/core_amazon_crud/v1/punto_salarial/?sortby=Vigencia&order=desc&limit=1", &v); err == nil {
+	if err := getJson("http://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/punto_salarial/?sortby=Vigencia&order=desc&limit=1", &v); err == nil {
 	} else {
 	}
+
 	return v[0]
 }
 
 func CargarSalarioMinimo() (p models.SalarioMinimo) {
 	var v []models.SalarioMinimo
 
-	if err := getJson("http://10.20.0.254/core_amazon_crud/v1/salario_minimo/?sortby=Vigencia&order=desc&limit=1", &v); err == nil {
+	if err := getJson("http://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/salario_minimo/?sortby=Vigencia&order=desc&limit=1", &v); err == nil {
 	} else {
 	}
+
 	return v[0]
 }
 
@@ -138,7 +140,7 @@ func BuscarIdProveedor(DocumentoIdentidad int)(id_proveedor_docente int){
 		var id_proveedor int
 		queryInformacionProveedor := "?query=NumDocumento:"+strconv.Itoa(DocumentoIdentidad)
 		var informacion_proveedor []models.InformacionProveedor
-		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudArgo")+"/informacion_proveedor/"+queryInformacionProveedor, &informacion_proveedor); err2 == nil {
+		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/"+queryInformacionProveedor, &informacion_proveedor); err2 == nil {
 			if(informacion_proveedor != nil){
 				id_proveedor = informacion_proveedor[0].Id
 			}else{

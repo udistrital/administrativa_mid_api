@@ -36,7 +36,7 @@ func (c *ListarDocentesVinculacionController) ListarDocentesPrevinculados(){
 	query := "?limit=-1&query=IdResolucion.Id:"+id_resolucion
 	var v []models.VinculacionDocente
 
-	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudArgo")+"/vinculacion_docente"+query, &v); err2 == nil {
+	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &v); err2 == nil {
 		for x, pos := range  v{
 			documento_identidad,_ := strconv.Atoi(pos.IdPersona)
 			v[x].NombreCompleto = BuscarNombreProveedor(documento_identidad);
@@ -368,7 +368,7 @@ func BuscarNombreProveedor(DocumentoIdentidad int)(nombre_prov string){
 		var nom_proveedor string
 		queryInformacionProveedor := "?query=NumDocumento:"+strconv.Itoa(DocumentoIdentidad)
 		var informacion_proveedor []models.InformacionProveedor
-		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudArgo")+"/informacion_proveedor/"+queryInformacionProveedor, &informacion_proveedor); err2 == nil {
+		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/"+queryInformacionProveedor, &informacion_proveedor); err2 == nil {
 			if(informacion_proveedor != nil){
 				nom_proveedor = informacion_proveedor[0].NomProveedor
 			}else{
@@ -387,7 +387,7 @@ func BuscarNumeroDisponibilidad(IdCDP int)(numero_disp int){
 
 		var temp []models.Disponibilidad
 		var numero_disponibilidad int
-		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudArgo")+"/disponibilidad?limit=-1&query=Id:"+strconv.Itoa(IdCDP), &temp); err2 == nil {
+		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad?limit=-1&query=Id:"+strconv.Itoa(IdCDP), &temp); err2 == nil {
 			if(temp != nil){
 				numero_disponibilidad = int(temp[0].NumeroDisponibilidad)
 
