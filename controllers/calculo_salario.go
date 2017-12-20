@@ -20,8 +20,32 @@ type CalculoSalarioController struct {
 func (c *CalculoSalarioController) URLMapping() {
 	//c.Mapping("CalcularSalarioContratacion", c.CalcularSalarioContratacion)
 	c.Mapping("InsertarPrevinculaciones", c.InsertarPrevinculaciones)
+	c.Mapping("CalcularTotalDeSalarios", c.Calcular_total_de_salarios)
 }
 
+// InsertarPrevinculaciones ...
+// @Title InsetarPrevinculaciones
+// @Description create InsertarPrevinculaciones
+// @Success 201 {int} models.VinculacionDocente
+// @Failure 403 body is empty
+// @router Contratacion/calcular_valor_contratos [post]
+func (c *CalculoSalarioController) Calcular_total_de_salarios() {
+
+	var v []models.VinculacionDocente
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+
+		v = CalcularSalarioPrecontratacion(v)
+		totales_de_salario := Calcular_total_de_salario(v)
+		c.Data["json"] = totales_de_salario
+	} else {
+		fmt.Println("ERROR")
+		fmt.Println(err)
+		c.Data["json"] = "Error al calcular totales"
+	}
+
+	c.ServeJSON()
+}
 
 // InsertarPrevinculaciones ...
 // @Title InsetarPrevinculaciones
@@ -152,4 +176,14 @@ func BuscarIdProveedor(DocumentoIdentidad int)(id_proveedor_docente int){
 		return id_proveedor
 		//docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IdProveedor = HomologarProyectoCurricular("old",pos.IDProyecto)
 
+}
+
+func Calcular_total_de_salario(v []models.VinculacionDocente)(total float64){
+
+	var sumatoria float64
+	for _, docente := range v {
+		sumatoria = sumatoria + docente.ValorContrato
+	}
+
+	return sumatoria
 }

@@ -9,6 +9,14 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:CalculoSalarioController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:CalculoSalarioController"],
 		beego.ControllerComments{
+			Method: "Calcular_total_de_salarios",
+			Router: `Contratacion/calcular_valor_contratos`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:CalculoSalarioController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:CalculoSalarioController"],
+		beego.ControllerComments{
 			Method: "InsertarPrevinculaciones",
 			Router: `Contratacion/insertar_previnculaciones`,
 			AllowHTTPMethods: []string{"post"},
@@ -60,6 +68,14 @@ func init() {
 			Method: "ValidarContrato",
 			Router: `/:dedicacion/:numHoras`,
 			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:VerificarDisponibilidadesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:VerificarDisponibilidadesController"],
+		beego.ControllerComments{
+			Method: "ListarApropiaciones",
+			Router: `/listar_apropiaciones`,
+			AllowHTTPMethods: []string{"post"},
 			MethodParams: param.Make(),
 			Params: nil})
 
