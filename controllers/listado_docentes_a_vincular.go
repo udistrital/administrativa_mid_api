@@ -40,7 +40,8 @@ func (c *ListarDocentesVinculacionController) ListarDocentesPrevinculados(){
 		for x, pos := range  v{
 			documento_identidad,_ := strconv.Atoi(pos.IdPersona)
 			v[x].NombreCompleto = BuscarNombreProveedor(documento_identidad);
-			v[x].NumeroDisponibilidad = BuscarNumeroDisponibilidad(pos.Disponibilidad)
+			v[x].NumeroDisponibilidad = BuscarNumeroDisponibilidad(pos.Disponibilidad);
+			v[x].Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id)
 		}
 
 	}else{
@@ -382,6 +383,21 @@ func BuscarNombreProveedor(DocumentoIdentidad int)(nombre_prov string){
 
 }
 
+func BuscarNombreDedicacion(id_dedicacion int)(nombre_dedicacion string){
+	var nom_dedicacion string
+	query:= "?limit=-1&query=Id:"+strconv.Itoa(id_dedicacion)
+	var dedicaciones []models.Dedicacion
+	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/dedicacion"+query, &dedicaciones); err2 == nil {
+		if(dedicaciones != nil){
+			nom_dedicacion = dedicaciones[0].Descripcion
+		}else{
+			nom_dedicacion = ""
+		}
+
+	}
+
+	return nom_dedicacion
+}
 
 func BuscarNumeroDisponibilidad(IdCDP int)(numero_disp int){
 
