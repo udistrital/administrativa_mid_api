@@ -35,9 +35,10 @@ func (c *VerificarDisponibilidadesController) ListarApropiaciones() {
 	var respuesta models.DatosApropiacion
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 
-		for _, pos := range v {
+		for x, pos := range v {
 
 		if err2 := sendJson("http://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad/SaldoCdp","POST", &respuesta, &pos); err2 == nil {
+			v[x].Apropiacion.Saldo = int(respuesta.Saldo);
 			fmt.Println("respuesta", respuesta)
 
 		}else{
