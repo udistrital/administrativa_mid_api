@@ -25,4 +25,5 @@ type VinculacionDocente struct {
 	NivelAcademico     string
 	Disponibilidad 		   int
 	NumeroDisponibilidad int
+	LugarExpedicionCedula float64
 }

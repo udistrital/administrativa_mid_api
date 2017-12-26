@@ -41,7 +41,8 @@ func (c *ListarDocentesVinculacionController) ListarDocentesPrevinculados(){
 			documento_identidad,_ := strconv.Atoi(pos.IdPersona)
 			v[x].NombreCompleto = BuscarNombreProveedor(documento_identidad);
 			v[x].NumeroDisponibilidad = BuscarNumeroDisponibilidad(pos.Disponibilidad);
-			v[x].Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id)
+			v[x].Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id);
+			v[x].LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona);
 		}
 
 	}else{
@@ -415,6 +416,24 @@ func BuscarNumeroDisponibilidad(IdCDP int)(numero_disp int){
 			fmt.Println("error en json",err2)
 		}
 		return numero_disponibilidad
+		//docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IdProveedor = HomologarProyectoCurricular("old",pos.IDProyecto)
+
+}
+
+func BuscarLugarExpedicion(Cedula string)(nombre_lugar_exp float64){
+
+		var nombre_ciudad float64
+		var temp []models.InformacionPersonaNatural
+		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_persona_natural?limit=-1&query=Id:"+Cedula, &temp); err2 == nil {
+			if(temp != nil){
+				nombre_ciudad = temp[0].IdCiudadExpedicionDocumento
+
+		}else{
+			fmt.Println("error en json",err2)
+		}
+
+	}
+		return nombre_ciudad;
 		//docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IdProveedor = HomologarProyectoCurricular("old",pos.IDProyecto)
 
 }
