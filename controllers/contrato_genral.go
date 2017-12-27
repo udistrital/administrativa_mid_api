@@ -30,7 +30,7 @@ func (c *Contrato_genralController) GetContratoById() {
 	vigenciaStr := c.Ctx.Input.Param(":vigencia")
 	var infoContrato []map[string]interface{}
 	if _, err := strconv.Atoi(vigenciaStr); err == nil {
-		if err = getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/contrato_general?query=ContratoSuscrito.Vigencia:"+vigenciaStr+",Id:"+idStr, &infoContrato); err == nil {
+		if err = getJson("http://"+beego.AppConfig.String("UrlAdminAmazon")+"/contrato_general?query=ContratoSuscrito.Vigencia:"+vigenciaStr+",Id:"+idStr, &infoContrato); err == nil {
 
 			if infoContrato != nil {
 				c.Data["json"] = infoContrato[0]
