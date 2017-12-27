@@ -7,13 +7,13 @@ import (
 	"github.com/astaxie/beego"
 )
 
-// Contrato_genralController operations for Contrato_genral
-type Contrato_genralController struct {
+// Contrato_generalController operations for Contrato_genral
+type Contrato_generalController struct {
 	beego.Controller
 }
 
 // URLMapping ...
-func (c *Contrato_genralController) URLMapping() {
+func (c *Contrato_generalController) URLMapping() {
 	c.Mapping("GetContratoById", c.GetContratoById)
 }
 
@@ -25,7 +25,7 @@ func (c *Contrato_genralController) URLMapping() {
 // @Success 200 {object} models.Contrato_genral
 // @Failure 403
 // @router GetContratoById/:id/:vigencia [get]
-func (c *Contrato_genralController) GetContratoById() {
+func (c *Contrato_generalController) GetContratoById() {
 	idStr := c.Ctx.Input.Param(":id")
 	vigenciaStr := c.Ctx.Input.Param(":vigencia")
 	var infoContrato []map[string]interface{}

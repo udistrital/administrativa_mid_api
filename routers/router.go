@@ -57,7 +57,7 @@ func init() {
 		),
 		beego.NSNamespace("/contrato_general",
 			beego.NSInclude(
-				&controllers.Contrato_genralController{},
+				&controllers.Contrato_generalController{},
 			),
 		),
 	)
