@@ -39,6 +39,14 @@ func init() {
 			MethodParams: param.Make(),
 			Params: nil})
 
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:Contrato_genralController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:Contrato_genralController"],
+		beego.ControllerComments{
+			Method: "GetContratoById",
+			Router: `GetContratoById/:id/:vigencia`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:InformacionProveedorController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:InformacionProveedorController"],
 		beego.ControllerComments{
 			Method: "Contrato_proveedor",
