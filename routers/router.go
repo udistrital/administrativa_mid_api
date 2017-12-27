@@ -55,6 +55,11 @@ func init() {
 				&controllers.ListarDocentesVinculacionController{},
 			),
 		),
+		beego.NSNamespace("/contrato_general",
+			beego.NSInclude(
+				&controllers.Contrato_generalController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }
