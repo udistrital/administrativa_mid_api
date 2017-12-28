@@ -54,9 +54,9 @@ func (c *Contrato_generalController) GetContratoByContratoSuscritoId() {
 func FormatoInfoContratoContratoSuscrito(contratoIntfc interface{}, params ...interface{}) (res interface{}) {
 	if infoContrato, e := contratoIntfc.(map[string]interface{}); e {
 		idContratista := infoContrato["Contratista"].(float64)
-		var infoContratista []map[string]interface{}
-		if err := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor?query=Id:"+strconv.Itoa(int(idContratista)), &infoContratista); err == nil {
-			infoContrato["Contratista"] = infoContratista[0]
+		var infoContratista map[string]interface{}
+		if err := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/"+strconv.Itoa(int(idContratista)), &infoContratista); err == nil {
+			infoContrato["Contratista"] = infoContratista
 			return infoContrato
 		} else {
 			return infoContrato
