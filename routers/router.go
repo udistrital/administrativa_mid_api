@@ -26,6 +26,12 @@ func init() {
 			),
 		),
 
+		beego.NSNamespace("/gestion_resoluciones",
+			beego.NSInclude(
+				&controllers.GestionResolucionesController{},
+			),
+		),
+
 		beego.NSNamespace("/consultar_disponibilidades",
 			beego.NSInclude(
 				&controllers.VerificarDisponibilidadesController{},
