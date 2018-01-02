@@ -24,4 +24,11 @@ type Resolucion struct {
 type ObjetoResolucion struct {
 	Resolucion       *Resolucion
 	ResolucionVinculacionDocente *ResolucionVinculacionDocente
+	ResolucionVieja   int
+}
+
+type ModificacionResolucion struct {
+	Id             int       			`orm:"column(id);pk;auto"`
+	ResolucionNueva       int      `orm:"column(resolucion_nueva)"`
+	ResolucionAnterior     int    `orm:"column(resolucion_anterior)"`
 }

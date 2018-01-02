@@ -36,7 +36,7 @@ func (c *GestionResolucionesController) InsertarResolucionCompleta() {
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		//****MANEJO DE TRANSACCIONES!***!//
 		//Primero se inserta la resolución, si eso se realiza correctamente
-		control,id_resolucion_creada = InsertarResolucion(v.Resolucion);
+		control,id_resolucion_creada = InsertarResolucion(v);
 		if(control){
 				//Si se inserta bien en resolución, se puede insertar en resolucion_vinculacion_docente y en resolucion_estado
 					control=InsertarResolucionVinDocente(id_resolucion_creada,v.ResolucionVinculacionDocente);
@@ -57,7 +57,7 @@ func (c *GestionResolucionesController) InsertarResolucionCompleta() {
 
 	if(control){
 		fmt.Println("okey")
-		c.Data["json"] = "OK"
+		c.Data["json"] = id_resolucion_creada
 	}else{
 		fmt.Println("not okey")
 		c.Data["json"] = "Error"
@@ -65,11 +65,12 @@ func (c *GestionResolucionesController) InsertarResolucionCompleta() {
 	c.ServeJSON()
 }
 
-func InsertarResolucion(resolucion *models.Resolucion)(contr bool,id_cre int){
-	var temp = resolucion
+func InsertarResolucion(resolucion models.ObjetoResolucion)(contr bool,id_cre int){
+	var temp = resolucion.Resolucion
 	var respuesta models.Resolucion
 	var id_creada int;
 	var cont bool;
+	var respuesta_modificacion_res models.ModificacionResolucion
 
 	temp.Vigencia, _, _ = time.Now().Date()
 	temp.FechaRegistro = time.Now()
@@ -82,6 +83,22 @@ func InsertarResolucion(resolucion *models.Resolucion)(contr bool,id_cre int){
 	} else {
 		cont = false;
 		id_creada = 0;
+	}
+
+	if(temp.IdTipoResolucion.Id != 1){
+		fmt.Println(resolucion.ResolucionVieja)
+		objeto_modificacion_res:= models.ModificacionResolucion {
+			ResolucionAnterior: resolucion.ResolucionVieja,
+			ResolucionNueva: id_creada,
+		}
+		if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion", "POST", &respuesta_modificacion_res, &objeto_modificacion_res); err == nil {
+			cont = true;
+		} else {
+			fmt.Println("error al insertar en modificacion resolucion", err)
+			cont = false;
+
+		}
+
 	}
 
 	return cont,id_creada

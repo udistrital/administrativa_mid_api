@@ -33,7 +33,7 @@ func (c *ListarDocentesVinculacionController) ListarDocentesPrevinculados(){
 	id_resolucion := c.GetString("id_resolucion")
 	fmt.Println("resolucion a consultar")
 	fmt.Println(id_resolucion)
-	query := "?limit=-1&query=IdResolucion.Id:"+id_resolucion
+	query := "?limit=-1&query=IdResolucion.Id:"+id_resolucion+",Estado:true";
 	var v []models.VinculacionDocente
 
 	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &v); err2 == nil {
