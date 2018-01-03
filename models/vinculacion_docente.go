@@ -27,3 +27,16 @@ type VinculacionDocente struct {
 	NumeroDisponibilidad int
 	LugarExpedicionCedula string
 }
+
+type Objeto_Desvinculacion struct{
+	IdModificacionResolucion int
+	DocentesDesvincular []VinculacionDocente
+}
+
+type ModificacionVinculacion struct {
+	Id           								  int       			`orm:"column(id);pk;auto"`
+	ModificacionResolucion        *ModificacionResolucion      `orm:"column(modificacion_resolucion);rel(fk)"`
+	VinculacionDocenteCancelada     *VinculacionDocente    `orm:"column(vinculacion_docente_cancelada);rel(fk)"`
+	VinculacionDocenteRegistrada    *VinculacionDocente    `orm:"column(vinculacion_docente_registrada);rel(fk);null"`
+	Horas														int	   `orm:"column(horas);null"`
+}

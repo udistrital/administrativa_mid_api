@@ -2,61 +2,84 @@ package controllers
 
 import (
 	"fmt"
-	"strconv"
-	//"strings"
 	"encoding/json"
+	"strconv"
+	"strings"
 	"github.com/astaxie/beego"
 	//. "github.com/mndrix/golog"
 	"github.com/udistrital/administrativa_mid_api/models"
-	//. "github.com/udistrital/golog"
+	. "github.com/udistrital/golog"
 )
 
-//ListarDocentesVinculacionController operations for Preliquidacion
-type ListarDocentesVinculacionController struct {
+// PreliquidacionController operations for Preliquidacion
+type GestionPrevinculacionesController struct {
 	beego.Controller
 }
 
 // URLMapping ...
-func (c *ListarDocentesVinculacionController) URLMapping() {
+func (c *GestionPrevinculacionesController) URLMapping() {
+	//c.Mapping("CalcularSalarioContratacion", c.CalcularSalarioContratacion)
+	c.Mapping("InsertarPrevinculaciones", c.InsertarPrevinculaciones)
+	c.Mapping("CalcularTotalDeSalarios", c.Calcular_total_de_salarios)
 	c.Mapping("ListarDocentesCargaHoraria", c.ListarDocentesCargaHoraria)
-
 }
 
-// ListarDocentesVinculacionController ...
-// @Title ListarDocentesPrevinculados
-// @Description create ListarDocentesPrevinculados
-// @Param id_resolucion query string false "resolucion a consultar"
+// InsertarPrevinculaciones ...
+// @Title InsetarPrevinculaciones
+// @Description create InsertarPrevinculaciones
 // @Success 201 {int} models.VinculacionDocente
 // @Failure 403 body is empty
-// @router /docentes_previnculados [get]
-func (c *ListarDocentesVinculacionController) ListarDocentesPrevinculados(){
-	id_resolucion := c.GetString("id_resolucion")
-	fmt.Println("resolucion a consultar")
-	fmt.Println(id_resolucion)
-	query := "?limit=-1&query=IdResolucion.Id:"+id_resolucion+",Estado:true";
+// @router Precontratacion/calcular_valor_contratos [post]
+func (c *GestionPrevinculacionesController) Calcular_total_de_salarios() {
+
 	var v []models.VinculacionDocente
 
-	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &v); err2 == nil {
-		for x, pos := range  v{
-			documento_identidad,_ := strconv.Atoi(pos.IdPersona)
-			v[x].NombreCompleto = BuscarNombreProveedor(documento_identidad);
-			v[x].NumeroDisponibilidad = BuscarNumeroDisponibilidad(pos.Disponibilidad);
-			v[x].Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id);
-			v[x].LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona);
-		}
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 
-	}else{
-		fmt.Println("Error de cosulta en vinculacion",err2)
+		v = CalcularSalarioPrecontratacion(v)
+		totales_de_salario := Calcular_total_de_salario(v)
+		c.Data["json"] = totales_de_salario
+	} else {
+		fmt.Println("ERROR")
+		fmt.Println(err)
+		c.Data["json"] = "Error al calcular totales"
 	}
 
-	c.Ctx.Output.SetStatus(201)
-	c.Data["json"] = 	v
 	c.ServeJSON()
-  //fmt.Println(v)
-
 }
 
-// ListarDocentesVinculacionController ...
+// InsertarPrevinculaciones ...
+// @Title InsetarPrevinculaciones
+// @Description create InsertarPrevinculaciones
+// @Success 201 {int} models.VinculacionDocente
+// @Failure 403 body is empty
+// @router Precontratacion/insertar_previnculaciones [post]
+func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
+
+	var v []models.VinculacionDocente
+	var id_respuesta interface{}
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+		fmt.Println("docentes a contratar",v)
+		v = CalcularSalarioPrecontratacion(v)
+
+	} else {
+		fmt.Println("ERROR")
+		fmt.Println(err)
+
+	}
+
+	if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &id_respuesta, &v); err == nil {
+		fmt.Println("er",id_respuesta)
+		c.Data["json"] = "OK"
+	} else {
+		c.Data["json"] = "Error al insertar docentes"
+	}
+	c.ServeJSON()
+}
+
+
+// GestionPrevinculacionesController ...
 // @Title ListarDocentesCargaHoraria
 // @Description create ListarDocentesCargaHoraria
 // @Param vigencia query string false "año a consultar"
@@ -65,8 +88,8 @@ func (c *ListarDocentesVinculacionController) ListarDocentesPrevinculados(){
 // @Param facultad query string false "facultad"
 // @Success 201 {object} models.Docentes_x_Carga
 // @Failure 403 body is empty
-// @router /docentes_x_carga_horaria [get]
-func (c *ListarDocentesVinculacionController) ListarDocentesCargaHoraria() {
+// @router Precontratacion/docentes_x_carga_horaria [get]
+func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 	vigencia := c.GetString("vigencia")
 	periodo := c.GetString("periodo")
 	tipo_vinculacion := c.GetString("tipo_vinculacion")
@@ -108,6 +131,152 @@ func (c *ListarDocentesVinculacionController) ListarDocentesCargaHoraria() {
 	c.ServeJSON()
 
 }
+
+func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDocente)(docentes_a_insertar []models.VinculacionDocente) {
+	//id_resolucion := 141
+	nivel_academico := docentes_a_vincular[0].NivelAcademico
+	var a string
+	var categoria string
+
+
+	for x, docente := range docentes_a_vincular {
+		//docentes_a_vincular[x].NombreCompleto = docente.PrimerNombre + " " + docente.SegundoNombre + " " + docente.PrimerApellido + " " + docente.SegundoApellido
+		//docentes_a_vincular[x].IdPersona = BuscarIdProveedor(docente.DocumentoIdentidad);
+
+		if EsDocentePlanta(docente.IdPersona) && strings.ToLower(nivel_academico) == "posgrado" {
+			categoria = categoria + "ud"
+		} else {
+			categoria = docente.Categoria
+		}
+
+		var predicados string
+		if strings.ToLower(nivel_academico) == "posgrado" {
+			predicados = `valor_salario_minimo(` + strconv.Itoa(CargarSalarioMinimo().Valor) + `,2016).` + "\n"
+		} else if strings.ToLower(nivel_academico) == "pregrado" {
+			predicados = `valor_punto(` + strconv.Itoa(CargarPuntoSalarial().ValorPunto) + `, 2016).` + "\n"
+		}
+
+		predicados = predicados + `categoria(` + docente.IdPersona + `,` + strings.ToLower(categoria) + `, 2016).` + "\n"
+		predicados = predicados + `vinculacion(` + docente.IdPersona + `,` + strings.ToLower(docente.Dedicacion) + `, 2016).` + "\n"
+		predicados = predicados + `horas(` + docente.IdPersona + `,` + strconv.Itoa(docente.NumeroHorasSemanales*docente.NumeroSemanas) + `, 2016).` + "\n"
+		reglasbase := CargarReglasBase("CDVE")
+		reglasbase = reglasbase + predicados
+		m := NewMachine().Consult(reglasbase)
+
+		contratos := m.ProveAll(`valor_contrato(` + strings.ToLower(nivel_academico) + `,` + docente.IdPersona + `,2016,X).`)
+		for _, solution := range contratos {
+			a = fmt.Sprintf("%s", solution.ByName_("X"))
+		}
+		f, _ := strconv.ParseFloat(a, 64)
+		salario := f
+		docentes_a_vincular[x].ValorContrato = salario
+
+	}
+
+	f, _ := strconv.ParseFloat(a, 64)
+	salario := int(f)
+
+	fmt.Println(salario)
+
+	return docentes_a_vincular
+
+}
+
+func CargarPuntoSalarial() (p models.PuntoSalarial) {
+	var v []models.PuntoSalarial
+
+	if err := getJson("http://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/punto_salarial/?sortby=Vigencia&order=desc&limit=1", &v); err == nil {
+	} else {
+	}
+
+	return v[0]
+}
+
+func CargarSalarioMinimo() (p models.SalarioMinimo) {
+	var v []models.SalarioMinimo
+
+	if err := getJson("http://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/salario_minimo/?sortby=Vigencia&order=desc&limit=1", &v); err == nil {
+	} else {
+	}
+
+	return v[0]
+}
+
+func EsDocentePlanta(idPersona string) (docentePlanta bool) {
+	var v []models.DocentePlanta
+	if err := getJson("http://10.20.0.127/urano/index.php?data=B-7djBQWvIdLAEEycbH1n6e-3dACi5eLUOb63vMYhGq0kPBs7NGLYWFCL0RSTCu1yTlE5hH854MOgmjuVfPWyvdpaJDUOyByX-ksEPFIrrQQ7t1p4BkZcBuGD2cgJXeD&documento="+idPersona, &v); err == nil {
+		fmt.Println(v[0].Nombres)
+		return true
+	} else {
+		//fmt.Println("false")
+		return false
+	}
+}
+
+func BuscarIdProveedor(DocumentoIdentidad int)(id_proveedor_docente int){
+
+		var id_proveedor int
+		queryInformacionProveedor := "?query=NumDocumento:"+strconv.Itoa(DocumentoIdentidad)
+		var informacion_proveedor []models.InformacionProveedor
+		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/"+queryInformacionProveedor, &informacion_proveedor); err2 == nil {
+			if(informacion_proveedor != nil){
+				id_proveedor = informacion_proveedor[0].Id
+			}else{
+				id_proveedor = 0
+			}
+
+		}
+
+		return id_proveedor
+		//docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IdProveedor = HomologarProyectoCurricular("old",pos.IDProyecto)
+
+}
+
+func Calcular_total_de_salario(v []models.VinculacionDocente)(total float64){
+
+	var sumatoria float64
+	for _, docente := range v {
+		sumatoria = sumatoria + docente.ValorContrato
+	}
+
+	return sumatoria
+}
+
+// GestionPrevinculacionesController ...
+// @Title ListarDocentesPrevinculados
+// @Description create ListarDocentesPrevinculados
+// @Param id_resolucion query string false "resolucion a consultar"
+// @Success 201 {int} models.VinculacionDocente
+// @Failure 403 body is empty
+// @router /docentes_previnculados [get]
+func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados(){
+	id_resolucion := c.GetString("id_resolucion")
+	fmt.Println("resolucion a consultar")
+	fmt.Println(id_resolucion)
+	query := "?limit=-1&query=IdResolucion.Id:"+id_resolucion+",Estado:true";
+	var v []models.VinculacionDocente
+
+	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &v); err2 == nil {
+		for x, pos := range  v{
+			documento_identidad,_ := strconv.Atoi(pos.IdPersona)
+			v[x].NombreCompleto = BuscarNombreProveedor(documento_identidad);
+			v[x].NumeroDisponibilidad = BuscarNumeroDisponibilidad(pos.Disponibilidad);
+			v[x].Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id);
+			v[x].LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona);
+		}
+
+	}else{
+		fmt.Println("Error de cosulta en vinculacion",err2)
+	}
+
+	c.Ctx.Output.SetStatus(201)
+	c.Data["json"] = 	v
+	c.ServeJSON()
+  //fmt.Println(v)
+
+}
+
+
 
 func ListarDocentesHorasLectivas(vigencia, periodo, tipo_vinculacion, facultad string)(docentes_a_listar models.ObjetoCargaLectiva){
 
@@ -428,10 +597,7 @@ func BuscarLugarExpedicion(Cedula string)(nombre_lugar_exp string){
 		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_persona_natural?limit=-1&query=Id:"+Cedula, &temp); err2 == nil {
 			if(temp != nil){
 				id_ciudad := temp[0].IdCiudadExpedicionDocumento;
-				fmt.Println("id_ciudad",id_ciudad)
-				if err := getJson("http://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ciudad?limit=-1&query=Id:"+strconv.Itoa(int(id_ciudad)), &temp2); err2 == nil {
-					fmt.Println("ciudades")
-					fmt.Println(temp2)
+					if err := getJson("http://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ciudad?limit=-1&query=Id:"+strconv.Itoa(int(id_ciudad)), &temp2); err2 == nil {
 					if(temp2 != nil){
 						nombre_ciudad = temp2[0].Nombre
 

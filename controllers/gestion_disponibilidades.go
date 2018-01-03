@@ -12,12 +12,12 @@ import (
 )
 
 // PreliquidacionController operations for Preliquidacion
-type VerificarDisponibilidadesController struct {
+type GestionDisponibilidadController struct {
 	beego.Controller
 }
 
 // URLMapping ...
-func (c *VerificarDisponibilidadesController) URLMapping() {
+func (c *GestionDisponibilidadController) URLMapping() {
 	//c.Mapping("CalcularSalarioContratacion", c.CalcularSalarioContratacion)
 	c.Mapping("ListarApropiaciones", c.ListarApropiaciones)
 
@@ -29,7 +29,7 @@ func (c *VerificarDisponibilidadesController) URLMapping() {
 // @Success 201 {int} models.DisponibilidadApropiacion
 // @Failure 403 body is empty
 // @router /listar_apropiaciones [post]
-func (c *VerificarDisponibilidadesController) ListarApropiaciones() {
+func (c *GestionDisponibilidadController) ListarApropiaciones() {
 
   var v []models.DisponibilidadApropiacion
 	var respuesta models.DatosApropiacion
