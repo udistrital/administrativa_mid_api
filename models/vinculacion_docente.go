@@ -29,11 +29,25 @@ type VinculacionDocente struct {
 	NumeroDisponibilidad int
 
 	// Esto fué improvisando, si algo se muere ver acá abajo.
-	ValorContrato  float64 `orm:"column(valor_contrato)"`
-	Categoria      string  `orm:"column(categoria)"`
-	Disponibilidad int     `orm:"column(disponibilidad)"`
+	ValorContrato         float64 `orm:"column(valor_contrato)"`
+	Categoria             string  `orm:"column(categoria)"`
+	Disponibilidad        int     `orm:"column(disponibilidad)"`
+	LugarExpedicionCedula string
 }
 
 func init() {
 	orm.RegisterModel(new(VinculacionDocente))
+}
+
+type Objeto_Desvinculacion struct {
+	IdModificacionResolucion int
+	DocentesDesvincular      []VinculacionDocente
+}
+
+type ModificacionVinculacion struct {
+	Id                           int                     `orm:"column(id);pk;auto"`
+	ModificacionResolucion       *ModificacionResolucion `orm:"column(modificacion_resolucion);rel(fk)"`
+	VinculacionDocenteCancelada  *VinculacionDocente     `orm:"column(vinculacion_docente_cancelada);rel(fk)"`
+	VinculacionDocenteRegistrada *VinculacionDocente     `orm:"column(vinculacion_docente_registrada);rel(fk);null"`
+	Horas                        int                     `orm:"column(horas);null"`
 }

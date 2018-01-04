@@ -20,15 +20,27 @@ func init() {
 			),
 		),
 
-		beego.NSNamespace("/calculo_salario",
+		beego.NSNamespace("/gestion_previnculacion",
 			beego.NSInclude(
-				&controllers.CalculoSalarioController{},
+				&controllers.GestionPrevinculacionesController{},
+			),
+		),
+
+		beego.NSNamespace("/gestion_resoluciones",
+			beego.NSInclude(
+				&controllers.GestionResolucionesController{},
+			),
+		),
+
+		beego.NSNamespace("/gestion_desvinculaciones",
+			beego.NSInclude(
+				&controllers.GestionDesvinculacionesController{},
 			),
 		),
 
 		beego.NSNamespace("/consultar_disponibilidades",
 			beego.NSInclude(
-				&controllers.VerificarDisponibilidadesController{},
+				&controllers.GestionDisponibilidadController{},
 			),
 		),
 
@@ -56,9 +68,9 @@ func init() {
 			),
 		),
 
-		beego.NSNamespace("/informacionDocentes",
+		beego.NSNamespace("/contrato_general",
 			beego.NSInclude(
-				&controllers.ListarDocentesVinculacionController{},
+				&controllers.Contrato_generalController{},
 			),
 		),
 	)
