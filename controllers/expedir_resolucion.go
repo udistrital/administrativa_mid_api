@@ -57,7 +57,7 @@ func (c *ExpedirResolucionController) Expedir() {
 			fmt.Println("He fallado un poquito aaaaaaaa4 con el v, solucioname!!!", v)
 			//if err = flyway.Read(&v); err == nil {
 			fmt.Println("He fallado un poquito aaaaaaaa5, solucioname!!!", err)
-			if v.NumeroContrato == "" && v.Vigencia == 0 {
+			if v.NumeroContrato.String == "" && v.Vigencia.Int64 == 0 {
 				contrato := vinculacion.ContratoGeneral
 				acta := vinculacion.ActaInicio
 				fmt.Println(contrato.Contratista)
@@ -175,8 +175,8 @@ func (c *ExpedirResolucionController) Expedir() {
 							a.IdPuntoSalarial = vinculacion.VinculacionDocente.IdPuntoSalarial
 							a.IdSalarioMinimo = vinculacion.VinculacionDocente.IdSalarioMinimo
 							v := a
-							v.NumeroContrato = aux1
-							v.Vigencia = aux2
+							v.NumeroContrato.String = aux1
+							v.Vigencia.Int64 = int64(aux2)
 							fmt.Println("Soyyyyyyyyyyyy la aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ", a)
 							fmt.Println("Soyyyyyyyyyyyy la vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv ", v)
 							fmt.Println("Soyyyyyyyyyyyy la idresolucion ", a.IdResolucion)
@@ -214,8 +214,8 @@ func (c *ExpedirResolucionController) Expedir() {
 				aux1 := v.NumeroContrato
 				aux2 := v.Vigencia
 				var ce models.ContratoEstado
-				ce.NumeroContrato = aux1
-				ce.Vigencia = aux2
+				ce.NumeroContrato = aux1.String
+				ce.Vigencia = int(aux2.Int64)
 				ce.FechaRegistro = time.Now()
 				ce.Estado.Id = 1
 				//_, err = o.Insert(&e)

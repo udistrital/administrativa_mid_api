@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/astaxie/beego/orm"
@@ -17,8 +18,8 @@ type VinculacionDocente struct {
 	NumeroSemanas        int                           `orm:"column(numero_semanas)"`
 	NumeroHorasSemanales int                           `orm:"column(numero_horas_semanales)"`
 	IdPersona            string                        `orm:"column(id_persona)"`
-	Vigencia             int                           `orm:"column(vigencia);null"`
-	NumeroContrato       string                        `orm:"column(numero_contrato);null"`
+	Vigencia             sql.NullInt64                 `orm:"column(vigencia);null"`
+	NumeroContrato       sql.NullString                `orm:"column(numero_contrato);null"`
 	Id                   int                           `orm:"column(id);pk;auto"`
 	NombreCompleto       string
 	//Categoria			 		 string
