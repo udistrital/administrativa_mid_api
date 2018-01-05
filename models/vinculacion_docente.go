@@ -13,6 +13,22 @@ type VinculacionDocente struct {
 	IdProyectoCurricular int                           `orm:"column(id_proyecto_curricular)"`
 	IdDedicacion         *Dedicacion                   `orm:"column(id_dedicacion);rel(fk)"`
 	IdResolucion         *ResolucionVinculacionDocente `orm:"column(id_resolucion);rel(fk)"`
+<<<<<<< HEAD
+	IdSalarioMinimo      int                       `orm:"column(id_salario_minimo);null"`
+	IdPuntoSalarial      int             			`orm:"column(id_punto_salarial);null"`
+	NumeroSemanas        int                        `orm:"column(numero_semanas)"`
+	NumeroHorasSemanales int                        `orm:"column(numero_horas_semanales)"`
+	IdPersona            string 						`orm:"column(id_persona)"`
+	Vigencia             int                       `orm:"column(vigencia);null"`
+	NumeroContrato      	string                    `orm:"column(numero_contrato);null"`
+	Id                   int                        `orm:"column(id);pk;auto"`
+	NombreCompleto 		 string
+	Categoria			 		 string
+	Dedicacion				 string
+	ValorContrato      float64
+	NivelAcademico     string
+	Disponibilidad 		   int
+=======
 	IdSalarioMinimo      int                           `orm:"column(id_salario_minimo);null"`
 	IdPuntoSalarial      int                           `orm:"column(id_punto_salarial);null"`
 	NumeroSemanas        int                           `orm:"column(numero_semanas)"`
@@ -27,6 +43,7 @@ type VinculacionDocente struct {
 	//ValorContrato      float64
 	NivelAcademico string
 	//Disponibilidad 		   int
+>>>>>>> 60632e41b1cd5705e1348a1dea5c8378d2a7d70f
 	NumeroDisponibilidad int
 
 	// Esto fué improvisando, si algo se muere ver acá abajo.
