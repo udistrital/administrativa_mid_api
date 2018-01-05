@@ -58,7 +58,7 @@ func (c *GestionPrevinculacionesController) Calcular_total_de_salarios() {
 func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 
 	var v []models.VinculacionDocente
-	var id_respuesta interface{}
+	var id_respuesta int
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		fmt.Println("docentes a contratar", v)
@@ -72,7 +72,7 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 
 	if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &id_respuesta, &v); err == nil {
 		fmt.Println("er", id_respuesta)
-		c.Data["json"] = "OK"
+		c.Data["json"] = id_respuesta
 	} else {
 		c.Data["json"] = "Error al insertar docentes"
 	}

@@ -35,6 +35,7 @@ type VinculacionDocente struct {
 	Categoria             string  `orm:"column(categoria)"`
 	Disponibilidad        int     `orm:"column(disponibilidad)"`
 	LugarExpedicionCedula string
+	NumeroHorasNuevas     int
 }
 
 func init() {
@@ -43,7 +44,10 @@ func init() {
 
 type Objeto_Desvinculacion struct {
 	IdModificacionResolucion int
+	IdNuevaResolucion        int
+	DisponibilidadNueva       int
 	DocentesDesvincular      []VinculacionDocente
+
 }
 
 type ModificacionVinculacion struct {
@@ -52,4 +56,5 @@ type ModificacionVinculacion struct {
 	VinculacionDocenteCancelada  *VinculacionDocente     `orm:"column(vinculacion_docente_cancelada);rel(fk)"`
 	VinculacionDocenteRegistrada *VinculacionDocente     `orm:"column(vinculacion_docente_registrada);rel(fk);null"`
 	Horas                        int                     `orm:"column(horas);null"`
+
 }

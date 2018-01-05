@@ -74,10 +74,13 @@ func (c *GestionDesvinculacionesController) ActualizarVinculaciones() {
 func (c *GestionDesvinculacionesController) AdicionarHoras() {
 
 	var v models.Objeto_Desvinculacion
+	var respuesta_mod_vin models.ModificacionVinculacion
 	var respuesta string
-	var vinculacion_nueva models.VinculacionDocente
+	var vinculacion_nueva int;
+	var temp_vinculacion [1]models.VinculacionDocente;
+
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-		fmt.Println("docentes a adicionar",v.DocentesDesvincular[0].Vigencia)
+
 
 		//CAMBIAR ESTADO DE VINCULACIÓN DOCNETE
 		for _, pos := range v.DocentesDesvincular {
@@ -88,27 +91,41 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 		}
 		}
 
+
+		temp_vinculacion[0] = models.VinculacionDocente {
+				IdPersona: v.DocentesDesvincular[0].IdPersona,
+				NumeroHorasSemanales:  v.DocentesDesvincular[0].NumeroHorasNuevas,
+				NumeroSemanas:  v.DocentesDesvincular[0].NumeroSemanas,
+				IdResolucion: &models.ResolucionVinculacionDocente {Id: v.IdNuevaResolucion},
+				IdDedicacion: v.DocentesDesvincular[0].IdDedicacion,
+				IdProyectoCurricular:  v.DocentesDesvincular[0].IdProyectoCurricular,
+				Categoria:  v.DocentesDesvincular[0].Categoria ,
+				Dedicacion:  v.DocentesDesvincular[0].Dedicacion,
+				NivelAcademico: v.DocentesDesvincular[0].NivelAcademico ,
+				Disponibilidad:  v.DisponibilidadNueva,
+
+		};
 		//CREAR NUEVA Vinculacion
-		for _, pos := range v.DocentesDesvincular {
-		if err2 := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/","POST", &vinculacion_nueva, pos); err2 == nil {
+
+		if err := sendJson("http://localhost:8082/v1/gestion_previnculacion/Precontratacion/insertar_previnculaciones","POST", &vinculacion_nueva, temp_vinculacion); err == nil {
 			fmt.Println("vinculacion nueva",vinculacion_nueva)
 		}else{
-			fmt.Println("error en json de modificacion vinculacion",err2)
+			fmt.Println("error en json de modificacion vinculacion",err)
 		}
-		}
+
 		//
 		fmt.Println("Id para modificacion,res",v.IdModificacionResolucion)
-		/*
+
 		//ACTUALIZO TABLA MODIFICACION VINCULACION
 		for _, pos := range v.DocentesDesvincular {
-			temp:= models.ModificacionVinculacion {ModificacionResolucion: &models.ModificacionResolucion {Id: v.IdModificacionResolucion},VinculacionDocenteCancelada: &models.VinculacionDocente{Id:pos.Id},VinculacionDocenteRegistrada: &models.VinculacionDocente{Id:vinculacion_registrada},Horas: v.NumeroHorasSemanales}
-		if err2 := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/","POST", &respuesta, temp); err2 == nil {
-			fmt.Println("respuesta", respuesta)
+			temp:= models.ModificacionVinculacion {ModificacionResolucion: &models.ModificacionResolucion {Id: v.IdModificacionResolucion},VinculacionDocenteCancelada: &models.VinculacionDocente{Id:pos.Id},VinculacionDocenteRegistrada: &models.VinculacionDocente{Id:vinculacion_nueva},Horas: pos.NumeroHorasNuevas}
+		if err2 := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/","POST", &respuesta_mod_vin, temp); err2 == nil {
+			fmt.Println("respuesta modificacion vin", respuesta_mod_vin)
 		}else{
 			fmt.Println("error en json de modificacion vinculacion",err2)
 		}
 		}
-*/
+
 		c.Data["json"] = respuesta
 	} else {
 		fmt.Println("ERROR")
