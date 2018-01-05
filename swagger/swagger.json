@@ -177,6 +177,23 @@
                 }
             }
         },
+        "/gestion_desvinculacionesadicionar_horas": {
+            "post": {
+                "tags": [
+                    "gestion_desvinculaciones"
+                ],
+                "description": "create AdicionarHoras",
+                "operationId": "GestionDesvinculacionesController.AdicionarHoras",
+                "responses": {
+                    "201": {
+                        "description": "{string}"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
         "/gestion_previnculacion/docentes_previnculados": {
             "get": {
                 "tags": [
