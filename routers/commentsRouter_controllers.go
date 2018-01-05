@@ -47,6 +47,14 @@ func init() {
 			MethodParams: param.Make(),
 			Params: nil})
 
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"],
+		beego.ControllerComments{
+			Method: "AdicionarHoras",
+			Router: `adicionar_horas`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
+			Params: nil})
+
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDisponibilidadController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDisponibilidadController"],
 		beego.ControllerComments{
 			Method: "ListarApropiaciones",

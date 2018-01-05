@@ -16,7 +16,7 @@ type VinculacionDocente struct {
 	NumeroHorasSemanales int                        `orm:"column(numero_horas_semanales)"`
 	IdPersona            string 						`orm:"column(id_persona)"`
 	Vigencia             int                       `orm:"column(vigencia);null"`
-	NumeroContrato       string                    `orm:"column(numero_contrato);null"`
+	NumeroContrato      	string                    `orm:"column(numero_contrato);null"`
 	Id                   int                        `orm:"column(id);pk;auto"`
 	NombreCompleto 		 string
 	Categoria			 		 string
