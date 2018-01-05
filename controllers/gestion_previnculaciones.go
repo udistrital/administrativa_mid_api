@@ -1,10 +1,11 @@
 package controllers
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"strings"
+
 	"github.com/astaxie/beego"
 	//. "github.com/mndrix/golog"
 	"github.com/udistrital/administrativa_mid_api/models"
@@ -60,7 +61,7 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 	var id_respuesta interface{}
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-		fmt.Println("docentes a contratar",v)
+		fmt.Println("docentes a contratar", v)
 		v = CalcularSalarioPrecontratacion(v)
 
 	} else {
@@ -70,14 +71,13 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 	}
 
 	if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &id_respuesta, &v); err == nil {
-		fmt.Println("er",id_respuesta)
+		fmt.Println("er", id_respuesta)
 		c.Data["json"] = "OK"
 	} else {
 		c.Data["json"] = "Error al insertar docentes"
 	}
 	c.ServeJSON()
 }
-
 
 // GestionPrevinculacionesController ...
 // @Title ListarDocentesCargaHoraria
@@ -98,46 +98,44 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 	docentes_x_carga_horaria := ListarDocentesHorasLectivas(vigencia, periodo, tipo_vinculacion, facultad)
 
 	//BUSCAR CATEGORÍA DE CADA DOCENTE
-	for x, pos := range  docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
-		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].CategoriaNombre,docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDCategoria  = Buscar_Categoria_Docente(vigencia, periodo, pos.DocDocente)
+	for x, pos := range docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
+		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].CategoriaNombre, docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDCategoria = Buscar_Categoria_Docente(vigencia, periodo, pos.DocDocente)
 	}
 
 	//RETORNAR CON ID DE TIPO DE VINCULACION DE NUEVO MODELO
-	for x, pos := range  docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
-		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDTipoVinculacion, docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].NombreTipoVinculacion  = HomologarDedicacion_ID("old",pos.IDTipoVinculacion)
-		if (docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDTipoVinculacion == "3"){
-			docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].HorasLectivas	= "20"
+	for x, pos := range docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
+		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDTipoVinculacion, docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].NombreTipoVinculacion = HomologarDedicacion_ID("old", pos.IDTipoVinculacion)
+		if docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDTipoVinculacion == "3" {
+			docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].HorasLectivas = "20"
 			docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].NombreTipoVinculacion = "MTO"
 		}
-		if(docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDTipoVinculacion == "4"){
-			docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].HorasLectivas	= "40"
+		if docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDTipoVinculacion == "4" {
+			docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].HorasLectivas = "40"
 			docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].NombreTipoVinculacion = "TCO"
 		}
 	}
 
 	//RETORNAR FACULTTADES CON ID DE OIKOS, HOMOLOGACION
-	for x, pos := range  docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
-		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDFacultad = HomologarFacultad("old",pos.IDFacultad)
+	for x, pos := range docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
+		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDFacultad = HomologarFacultad("old", pos.IDFacultad)
 	}
 
 	//RETORNAR PROYECTOS CURRICUALRES HOMOLOGADOS!!
-	for x, pos := range  docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
-		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDProyecto = HomologarProyectoCurricular("old",pos.IDProyecto)
+	for x, pos := range docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
+		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDProyecto = HomologarProyectoCurricular("old", pos.IDProyecto)
 	}
 
-
 	c.Ctx.Output.SetStatus(201)
-	c.Data["json"] = 	docentes_x_carga_horaria .CargasLectivas.CargaLectiva
+	c.Data["json"] = docentes_x_carga_horaria.CargasLectivas.CargaLectiva
 	c.ServeJSON()
 
 }
 
-func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDocente)(docentes_a_insertar []models.VinculacionDocente) {
+func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDocente) (docentes_a_insertar []models.VinculacionDocente) {
 	//id_resolucion := 141
 	nivel_academico := docentes_a_vincular[0].NivelAcademico
 	var a string
 	var categoria string
-
 
 	for x, docente := range docentes_a_vincular {
 		//docentes_a_vincular[x].NombreCompleto = docente.PrimerNombre + " " + docente.SegundoNombre + " " + docente.PrimerApellido + " " + docente.SegundoApellido
@@ -213,26 +211,26 @@ func EsDocentePlanta(idPersona string) (docentePlanta bool) {
 	}
 }
 
-func BuscarIdProveedor(DocumentoIdentidad int)(id_proveedor_docente int){
+func BuscarIdProveedor(DocumentoIdentidad int) (id_proveedor_docente int) {
 
-		var id_proveedor int
-		queryInformacionProveedor := "?query=NumDocumento:"+strconv.Itoa(DocumentoIdentidad)
-		var informacion_proveedor []models.InformacionProveedor
-		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/"+queryInformacionProveedor, &informacion_proveedor); err2 == nil {
-			if(informacion_proveedor != nil){
-				id_proveedor = informacion_proveedor[0].Id
-			}else{
-				id_proveedor = 0
-			}
-
+	var id_proveedor int
+	queryInformacionProveedor := "?query=NumDocumento:" + strconv.Itoa(DocumentoIdentidad)
+	var informacion_proveedor []models.InformacionProveedor
+	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/"+queryInformacionProveedor, &informacion_proveedor); err2 == nil {
+		if informacion_proveedor != nil {
+			id_proveedor = informacion_proveedor[0].Id
+		} else {
+			id_proveedor = 0
 		}
 
-		return id_proveedor
-		//docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IdProveedor = HomologarProyectoCurricular("old",pos.IDProyecto)
+	}
+
+	return id_proveedor
+	//docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IdProveedor = HomologarProyectoCurricular("old",pos.IDProyecto)
 
 }
 
-func Calcular_total_de_salario(v []models.VinculacionDocente)(total float64){
+func Calcular_total_de_salario(v []models.VinculacionDocente) (total float64) {
 
 	var sumatoria float64
 	for _, docente := range v {
@@ -249,97 +247,95 @@ func Calcular_total_de_salario(v []models.VinculacionDocente)(total float64){
 // @Success 201 {int} models.VinculacionDocente
 // @Failure 403 body is empty
 // @router /docentes_previnculados [get]
-func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados(){
+func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 	id_resolucion := c.GetString("id_resolucion")
 	fmt.Println("resolucion a consultar")
 	fmt.Println(id_resolucion)
-	query := "?limit=-1&query=IdResolucion.Id:"+id_resolucion+",Estado:true";
+	query := "?limit=-1&query=IdResolucion.Id:" + id_resolucion + ",Estado:true"
 	var v []models.VinculacionDocente
 
 	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &v); err2 == nil {
-		for x, pos := range  v{
-			documento_identidad,_ := strconv.Atoi(pos.IdPersona)
-			v[x].NombreCompleto = BuscarNombreProveedor(documento_identidad);
-			v[x].NumeroDisponibilidad = BuscarNumeroDisponibilidad(pos.Disponibilidad);
-			v[x].Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id);
-			v[x].LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona);
+		for x, pos := range v {
+			documento_identidad, _ := strconv.Atoi(pos.IdPersona)
+			v[x].NombreCompleto = BuscarNombreProveedor(documento_identidad)
+			v[x].NumeroDisponibilidad = BuscarNumeroDisponibilidad(pos.Disponibilidad)
+			v[x].Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id)
+			v[x].LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona)
 		}
 
-	}else{
-		fmt.Println("Error de cosulta en vinculacion",err2)
+	} else {
+		fmt.Println("Error de cosulta en vinculacion", err2)
 	}
 
 	c.Ctx.Output.SetStatus(201)
-	c.Data["json"] = 	v
+	c.Data["json"] = v
 	c.ServeJSON()
-  //fmt.Println(v)
+	//fmt.Println(v)
 
 }
 
-
-
-func ListarDocentesHorasLectivas(vigencia, periodo, tipo_vinculacion, facultad string)(docentes_a_listar models.ObjetoCargaLectiva){
+func ListarDocentesHorasLectivas(vigencia, periodo, tipo_vinculacion, facultad string) (docentes_a_listar models.ObjetoCargaLectiva) {
 
 	tipo_vinculacion_old := HomologarDedicacion_nombre(tipo_vinculacion)
-	facultad_old := HomologarFacultad("new",facultad)
+	facultad_old := HomologarFacultad("new", facultad)
 
 	var temp map[string]interface{}
 	var docentes_x_carga models.ObjetoCargaLectiva
 
-	for _, pos := range  tipo_vinculacion_old {
-		if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_academicos.HTTPEndpoint/carga_lectiva/"+vigencia+"/"+periodo+"/"+pos+"/"+facultad_old, &temp); err == nil && temp != nil{
-		 jsonDocentes, error_json := json.Marshal(temp)
+	for _, pos := range tipo_vinculacion_old {
+		if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_academicos.HTTPEndpoint/carga_lectiva/"+vigencia+"/"+periodo+"/"+pos+"/"+facultad_old, &temp); err == nil && temp != nil {
+			jsonDocentes, error_json := json.Marshal(temp)
 
-		 if error_json == nil {
-			 var temp_docentes models.ObjetoCargaLectiva
-			 json.Unmarshal(jsonDocentes, &temp_docentes)
-			 docentes_x_carga.CargasLectivas.CargaLectiva = append(docentes_x_carga.CargasLectivas.CargaLectiva, temp_docentes.CargasLectivas.CargaLectiva...)
-			 //c.Ctx.Output.SetStatus(201)
-			 //c.Data["json"] = docentes_a_listar.CargasLectivas.CargaLectiva
-		 }else{
-			// c.Data["json"] = error_json.Error()
-		 }
-	 }else {
-		 fmt.Println(err)
+			if error_json == nil {
+				var temp_docentes models.ObjetoCargaLectiva
+				json.Unmarshal(jsonDocentes, &temp_docentes)
+				docentes_x_carga.CargasLectivas.CargaLectiva = append(docentes_x_carga.CargasLectivas.CargaLectiva, temp_docentes.CargasLectivas.CargaLectiva...)
+				//c.Ctx.Output.SetStatus(201)
+				//c.Data["json"] = docentes_a_listar.CargasLectivas.CargaLectiva
+			} else {
+				// c.Data["json"] = error_json.Error()
+			}
+		} else {
+			fmt.Println(err)
 
-	 }
-	 }
+		}
+	}
 
-	 return docentes_x_carga;
+	return docentes_x_carga
 
 }
 
-func Buscar_Categoria_Docente(vigencia, periodo, documento_ident string)(categoria_nombre, categoria_id_old string){
+func Buscar_Categoria_Docente(vigencia, periodo, documento_ident string) (categoria_nombre, categoria_id_old string) {
 	var temp map[string]interface{}
 	var nombre_categoria string
 	var id_categoria_old string
 	//*****ojo, está quemada la cédula por falta de datos*****
-	if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_urano_pruebas/categoria_docente/"+vigencia+"/1/79708124", &temp); err == nil && temp != nil{
-	 jsonDocentes, error_json := json.Marshal(temp)
+	if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_urano_pruebas/categoria_docente/"+vigencia+"/1/79708124", &temp); err == nil && temp != nil {
+		jsonDocentes, error_json := json.Marshal(temp)
 
-	 if error_json == nil {
-		 var temp_docentes models.ObjetoCategoriaDocente
-		 json.Unmarshal(jsonDocentes, &temp_docentes)
-		 nombre_categoria = temp_docentes.CategoriaDocente.Categoria
-		 id_categoria_old = temp_docentes.CategoriaDocente.IDCategoria
+		if error_json == nil {
+			var temp_docentes models.ObjetoCategoriaDocente
+			json.Unmarshal(jsonDocentes, &temp_docentes)
+			nombre_categoria = temp_docentes.CategoriaDocente.Categoria
+			id_categoria_old = temp_docentes.CategoriaDocente.IDCategoria
 
-	 }else{
-		 fmt.Println(error_json.Error())
-		// c.Data["json"] = error_json.Error()
-	 }
- }else {
-	 fmt.Println(err)
+		} else {
+			fmt.Println(error_json.Error())
+			// c.Data["json"] = error_json.Error()
+		}
+	} else {
+		fmt.Println(err)
 
- }
+	}
 
- return nombre_categoria,id_categoria_old
+	return nombre_categoria, id_categoria_old
 }
 
-func HomologacionTotal(){
+func HomologacionTotal() {
 
 }
 
-func HomologarProyectoCurricular(tipo, proyecto string)(proyecto_old string){
+func HomologarProyectoCurricular(tipo, proyecto string) (proyecto_old string) {
 	var id_proyecto_old string
 	var comparacion string
 	var resultado string
@@ -366,31 +362,30 @@ func HomologarProyectoCurricular(tipo, proyecto string)(proyecto_old string){
 						}
 						]`
 
-	 byt := []byte(homologacion_proyectos)
-	 var arreglo_homologacion []models.Homologacion
-	 if err := json.Unmarshal(byt, &arreglo_homologacion); err != nil {
-			 panic(err)
-	 }
+	byt := []byte(homologacion_proyectos)
+	var arreglo_homologacion []models.Homologacion
+	if err := json.Unmarshal(byt, &arreglo_homologacion); err != nil {
+		panic(err)
+	}
 
-
-	 for _, pos := range  arreglo_homologacion{
-		 	if(tipo == "new"){
-				comparacion = pos.New
-				resultado = pos.Old
-			}else{
-				comparacion = pos.Old
-				resultado = pos.New
-			}
-
-			if(comparacion == proyecto){
-				id_proyecto_old = resultado
+	for _, pos := range arreglo_homologacion {
+		if tipo == "new" {
+			comparacion = pos.New
+			resultado = pos.Old
+		} else {
+			comparacion = pos.Old
+			resultado = pos.New
 		}
- 	}
+
+		if comparacion == proyecto {
+			id_proyecto_old = resultado
+		}
+	}
 
 	return id_proyecto_old
 }
 
-func HomologarFacultad(tipo, facultad string)(facultad_old string){
+func HomologarFacultad(tipo, facultad string) (facultad_old string) {
 
 	var id_facultad_old string
 	var comparacion string
@@ -418,31 +413,30 @@ func HomologarFacultad(tipo, facultad string)(facultad_old string){
 						}
 						]`
 
-	 byt := []byte(homologacion_facultad)
-	 var arreglo_homologacion []models.Homologacion
-	 if err := json.Unmarshal(byt, &arreglo_homologacion); err != nil {
-			 panic(err)
-	 }
+	byt := []byte(homologacion_facultad)
+	var arreglo_homologacion []models.Homologacion
+	if err := json.Unmarshal(byt, &arreglo_homologacion); err != nil {
+		panic(err)
+	}
 
-
-	 for _, pos := range  arreglo_homologacion{
-		 	if(tipo == "new"){
-				comparacion = pos.New
-				resultado = pos.Old
-			}else{
-				comparacion = pos.Old
-				resultado = pos.New
-			}
-
-			if(comparacion == facultad){
-				id_facultad_old = resultado
+	for _, pos := range arreglo_homologacion {
+		if tipo == "new" {
+			comparacion = pos.New
+			resultado = pos.Old
+		} else {
+			comparacion = pos.Old
+			resultado = pos.New
 		}
- 	}
+
+		if comparacion == facultad {
+			id_facultad_old = resultado
+		}
+	}
 
 	return id_facultad_old
 }
 
-func HomologarDedicacion_nombre(dedicacion string)(vinculacion_old []string){
+func HomologarDedicacion_nombre(dedicacion string) (vinculacion_old []string) {
 	var id_dedicacion_old []string
 	homologacion_dedicacion := `[
 						{
@@ -466,23 +460,22 @@ func HomologarDedicacion_nombre(dedicacion string)(vinculacion_old []string){
 						}
 						]`
 
-	 byt := []byte(homologacion_dedicacion)
-	 var arreglo_homologacion []models.HomologacionDedicacion
-	 if err := json.Unmarshal(byt, &arreglo_homologacion); err != nil {
-			 panic(err)
-	 }
+	byt := []byte(homologacion_dedicacion)
+	var arreglo_homologacion []models.HomologacionDedicacion
+	if err := json.Unmarshal(byt, &arreglo_homologacion); err != nil {
+		panic(err)
+	}
 
-	 for _, pos := range  arreglo_homologacion{
-			if(pos.Nombre == dedicacion){
-				id_dedicacion_old = append(id_dedicacion_old, pos.Old)
+	for _, pos := range arreglo_homologacion {
+		if pos.Nombre == dedicacion {
+			id_dedicacion_old = append(id_dedicacion_old, pos.Old)
 		}
- 	}
-
+	}
 
 	return id_dedicacion_old
 }
 
-func HomologarDedicacion_ID(tipo,dedicacion string)(vinculacion_old, nombre_vinculacion string){
+func HomologarDedicacion_ID(tipo, dedicacion string) (vinculacion_old, nombre_vinculacion string) {
 	var id_dedicacion_old string
 	var nombre_dedicacion string
 	var comparacion string
@@ -509,58 +502,57 @@ func HomologarDedicacion_ID(tipo,dedicacion string)(vinculacion_old, nombre_vinc
 						}
 						]`
 
-	 byt := []byte(homologacion_dedicacion)
-	 var arreglo_homologacion []models.HomologacionDedicacion
-	 if err := json.Unmarshal(byt, &arreglo_homologacion); err != nil {
-			 panic(err)
-	 }
+	byt := []byte(homologacion_dedicacion)
+	var arreglo_homologacion []models.HomologacionDedicacion
+	if err := json.Unmarshal(byt, &arreglo_homologacion); err != nil {
+		panic(err)
+	}
 
-	 for _, pos := range  arreglo_homologacion{
-					 if(tipo == "new"){
-					 comparacion = pos.New
-					 resultado = pos.Old
-				 }else{
-					 comparacion = pos.Old
-					 resultado = pos.New
-				 }
+	for _, pos := range arreglo_homologacion {
+		if tipo == "new" {
+			comparacion = pos.New
+			resultado = pos.Old
+		} else {
+			comparacion = pos.Old
+			resultado = pos.New
+		}
 
-				 if(comparacion == dedicacion){
-					 id_dedicacion_old = resultado
-					 nombre_dedicacion = pos.Nombre
-			 }
- 	}
-
+		if comparacion == dedicacion {
+			id_dedicacion_old = resultado
+			nombre_dedicacion = pos.Nombre
+		}
+	}
 
 	return id_dedicacion_old, nombre_dedicacion
 }
 
-func BuscarNombreProveedor(DocumentoIdentidad int)(nombre_prov string){
+func BuscarNombreProveedor(DocumentoIdentidad int) (nombre_prov string) {
 
-		var nom_proveedor string
-		queryInformacionProveedor := "?query=NumDocumento:"+strconv.Itoa(DocumentoIdentidad)
-		var informacion_proveedor []models.InformacionProveedor
-		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/"+queryInformacionProveedor, &informacion_proveedor); err2 == nil {
-			if(informacion_proveedor != nil){
-				nom_proveedor = informacion_proveedor[0].NomProveedor
-			}else{
-				nom_proveedor = ""
-			}
-
+	var nom_proveedor string
+	queryInformacionProveedor := "?query=NumDocumento:" + strconv.Itoa(DocumentoIdentidad)
+	var informacion_proveedor []models.InformacionProveedor
+	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/"+queryInformacionProveedor, &informacion_proveedor); err2 == nil {
+		if informacion_proveedor != nil {
+			nom_proveedor = informacion_proveedor[0].NomProveedor
+		} else {
+			nom_proveedor = ""
 		}
 
-		return nom_proveedor
-		//docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IdProveedor = HomologarProyectoCurricular("old",pos.IDProyecto)
+	}
+
+	return nom_proveedor
+	//docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IdProveedor = HomologarProyectoCurricular("old",pos.IDProyecto)
 
 }
 
-func BuscarNombreDedicacion(id_dedicacion int)(nombre_dedicacion string){
+func BuscarNombreDedicacion(id_dedicacion int) (nombre_dedicacion string) {
 	var nom_dedicacion string
-	query:= "?limit=-1&query=Id:"+strconv.Itoa(id_dedicacion)
+	query := "?limit=-1&query=Id:" + strconv.Itoa(id_dedicacion)
 	var dedicaciones []models.Dedicacion
 	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/dedicacion"+query, &dedicaciones); err2 == nil {
-		if(dedicaciones != nil){
+		if dedicaciones != nil {
 			nom_dedicacion = dedicaciones[0].Descripcion
-		}else{
+		} else {
 			nom_dedicacion = ""
 		}
 
@@ -569,54 +561,54 @@ func BuscarNombreDedicacion(id_dedicacion int)(nombre_dedicacion string){
 	return nom_dedicacion
 }
 
-func BuscarNumeroDisponibilidad(IdCDP int)(numero_disp int){
+func BuscarNumeroDisponibilidad(IdCDP int) (numero_disp int) {
 
-		var temp []models.Disponibilidad
-		var numero_disponibilidad int
-		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad?limit=-1&query=Id:"+strconv.Itoa(IdCDP), &temp); err2 == nil {
-			if(temp != nil){
-				numero_disponibilidad = int(temp[0].NumeroDisponibilidad)
+	var temp []models.Disponibilidad
+	var numero_disponibilidad int
+	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad?limit=-1&query=Id:"+strconv.Itoa(IdCDP), &temp); err2 == nil {
+		if temp != nil {
+			numero_disponibilidad = int(temp[0].NumeroDisponibilidad)
 
-			}else{
-				numero_disponibilidad = 0
-			}
-
-		}else{
-			fmt.Println("error en json",err2)
+		} else {
+			numero_disponibilidad = 0
 		}
-		return numero_disponibilidad
-		//docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IdProveedor = HomologarProyectoCurricular("old",pos.IDProyecto)
+
+	} else {
+		fmt.Println("error en json", err2)
+	}
+	return numero_disponibilidad
+	//docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IdProveedor = HomologarProyectoCurricular("old",pos.IDProyecto)
 
 }
 
-func BuscarLugarExpedicion(Cedula string)(nombre_lugar_exp string){
+func BuscarLugarExpedicion(Cedula string) (nombre_lugar_exp string) {
 
-		var nombre_ciudad string
-		var temp []models.InformacionPersonaNatural
-		var temp2 []models.Ciudad
-		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_persona_natural?limit=-1&query=Id:"+Cedula, &temp); err2 == nil {
-			if(temp != nil){
-				id_ciudad := temp[0].IdCiudadExpedicionDocumento;
-					if err := getJson("http://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ciudad?limit=-1&query=Id:"+strconv.Itoa(int(id_ciudad)), &temp2); err2 == nil {
-					if(temp2 != nil){
-						nombre_ciudad = temp2[0].Nombre
+	var nombre_ciudad string
+	var temp []models.InformacionPersonaNatural
+	var temp2 []models.Ciudad
+	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_persona_natural?limit=-1&query=Id:"+Cedula, &temp); err2 == nil {
+		if temp != nil {
+			id_ciudad := temp[0].IdCiudadExpedicionDocumento
+			if err := getJson("http://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ciudad?limit=-1&query=Id:"+strconv.Itoa(int(id_ciudad)), &temp2); err2 == nil {
+				if temp2 != nil {
+					nombre_ciudad = temp2[0].Nombre
 
-					}else{
-						nombre_ciudad = "N/A"
-					}
-
-				}else{
-						fmt.Println("error en json",err)
+				} else {
+					nombre_ciudad = "N/A"
 				}
 
-			}else{
-				nombre_ciudad = "N/A"
+			} else {
+				fmt.Println("error en json", err)
 			}
 
-		}else{
-			fmt.Println("error en json",err2)
+		} else {
+			nombre_ciudad = "N/A"
 		}
 
-		return nombre_ciudad;
+	} else {
+		fmt.Println("error en json", err2)
+	}
+
+	return nombre_ciudad
 
 }

@@ -39,6 +39,14 @@ func init() {
 			MethodParams: param.Make(),
 			Params: nil})
 
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:ExpedirResolucionController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:ExpedirResolucionController"],
+		beego.ControllerComments{
+			Method: "Expedir",
+			Router: `/expedir`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
+			Params: nil})
+
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"],
 		beego.ControllerComments{
 			Method: "ActualizarVinculaciones",
@@ -65,16 +73,16 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"],
 		beego.ControllerComments{
-			Method: "ListarDocentesPrevinculados",
-			Router: `/docentes_previnculados`,
-			AllowHTTPMethods: []string{"get"},
+			Method: "Calcular_total_de_salarios",
+			Router: `Precontratacion/calcular_valor_contratos`,
+			AllowHTTPMethods: []string{"post"},
 			MethodParams: param.Make(),
 			Params: nil})
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"],
 		beego.ControllerComments{
-			Method: "Calcular_total_de_salarios",
-			Router: `Precontratacion/calcular_valor_contratos`,
+			Method: "InsertarPrevinculaciones",
+			Router: `Precontratacion/insertar_previnculaciones`,
 			AllowHTTPMethods: []string{"post"},
 			MethodParams: param.Make(),
 			Params: nil})
@@ -89,9 +97,9 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"],
 		beego.ControllerComments{
-			Method: "InsertarPrevinculaciones",
-			Router: `Precontratacion/insertar_previnculaciones`,
-			AllowHTTPMethods: []string{"post"},
+			Method: "ListarDocentesPrevinculados",
+			Router: `/docentes_previnculados`,
+			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
 

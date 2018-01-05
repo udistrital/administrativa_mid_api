@@ -44,6 +44,12 @@ func init() {
 			),
 		),
 
+		beego.NSNamespace("/expedir_resolucion",
+			beego.NSInclude(
+				&controllers.ExpedirResolucionController{},
+			),
+		),
+
 		beego.NSNamespace("/validar_contrato",
 			beego.NSInclude(
 				&controllers.ValidarContratoController{},
