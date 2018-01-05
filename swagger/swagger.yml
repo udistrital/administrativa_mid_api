@@ -11,28 +11,6 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 basePath: /v1
 paths:
-  /calculo_salarioContratacion/{idVinculacion}:
-    get:
-      tags:
-      - calculo_salario
-      description: create CalcularSalarioContratacion
-      operationId: CalculoSalarioController.CalcularSalarioContratacion
-      responses:
-        "201":
-          description: '{int} models.ContratoGeneral'
-        "403":
-          description: body is empty
-  /calculo_salarioPrecontratacion/{nivelAcademico}/{idProfesor}/{numHoras}/{numSemanas}/{categoria}/{dedicacion}:
-    post:
-      tags:
-      - calculo_salario
-      description: create CalcularSalarioPrecontratacion
-      operationId: CalculoSalarioController.CalcularSalarioPrecontratacion
-      responses:
-        "201":
-          description: '{int} models.ContratoGeneral'
-        "403":
-          description: body is empty
   /cancelacion_valida/{idResolucion}:
     post:
       tags:
@@ -42,6 +20,179 @@ paths:
       responses:
         "201":
           description: '{int} models.ContratoGeneral'
+        "403":
+          description: body is empty
+  /consultar_disponibilidades/listar_apropiaciones:
+    post:
+      tags:
+      - consultar_disponibilidades
+      description: create ListarApropiaciones
+      operationId: GestionDisponibilidadController.ListarApropiaciones
+      responses:
+        "201":
+          description: '{int} models.DisponibilidadApropiacion'
+        "403":
+          description: body is empty
+  /contrato_generalGetContratoByContratoSuscritoId/{id}/{vigencia}:
+    get:
+      tags:
+      - contrato_general
+      description: get Contrato_genral by id
+      operationId: Contrato_generalController.GetContratoByContratoSuscritoId
+      parameters:
+      - in: path
+        name: id
+        description: numero del contrato a consultar
+        required: true
+        type: string
+      - in: path
+        name: vigencia
+        description: numero del contrato a consultar
+        required: true
+        type: string
+      responses:
+        "200":
+          schema:
+            $ref: '#/definitions/.Contrato_genral'
+        "403": {}
+  /contrato_generalListaContratoContratoSuscrito/{vigencia}:
+    get:
+      tags:
+      - contrato_general
+      description: get Disponibilidad by vigencia
+      operationId: Contrato_generalController.ListaContratoContratoSuscrito
+      parameters:
+      - in: query
+        name: vigencia
+        description: vigencia de la lista
+        type: string
+      - in: query
+        name: UnidadEjecutora
+        description: unidad ejecutora de las solicitudes a consultar
+        type: string
+      - in: query
+        name: limit
+        description: Limit the size of result set. Must be an integer
+        type: string
+      - in: query
+        name: offset
+        description: Start position of result set. Must be an integer
+        type: string
+      - in: query
+        name: rangoinicio
+        description: rango inicial del periodo a consultar
+        type: string
+      - in: query
+        name: rangofin
+        description: rango final del periodo a consultar
+        type: string
+      - in: query
+        name: query
+        description: query de filtrado para la lista de los cdp
+        type: string
+      responses:
+        "200":
+          schema:
+            $ref: '#/definitions/models.Disponibilidad'
+        "403": {}
+  /expedir_resolucion/expedir:
+    post:
+      tags:
+      - expedir_resolucion
+      description: create Expedir
+      operationId: ExpedirResolucionController.Expedir
+      responses:
+        "201":
+          description: '{int} models.ExpedicionResolucion'
+        "403":
+          description: body is empty
+  /gestion_desvinculacionesactualizar_vinculaciones:
+    post:
+      tags:
+      - gestion_desvinculaciones
+      description: create ActualizarVinculaciones
+      operationId: GestionDesvinculacionesController.ActualizarVinculaciones
+      responses:
+        "201":
+          description: '{string}'
+        "403":
+          description: body is empty
+  /gestion_previnculacion/docentes_previnculados:
+    get:
+      tags:
+      - gestion_previnculacion
+      description: create ListarDocentesPrevinculados
+      operationId: GestionPrevinculacionesController.ListarDocentesPrevinculados
+      parameters:
+      - in: query
+        name: id_resolucion
+        description: resolucion a consultar
+        type: string
+      responses:
+        "201":
+          description: '{int} models.VinculacionDocente'
+        "403":
+          description: body is empty
+  /gestion_previnculacionPrecontratacion/calcular_valor_contratos:
+    post:
+      tags:
+      - gestion_previnculacion
+      description: create InsertarPrevinculaciones
+      operationId: GestionPrevinculacionesController.InsetarPrevinculaciones
+      responses:
+        "201":
+          description: '{int} models.VinculacionDocente'
+        "403":
+          description: body is empty
+  /gestion_previnculacionPrecontratacion/docentes_x_carga_horaria:
+    get:
+      tags:
+      - gestion_previnculacion
+      description: create ListarDocentesCargaHoraria
+      operationId: GestionPrevinculacionesController.ListarDocentesCargaHoraria
+      parameters:
+      - in: query
+        name: vigencia
+        description: año a consultar
+        type: string
+      - in: query
+        name: periodo
+        description: periodo a listar
+        type: string
+      - in: query
+        name: tipo_vinculacion
+        description: vinculacion del docente
+        type: string
+      - in: query
+        name: facultad
+        description: facultad
+        type: string
+      responses:
+        "201":
+          schema:
+            $ref: '#/definitions/.Docentes_x_Carga'
+        "403":
+          description: body is empty
+  /gestion_previnculacionPrecontratacion/insertar_previnculaciones:
+    post:
+      tags:
+      - gestion_previnculacion
+      description: create InsertarPrevinculaciones
+      operationId: GestionPrevinculacionesController.InsetarPrevinculaciones
+      responses:
+        "201":
+          description: '{int} models.VinculacionDocente'
+        "403":
+          description: body is empty
+  /gestion_resoluciones/insertar_resolucion_completa:
+    post:
+      tags:
+      - gestion_resoluciones
+      description: create InsertarResolucionCompleta
+      operationId: GestionResolucionesController.InsertarResolucionCompleta
+      responses:
+        "201":
+          description: '{int} models.Resolucion'
         "403":
           description: body is empty
   /informacion_proveedor/contratoPersona:
@@ -73,7 +224,22 @@ paths:
           description: '{int} models.ContratoGeneral'
         "403":
           description: body is empty
+  /validarCambioEstado/:
+    post:
+      tags:
+      - validarCambioEstado
+      description: create ValidarCambiosEstado
+      operationId: CambioEstadoContratoValidoController.ValidarCambiosEstado
+      responses:
+        "201":
+          description: '{int} models.EstadoContrato'
+        "403":
+          description: body is empty
 definitions:
+  .Contrato_genral:
+    type: object
+  .Docentes_x_Carga:
+    type: object
   models.ContratoGeneral:
     title: ContratoGeneral
     type: object
@@ -110,13 +276,7 @@ definitions:
       ModalidadSeleccion:
         type: integer
         format: int64
-      NumeroCdp:
-        type: integer
-        format: int64
       NumeroConstancia:
-        type: integer
-        format: int64
-      NumeroSolicitudNecesidad:
         type: integer
         format: int64
       ObjetoContrato:
@@ -139,9 +299,6 @@ definitions:
         type: integer
         format: int64
       RegimenContratacion:
-        type: integer
-        format: int64
-      RegistroPresupuestal:
         type: integer
         format: int64
       SedeSolicitante:
@@ -185,6 +342,19 @@ definitions:
       VigenciaContrato:
         type: integer
         format: int64
+  models.Disponibilidad:
+    title: Disponibilidad
+    type: object
+    properties:
+      Id:
+        type: integer
+        format: int64
+      NumeroDisponibilidad:
+        type: number
+        format: double
+      Vigencia:
+        type: number
+        format: double
   models.LugarEjecucion:
     title: LugarEjecucion
     type: object
@@ -272,9 +442,24 @@ tags:
 - name: informacion_proveedor
   description: |
     InformacionProveedorController operations for InformacionProveedor
-- name: calculo_salario
+- name: gestion_previnculacion
   description: |
     PreliquidacionController operations for Preliquidacion
+- name: gestion_resoluciones
+  description: |
+    GestionResolucionesController operations for Preliquidacion
+- name: gestion_desvinculaciones
+  description: |
+    PreliquidacionController operations for Preliquidacion
+- name: consultar_disponibilidades
+  description: |
+    PreliquidacionController operations for Preliquidacion
+- name: expedir_resolucion
+  description: |
+    ExpedirResolucionController operations for ExpedirResolucion
 - name: validarCambioEstado
   description: |
     CambioEstadoContratoValidoController operations for CambioEstadoContratoValido
+- name: contrato_general
+  description: |
+    Contrato_generalController operations for Contrato_genral
