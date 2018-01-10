@@ -18,6 +18,41 @@ func (c *GestionDesvinculacionesController) URLMapping() {
 
 	c.Mapping("ActualizarVinculaciones", c.ActualizarVinculaciones)
 	c.Mapping("AdicionarHoras", c.AdicionarHoras)
+
+}
+
+// GestionDesvinculacionesController ...
+// @Title ListarDocentesDesvinculados
+// @Description create ListarDocentesDesvinculados
+// @Param id_resolucion query string false "resolucion a consultar"
+// @Success 201 {int} models.VinculacionDocente
+// @Failure 403 body is empty
+// @router /docentes_desvinculados [get]
+func (c *GestionDesvinculacionesController) ListarDocentesDesvinculados() {
+	id_resolucion := c.GetString("id_resolucion")
+	fmt.Println("resolucion a consultar")
+	fmt.Println(id_resolucion)
+	query := "?limit=-1&query=IdResolucion.Id:" + id_resolucion + ",Estado:false"
+	var v []models.VinculacionDocente
+
+	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &v); err2 == nil {
+		for x, pos := range v {
+			documento_identidad, _ := strconv.Atoi(pos.IdPersona)
+			v[x].NombreCompleto = BuscarNombreProveedor(documento_identidad)
+			v[x].NumeroDisponibilidad = BuscarNumeroDisponibilidad(pos.Disponibilidad)
+			v[x].Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id)
+			v[x].LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona)
+		}
+
+	} else {
+		fmt.Println("Error de cosulta en vinculacion", err2)
+	}
+
+	c.Ctx.Output.SetStatus(201)
+	c.Data["json"] = v
+	c.ServeJSON()
+	//fmt.Println(v)
+
 }
 
 // ActualizarVinculaciones ...
