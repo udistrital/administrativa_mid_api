@@ -195,7 +195,7 @@ func (c *GestionDesvinculacionesController) AnularDesvinculacionDocente() {
 				respuesta_total = "error"
 			}
 
-		query:="?limit=-1&query=ModificacionResolucion.Id:9,VinculacionDocenteCancelada.Id:"+strconv.Itoa(v.DocentesDesvincular[0].Id);
+		query:="?limit=-1&query=ModificacionResolucion.Id:"+strconv.Itoa(v.IdModificacionResolucion)+",VinculacionDocenteCancelada.Id:"+strconv.Itoa(v.DocentesDesvincular[0].Id);
 		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion"+query, &respuesta_modificacion_vinculacion); err2 == nil {
 					respuesta_total = "OK"
 				}else{
@@ -207,6 +207,79 @@ func (c *GestionDesvinculacionesController) AnularDesvinculacionDocente() {
 			}else{
 				respuesta_total = "error"
 			}
+
+		}else{
+			respuesta_total = "error"
+		}
+
+		c.Data["json"] = respuesta_total
+		c.ServeJSON()
+}
+
+// GestionDesvinculacionesController ...
+// @Title AnularAdicionDocente
+// @Description create AnularAdicionDocente
+// @Success 201 {string}
+// @Failure 403 body is empty
+// @router /anular_adicion [post]
+func (c *GestionDesvinculacionesController) AnularAdicionDocente() {
+	fmt.Println("anular adicion")
+	var v models.Objeto_Desvinculacion
+	var respuesta_vinculacion string
+	var vinculacion_cancelada []models.VinculacionDocente
+	var respuesta_delete_vin string
+	var respuesta_delete string
+	var respuesta_total string
+	var respuesta_modificacion_vinculacion []models.ModificacionVinculacion
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+		respuesta_total = "OK"
+
+		//Se trae información de tabla de traza modificacion_vinculacion, para saber cuál vinculación hay que poner en true y cuál eliminar
+		query:="?limit=-1&query=ModificacionResolucion.Id:"+strconv.Itoa(v.IdModificacionResolucion)+",VinculacionDocenteRegistrada.Id:"+strconv.Itoa(v.DocentesDesvincular[0].Id);
+		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion"+query, &respuesta_modificacion_vinculacion); err2 == nil {
+					fmt.Println("modificacion_vinculacion",respuesta_modificacion_vinculacion)
+					respuesta_total = "OK"
+				}else{
+					respuesta_total = "error"
+				}
+
+		//se trae informacion de vinculacion que fue cancelada
+		query2:="?limit=-1&query=Id:"+strconv.Itoa(respuesta_modificacion_vinculacion[0].VinculacionDocenteCancelada.Id);
+			if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query2, &vinculacion_cancelada); err2 == nil {
+							fmt.Println("vinculacion_cancelada",vinculacion_cancelada)
+							respuesta_total = "OK"
+					}else{
+							respuesta_total = "error"
+					}
+		//se cambia a true vinculacion que fue cancelada
+		vinculacion_cancelada[0].Estado = true;
+		fmt.Println("nuevo estado de vinculacion cancelada",vinculacion_cancelada)
+
+		//Se le cambia estado en bd a vinculacion cancelada
+
+	 if err2 := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(vinculacion_cancelada[0].Id),"PUT", &respuesta_vinculacion, vinculacion_cancelada[0]); err2 == nil {
+		 	fmt.Println("respuesta_vinculacion",respuesta_vinculacion)
+			 	respuesta_total = "OK"
+		 }else{
+			 respuesta_total = "error"
+		 }
+
+		 //se elimina registro en modificacion_vinculacion
+
+	 if err2 := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/"+strconv.Itoa(respuesta_modificacion_vinculacion[0].Id),"DELETE",&respuesta_delete,respuesta_modificacion_vinculacion[0]); err2 == nil {
+			 respuesta_total = "OK"
+		 }else{
+			 respuesta_total = "error"
+		 }
+
+		 //Se elimina vinculacion nueva
+		 if err2 := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(v.DocentesDesvincular[0].Id),"DELETE",&respuesta_delete_vin,v.DocentesDesvincular[0]); err2 == nil {
+			 	fmt.Println("respuesta_eliminar_vin_nueva",respuesta_delete_vin)
+				respuesta_total = "OK"
+ 			}else{
+ 				respuesta_total = "error"
+ 			}
 
 		}else{
 			respuesta_total = "error"
