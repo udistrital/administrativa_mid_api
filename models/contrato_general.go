@@ -88,8 +88,7 @@ func GetNumeroTotalContratoGeneralDVE(vigencia int) (n int) {
 	if err == nil {
 		fmt.Println("Consulta exitosa")
 	}
-
-	return temp[0].NumeroTotal
+	return int(temp[0].NumeroTotal)
 }
 
 func (t *ContratoGeneral) TableName() string {
