@@ -61,7 +61,6 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 	var id_respuesta int
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-		fmt.Println("docentes a contratar", v)
 		v = CalcularSalarioPrecontratacion(v)
 
 	} else {
@@ -71,7 +70,6 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 	}
 
 	if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &id_respuesta, &v); err == nil {
-		fmt.Println("er", id_respuesta)
 		c.Data["json"] = id_respuesta
 	} else {
 		c.Data["json"] = "Error al insertar docentes"
@@ -249,8 +247,6 @@ func Calcular_total_de_salario(v []models.VinculacionDocente) (total float64) {
 // @router /docentes_previnculados [get]
 func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 	id_resolucion := c.GetString("id_resolucion")
-	fmt.Println("resolucion a consultar")
-	fmt.Println(id_resolucion)
 	query := "?limit=-1&query=IdResolucion.Id:" + id_resolucion + ",Estado:true"
 	var v []models.VinculacionDocente
 
@@ -270,7 +266,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 	c.Ctx.Output.SetStatus(201)
 	c.Data["json"] = v
 	c.ServeJSON()
-	//fmt.Println(v)
+
 
 }
 
@@ -567,8 +563,7 @@ func BuscarNumeroDisponibilidad(IdCDP int) (numero_disp int) {
 	var numero_disponibilidad int
 	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad?limit=-1&query=DisponibilidadApropiacion.Id:"+strconv.Itoa(IdCDP), &temp); err2 == nil {
 		if temp != nil {
-			fmt.Println("disponibilidad",temp[0])
-			numero_disponibilidad = int(temp[0].NumeroDisponibilidad)
+				numero_disponibilidad = int(temp[0].NumeroDisponibilidad)
 
 		} else {
 			numero_disponibilidad = 0

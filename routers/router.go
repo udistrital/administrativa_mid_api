@@ -32,6 +32,12 @@ func init() {
 			),
 		),
 
+		beego.NSNamespace("/gestion_documento_resolucion",
+			beego.NSInclude(
+				&controllers.GestionDocumentoResolucionController{},
+			),
+		),
+
 		beego.NSNamespace("/gestion_desvinculaciones",
 			beego.NSInclude(
 				&controllers.GestionDesvinculacionesController{},

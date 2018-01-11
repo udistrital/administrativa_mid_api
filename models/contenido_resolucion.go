@@ -21,6 +21,8 @@ type ResolucionCompleta struct {
 	Numero        string
 	Id            int
 	Articulos     []Articulo
+	OrdenadorGasto OrdenadorGasto
+	
 }
 
 type ComponenteResolucion struct {
