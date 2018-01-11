@@ -142,13 +142,9 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 
 		};
 		//CREAR NUEVA Vinculacion
-
-		if err := sendJson("http://localhost:8082/v1/gestion_previnculacion/Precontratacion/insertar_previnculaciones","POST", &vinculacion_nueva, temp_vinculacion); err == nil {
-			fmt.Println("vinculacion nueva",vinculacion_nueva)
-		}else{
-			fmt.Println("error en json de modificacion vinculacion",err)
-		}
-
+		vinculacion_nueva = InsertarDesvinculaciones(temp_vinculacion)
+		fmt.Println("vinculacion nueva", vinculacion_nueva)
+		
 		//
 		fmt.Println("Id para modificacion,res",v.IdModificacionResolucion)
 
@@ -287,4 +283,29 @@ func (c *GestionDesvinculacionesController) AnularAdicionDocente() {
 
 		c.Data["json"] = respuesta_total
 		c.ServeJSON()
+}
+
+func InsertarDesvinculaciones(v [1]models.VinculacionDocente)(id int) {
+
+	var id_respuesta int
+	var d []models.VinculacionDocente
+	json_ejemplo, err := json.Marshal(v)
+	fmt.Println("error al hacer lo del json",err)
+	if err := json.Unmarshal(json_ejemplo, &d); err == nil {
+		fmt.Println("docentes a contratar", d)
+		d = CalcularSalarioPrecontratacion(d)
+
+	} else {
+		fmt.Println("ERROR")
+		fmt.Println(err)
+
+	}
+
+
+	if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &id_respuesta, &d); err == nil {
+		fmt.Println("no hay error", id_respuesta)
+	} else {
+		id_respuesta = 0
+	}
+	return id_respuesta
 }
