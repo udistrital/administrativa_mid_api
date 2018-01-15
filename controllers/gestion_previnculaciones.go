@@ -267,7 +267,47 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 	c.Data["json"] = v
 	c.ServeJSON()
 
+}
 
+// GestionCanceladosController ...
+// @Title ListarDocentesCancelados
+// @Description create ListarDocentesCancelados
+// @Param id_resolucion query string false "resolucion a consultar"
+// @Success 201 {int} models.VinculacionDocente
+// @Failure 403 body is empty
+// @router /docentes_cancelados [get]
+func (c *GestionPrevinculacionesController) ListarDocentesCancelados() {
+	id_resolucion := c.GetString("id_resolucion")
+	var v []models.VinculacionDocente
+	var modRes []models.ModificacionResolucion
+	var modVin []models.ModificacionVinculacion
+	// if 3 - modificacion_resolucion
+	if err := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=resolucionNueva:"+id_resolucion, &modRes); err == nil {
+		// if 2 - modificacion_vinculacion
+		fmt.Println("Primer if", modRes[0])
+		if err := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/?limit=-1&query=modificacion_resolucion:"+strconv.Itoa(modRes[0].Id), &modVin); err == nil {
+			//for vinculaciones
+			for x, vinculacion := range modVin {
+				// if 1 - vinculacion_docente
+				if err := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(vinculacion.VinculacionDocenteCancelada.Id), &v); err == nil {
+					documento_identidad, _ := strconv.Atoi(vinculacion.VinculacionDocenteCancelada.IdPersona)
+					v[x].NombreCompleto = BuscarNombreProveedor(documento_identidad)
+					v[x].NumeroDisponibilidad = BuscarNumeroDisponibilidad(vinculacion.VinculacionDocenteCancelada.Disponibilidad)
+					v[x].Dedicacion = BuscarNombreDedicacion(vinculacion.VinculacionDocenteCancelada.IdDedicacion.Id)
+					v[x].LugarExpedicionCedula = BuscarLugarExpedicion(vinculacion.VinculacionDocenteCancelada.IdPersona)
+				} else { // if 1 - vinculacion_docente
+					fmt.Println("Error de cosulta en vinculacion, solucioname!!!, if 1 - vinculacion_docente: ", err)
+				}
+			} //fin for vinculaciones
+		} else { // if 2 - modificacion_vinculacion
+			fmt.Println("Error de cosulta en modificacion_vinculacion, solucioname!!!, if 2 - modificacion_vinculacion: ", err)
+		}
+	} else { // if 3 - modificacion_resolucion
+		fmt.Println("Error de cosulta en modificacion_resolucion, solucioname!!!, if 3 - modificacion_resolucion: ", err)
+	}
+	c.Ctx.Output.SetStatus(201)
+	c.Data["json"] = v
+	c.ServeJSON()
 }
 
 func ListarDocentesHorasLectivas(vigencia, periodo, tipo_vinculacion, facultad string) (docentes_a_listar models.ObjetoCargaLectiva) {
@@ -563,7 +603,7 @@ func BuscarNumeroDisponibilidad(IdCDP int) (numero_disp int) {
 	var numero_disponibilidad int
 	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad?limit=-1&query=DisponibilidadApropiacion.Id:"+strconv.Itoa(IdCDP), &temp); err2 == nil {
 		if temp != nil {
-				numero_disponibilidad = int(temp[0].NumeroDisponibilidad)
+			numero_disponibilidad = int(temp[0].NumeroDisponibilidad)
 
 		} else {
 			numero_disponibilidad = 0
