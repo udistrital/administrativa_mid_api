@@ -87,6 +87,14 @@ func init() {
 			MethodParams: param.Make(),
 			Params: nil})
 
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"],
+		beego.ControllerComments{
+			Method: "ListarDocentesCancelados",
+			Router: `/docentes_cancelados`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDisponibilidadController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDisponibilidadController"],
 		beego.ControllerComments{
 			Method: "ListarApropiaciones",
@@ -131,14 +139,6 @@ func init() {
 		beego.ControllerComments{
 			Method: "ListarDocentesPrevinculados",
 			Router: `/docentes_previnculados`,
-			AllowHTTPMethods: []string{"get"},
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"],
-		beego.ControllerComments{
-			Method: "ListarDocentesCancelados",
-			Router: `/docentes_cancelados`,
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})

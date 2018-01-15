@@ -9,7 +9,6 @@ import (
 	"github.com/astaxie/beego"
 	//. "github.com/mndrix/golog"
 	"github.com/udistrital/administrativa_mid_api/models"
-
 )
 
 //GestionDocumentoResolucionController operations for Preliquidacion
@@ -19,7 +18,6 @@ type GestionDocumentoResolucionController struct {
 
 // URLMapping ...
 func (c *GestionDocumentoResolucionController) URLMapping() {
-
 
 }
 
@@ -40,38 +38,37 @@ func (c *GestionDocumentoResolucionController) GetContenidoResolucion() {
 	var query string
 
 	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/contenido_resolucion/"+id_resolucion, &contenidoResolucion); err2 == nil {
-		query = "?limit=-1&query=DependenciaId:"+id_facultad
+		query = "?limit=-1&query=DependenciaId:" + id_facultad
 
 		if err := getJson("http://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ordenador_gasto"+query, &ordenador_gasto); err == nil {
-			if(ordenador_gasto == nil){
+			if ordenador_gasto == nil {
 				if err := getJson("http://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ordenador_gasto/1", &ordenador_gasto); err == nil {
 					contenidoResolucion.OrdenadorGasto = ordenador_gasto[0]
-				}else{
-							fmt.Println("Error al consultar ordenador 1", err2)
-					}
-			}else{
+				} else {
+					fmt.Println("Error al consultar ordenador 1", err)
+				}
+			} else {
 				contenidoResolucion.OrdenadorGasto = ordenador_gasto[0]
 			}
 
-
 		} else {
 
-			fmt.Println("Error al consultar ordenador del gasto", err2)
+			fmt.Println("Error al consultar ordenador del gasto", err)
 		}
 
 	} else {
 		fmt.Println("Error al consultar contenido", err2)
 	}
 
-	query="?query=DependenciaId:"+id_facultad
+	query = "?query=DependenciaId:" + id_facultad
 	if err := getJson("http://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/jefe_dependencia"+query, &jefe_dependencia); err == nil {
 		contenidoResolucion.OrdenadorGasto.NombreOrdenador = BuscarNombreProveedor(jefe_dependencia[0].TerceroId)
-	}else{
+	} else {
 
 	}
 
 	c.Ctx.Output.SetStatus(201)
 	c.Data["json"] = contenidoResolucion
 	c.ServeJSON()
-	
+
 }
