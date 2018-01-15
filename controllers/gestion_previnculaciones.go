@@ -281,23 +281,26 @@ func (c *GestionPrevinculacionesController) ListarDocentesCancelados() {
 	var v []models.VinculacionDocente
 	var modRes []models.ModificacionResolucion
 	var modVin []models.ModificacionVinculacion
+	var cv models.VinculacionDocente
 	// if 3 - modificacion_resolucion
 	if err := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=resolucionNueva:"+id_resolucion, &modRes); err == nil {
 		// if 2 - modificacion_vinculacion
 		fmt.Println("Primer if", modRes[0])
 		if err := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/?limit=-1&query=modificacion_resolucion:"+strconv.Itoa(modRes[0].Id), &modVin); err == nil {
 			//for vinculaciones
-			for x, vinculacion := range modVin {
+			for _, vinculacion := range modVin {
 				// if 1 - vinculacion_docente
-				if err := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(vinculacion.VinculacionDocenteCancelada.Id), &v); err == nil {
+				if err := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(vinculacion.VinculacionDocenteCancelada.Id), &cv); err == nil {
 					documento_identidad, _ := strconv.Atoi(vinculacion.VinculacionDocenteCancelada.IdPersona)
-					v[x].NombreCompleto = BuscarNombreProveedor(documento_identidad)
-					v[x].NumeroDisponibilidad = BuscarNumeroDisponibilidad(vinculacion.VinculacionDocenteCancelada.Disponibilidad)
-					v[x].Dedicacion = BuscarNombreDedicacion(vinculacion.VinculacionDocenteCancelada.IdDedicacion.Id)
-					v[x].LugarExpedicionCedula = BuscarLugarExpedicion(vinculacion.VinculacionDocenteCancelada.IdPersona)
+					cv.NombreCompleto = BuscarNombreProveedor(documento_identidad)
+					cv.NumeroDisponibilidad = BuscarNumeroDisponibilidad(vinculacion.VinculacionDocenteCancelada.Disponibilidad)
+					cv.Dedicacion = BuscarNombreDedicacion(vinculacion.VinculacionDocenteCancelada.IdDedicacion.Id)
+					cv.LugarExpedicionCedula = BuscarLugarExpedicion(vinculacion.VinculacionDocenteCancelada.IdPersona)
 				} else { // if 1 - vinculacion_docente
 					fmt.Println("Error de cosulta en vinculacion, solucioname!!!, if 1 - vinculacion_docente: ", err)
 				}
+				fmt.Println("Aqui estoy: ", cv)
+				v = append(v, cv)
 			} //fin for vinculaciones
 		} else { // if 2 - modificacion_vinculacion
 			fmt.Println("Error de cosulta en modificacion_vinculacion, solucioname!!!, if 2 - modificacion_vinculacion: ", err)
