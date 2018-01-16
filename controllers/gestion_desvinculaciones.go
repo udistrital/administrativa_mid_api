@@ -135,10 +135,12 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 					Disponibilidad:       v.DisponibilidadNueva,
 				}
 
+
 				//CREAR NUEVA Vinculacion
 				vinculacion_nueva, respuesta = InsertarDesvinculaciones(temp_vinculacion)
 				fmt.Println("vinculacion nueva", vinculacion_nueva)
 
+				if (respuesta == "OK") {
 				//
 				fmt.Println("Id para modificacion,res", v.IdModificacionResolucion)
 
@@ -153,6 +155,12 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 						respuesta = "error"
 					}
 				}
+
+					}else{
+						fmt.Println("error al realizar vinculacion nueva")
+					}
+
+
 
 			} else {
 				fmt.Println("error al cambiar estado en vinculación docente al adicionar horas", err2)
