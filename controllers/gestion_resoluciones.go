@@ -3,7 +3,7 @@ package controllers
 import (
 	"fmt"
 	"time"
-	//"strconv"
+	"strconv"
 	//"strings"
 	"encoding/json"
 	"github.com/astaxie/beego"
@@ -22,6 +22,33 @@ func (c *GestionResolucionesController) URLMapping() {
 	c.Mapping("InsertarResolucionCompleta", c.InsertarResolucionCompleta)
 
 }
+
+// GestionResolucionesController ...
+// @Title getResolucionesInscritas
+// @Description create  getResolucionesInscritas
+// @Param vigencia query string false "año a consultar"
+// @Success 201 {object} []models.ResolucionVinculacion
+// @Failure 403 body is empty
+// @router get_resoluciones_inscritas [get]
+func (c *GestionResolucionesController) GetResolucionesInscritas() {
+	var resolucion_vinculacion []models.ResolucionVinculacion;
+
+	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion", &resolucion_vinculacion); err2 == nil {
+			for x,pos := range resolucion_vinculacion {
+				resolucion_vinculacion[x].FacultadNombre = BuscarNombreFacultad(pos.Facultad)
+
+			}
+
+			c.Data["json"] = resolucion_vinculacion
+
+
+	}else{
+		c.Data["json"] = "error"
+		fmt.Println("Error de consulta en resolucion_vinculacion",err2)
+	}
+	c.ServeJSON();
+}
+
 
 // InsertarResolucionCompleta ...
 // @Title InsertarResolucionCompleta
@@ -185,4 +212,18 @@ var respuesta models.ComponenteResolucion
 		}
 	}
 
+}
+
+
+
+func BuscarNombreFacultad(id_facultad int ) (nombre_facultad string){
+
+	var facultad []models.Facultad
+	var nom string
+	if err2 := getJson("http://10.20.0.254/oikos_api/v1/dependencia?query=Id:"+strconv.Itoa(id_facultad), &facultad); err2 == nil {
+			nom = facultad[0].Nombre
+	}else{
+		nom = "N/A"
+	}
+	return nom
 }
