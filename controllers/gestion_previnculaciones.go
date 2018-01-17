@@ -121,7 +121,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 
 	//RETORNAR PROYECTOS CURRICUALRES HOMOLOGADOS!!
 	for x, pos := range docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
-		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDProyecto = HomologarProyectoCurricular("old", pos.IDProyecto)
+		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDProyecto = HomologarProyectoCurricular(pos.IDProyecto)
 	}
 
 	c.Ctx.Output.SetStatus(201)
@@ -225,7 +225,7 @@ func BuscarIdProveedor(DocumentoIdentidad int) (id_proveedor_docente int) {
 	}
 
 	return id_proveedor
-	//docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IdProveedor = HomologarProyectoCurricular("old",pos.IDProyecto)
+
 
 }
 
@@ -331,54 +331,32 @@ func HomologacionTotal() {
 
 }
 
-func HomologarProyectoCurricular(tipo, proyecto string) (proyecto_old string) {
-	var id_proyecto_old string
-	var comparacion string
-	var resultado string
-	homologacion_proyectos := `[
-						{
-							"old": "20",
-							"new": "72"
-						},
-						{
-							"old": "25",
-							"new": "70"
-						},
-						{
-							"old": "7",
-							"new": "73"
-						},
-						{
-							"old": "5",
-							"new": "74"
-						},
-						{
-							"old": "15",
-							"new": "79"
-						}
-						]`
+func HomologarProyectoCurricular(proyecto_old string) (proyecto string) {
+	var id_proyecto string
+	var temp map[string]interface{}
 
-	byt := []byte(homologacion_proyectos)
-	var arreglo_homologacion []models.Homologacion
-	if err := json.Unmarshal(byt, &arreglo_homologacion); err != nil {
-		panic(err)
-	}
+	fmt.Println("proyectoc",proyecto)
+	if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_homologacion_dependencias/proyecto_curricular_cod_proyecto/"+proyecto_old, &temp); err == nil && temp != nil {
+		json_proyecto_curricular, error_json := json.Marshal(temp)
 
-	for _, pos := range arreglo_homologacion {
-		if tipo == "new" {
-			comparacion = pos.New
-			resultado = pos.Old
+		if error_json == nil {
+			var temp_proy models.ObjetoProyectoCurricular
+			json.Unmarshal(json_proyecto_curricular, &temp_proy)
+			fmt.Println("unmarshal json proyecto cu", temp_proy)
+			id_proyecto = temp_proy.Homologacion.IDOikos
+
 		} else {
-			comparacion = pos.Old
-			resultado = pos.New
+			fmt.Println(error_json.Error())
+			// c.Data["json"] = error_json.Error()
 		}
+	} else {
+		fmt.Println(err)
 
-		if comparacion == proyecto {
-			id_proyecto_old = resultado
-		}
 	}
 
-	return id_proyecto_old
+
+
+	return id_proyecto
 }
 
 func HomologarFacultad(tipo, facultad string) (facultad_old string) {
@@ -537,7 +515,7 @@ func BuscarNombreProveedor(DocumentoIdentidad int) (nombre_prov string) {
 	}
 
 	return nom_proveedor
-	//docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IdProveedor = HomologarProyectoCurricular("old",pos.IDProyecto)
+
 
 }
 
@@ -573,7 +551,7 @@ func BuscarNumeroDisponibilidad(IdCDP int) (numero_disp int) {
 		fmt.Println("error en json", err2)
 	}
 	return numero_disponibilidad
-	//docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IdProveedor = HomologarProyectoCurricular("old",pos.IDProyecto)
+
 
 }
 
