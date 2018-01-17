@@ -85,6 +85,7 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 // @Param periodo query string false "periodo a listar"
 // @Param tipo_vinculacion query string false "vinculacion del docente"
 // @Param facultad query string false "facultad"
+// @Param nivel_academico query string false "nivel_academico"
 // @Success 201 {object} models.Docentes_x_Carga
 // @Failure 403 body is empty
 // @router Precontratacion/docentes_x_carga_horaria [get]
@@ -93,8 +94,9 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 	periodo := c.GetString("periodo")
 	tipo_vinculacion := c.GetString("tipo_vinculacion")
 	facultad := c.GetString("facultad")
+	nivel_academico := c.GetString("nivel_academico")
 
-	docentes_x_carga_horaria := ListarDocentesHorasLectivas(vigencia, periodo, tipo_vinculacion, facultad)
+	docentes_x_carga_horaria := ListarDocentesHorasLectivas(vigencia, periodo, tipo_vinculacion, facultad, nivel_academico)
 
 	//BUSCAR CATEGORÍA DE CADA DOCENTE
 	for x, pos := range docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
@@ -270,7 +272,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 
 }
 
-func ListarDocentesHorasLectivas(vigencia, periodo, tipo_vinculacion, facultad string) (docentes_a_listar models.ObjetoCargaLectiva) {
+func ListarDocentesHorasLectivas(vigencia, periodo, tipo_vinculacion, facultad, nivel_academico string) (docentes_a_listar models.ObjetoCargaLectiva) {
 
 	tipo_vinculacion_old := HomologarDedicacion_nombre(tipo_vinculacion)
 	facultad_old := HomologarFacultad("new", facultad)
@@ -279,7 +281,7 @@ func ListarDocentesHorasLectivas(vigencia, periodo, tipo_vinculacion, facultad s
 	var docentes_x_carga models.ObjetoCargaLectiva
 
 	for _, pos := range tipo_vinculacion_old {
-		if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_academicos.HTTPEndpoint/carga_lectiva/"+vigencia+"/"+periodo+"/"+pos+"/"+facultad_old, &temp); err == nil && temp != nil {
+		if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_academicos.HTTPEndpoint/carga_lectiva/"+vigencia+"/"+periodo+"/"+pos+"/"+facultad_old+"/"+nivel_academico, &temp); err == nil && temp != nil {
 			jsonDocentes, error_json := json.Marshal(temp)
 
 			if error_json == nil {
