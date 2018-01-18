@@ -19,6 +19,7 @@ type ExpedirResolucionController struct {
 // URLMapping ...
 func (c *ExpedirResolucionController) URLMapping() {
 	c.Mapping("Expedir", c.Expedir)
+	//c.Mapping("Cancelar", c.Cancelar)
 }
 
 // Expedir ...
@@ -264,3 +265,43 @@ func CalcularFechaFin(fecha_inicio time.Time, numero_semanas int) (fecha_fin tim
 	fmt.Println(after)
 	return after
 }
+
+/*
+// Cancelar ...
+// @Title Cancelar
+// @Description create Cancelar
+// @Success 201 {int} models.ExpedicionResolucion
+// @Failure 403 body is empty
+// @router /cancelar [post]
+func (c *ExpedirResolucionController) Cancelar() {
+	amazon := orm.NewOrm()
+	flyway := orm.NewOrm()
+	amazon.Using("amazonAdmin")
+	flyway.Using("flywayAdmin")
+	var m models.ExpedicionResolucion
+	var response interface{}
+	var datosAnular models.DatosAnular
+	//If 13 - Unmarshal
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &m); err == nil {
+		v := m.Vinculaciones
+		// for vinculaciones
+		for _, vinculacion := range *v {
+			v := vinculacion.VinculacionDocente
+			numeroContrato := v.NumeroContrato.String
+			vigenciaContrato := v.Vigencia.Int64
+			//idvinculaciondocente := strconv.Itoa(v.Id)
+			if err := sendJson("http://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/registro_presupuestal/Anular", "POST", &response, &datosAnular); err == nil {
+			}
+		} // for vinculaciones
+
+	} else { //If 13 - Unmarshal
+		fmt.Println("He fallado un poquito en If 13 - Unmarshal, solucioname!!! ", err)
+		amazon.Rollback()
+		flyway.Rollback()
+		return
+	}
+	amazon.Commit()
+	flyway.Commit()
+	c.ServeJSON()
+}
+*/

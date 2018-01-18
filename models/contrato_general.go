@@ -81,6 +81,105 @@ type ExpedicionResolucion struct {
 	IdResolucion  int
 }
 
+type CancelarVinculacion struct {
+	Vinculaciones *[]ContratoVinculacion
+	IdResolucion  int
+}
+
+type EstadoAnulacion struct {
+	Id                int    `orm:"column(id);pk;auto"`
+	Nombre            string `orm:"column(nombre)"`
+	Descripcion       string `orm:"column(descripcion);null"`
+	Activo            bool   `orm:"column(activo)"`
+	CodigoAbreviacion string `orm:"column(codigo_abreviacion);null"`
+	NumeroOrden       string `orm:"column(numero_orden);null"`
+}
+
+type AnulacionRegistroPresupuestal struct {
+	Id                   int              `orm:"auto;column(id);pk"`
+	Consecutivo          int              `orm:"column(consecutivo)"`
+	Motivo               string           `orm:"column(motivo)"`
+	FechaRegistro        time.Time        `orm:"column(fecha_registro);type(date)"`
+	TipoAnulacion        string           `orm:"column(tipo_anulacion)"`
+	EstadoAnulacion      *EstadoAnulacion `orm:"column(estado_anulacion);rel(fk)"`
+	JustificacionRechazo string           `orm:"column(justificacion_rechazo);null"`
+	Responsable          int              `orm:"column(responsable)"`
+	Solicitante          int              `orm:"column(solicitante)"`
+	Expidio              int              `orm:"column(expidio)"`
+}
+
+type CategoriaCompromiso struct {
+	Id          int    `orm:"column(id);pk;auto"`
+	Nombre      string `orm:"column(nombre)"`
+	Descripcion string `orm:"column(descripcion);null"`
+}
+
+type TipoCompromisoTesoral struct {
+	Id                  int                  `orm:"column(id);pk;auto"`
+	Nombre              string               `orm:"column(nombre)"`
+	Activo              bool                 `orm:"column(activo);"`
+	CategoriaCompromiso *CategoriaCompromiso `orm:"column(categoria_compromiso);rel(fk)"`
+	Descripcion         string               `orm:"column(descripcion);null"`
+	CodigoAbreviacion   string               `orm:"column(codigo_abreviacion);null"`
+	NumeroOrden         float64              `orm:"column(numero_orden);null"`
+}
+
+type Compromiso struct {
+	Id                    int                    `orm:"column(id);pk;auto"`
+	Objeto                string                 `orm:"column(objeto)"`
+	Vigencia              float64                `orm:"column(vigencia)"`
+	FechaInicio           time.Time              `orm:"column(fecha_inicio);type(date)"`
+	FechaFin              time.Time              `orm:"column(fecha_fin);type(date)"`
+	FechaModificacion     time.Time              `orm:"column(fecha_modificacion);type(date)"`
+	EstadoCompromiso      *EstadoCompromiso      `orm:"column(estado_compromiso);rel(fk)"`
+	TipoCompromisoTesoral *TipoCompromisoTesoral `orm:"column(tipo_compromiso_financiero);rel(fk)"`
+	UnidadEjecutora       int                    `orm:"column(unidad_ejecutora)"`
+}
+
+type EstadoCompromiso struct {
+	Id                int     `orm:"column(id);pk;auto"`
+	Nombre            string  `orm:"column(nombre)"`
+	Descripcion       string  `orm:"column(descripcion);null"`
+	CodigoAbreviacion string  `orm:"column(codigo_abreviacion);null"`
+	Activo            bool    `orm:"column(activo);null"`
+	NumeroOrden       float64 `orm:"column(numero_orden);null"`
+}
+
+type EstadoRegistroPresupuestal struct {
+	Id                int    `orm:"column(id);pk"`
+	Nombre            string `orm:"column(nombre)"`
+	Descripcion       string `orm:"column(descripcion)"`
+	Activo            bool   `orm:"column(activo)"`
+	CodigoAbreviacion string `orm:"column(codigo_abreviacion);null"`
+	NumeroOrden       string `orm:"column(numero_orden);null"`
+}
+
+type RegistroPresupuestal struct {
+	Id                         int                         `orm:"column(id);pk;auto"`
+	Vigencia                   float64                     `orm:"column(vigencia)"`
+	FechaRegistro              time.Time                   `orm:"column(fecha_registro);type(date);null"`
+	Responsable                int                         `orm:"column(responsable);null"`
+	Estado                     *EstadoRegistroPresupuestal `orm:"column(estado);rel(fk)"`
+	NumeroRegistroPresupuestal int                         `orm:"column(numero_registro_presupuestal)"`
+	Beneficiario               int                         `orm:"column(beneficiario);null"`
+	TipoCompromiso             *Compromiso                 `orm:"column(tipo_compromiso);rel(fk)"`
+	NumeroCompromiso           int                         `orm:"column(numero_compromiso)"`
+	Solicitud                  int                         `orm:"column(solicitud)"`
+}
+
+type RegistroPresupuestalDisponibilidadApropiacion struct {
+	Id                        int                        `orm:"auto;column(id);pk"`
+	RegistroPresupuestal      *RegistroPresupuestal      `orm:"column(registro_presupuestal);rel(fk)"`
+	DisponibilidadApropiacion *DisponibilidadApropiacion `orm:"column(disponibilidad_apropiacion);rel(fk)"`
+	Valor                     float64                    `orm:"column(valor);null"`
+}
+
+type DatosAnular struct {
+	Anulacion      *AnulacionRegistroPresupuestal
+	Rp_apropiacion *RegistroPresupuestalDisponibilidadApropiacion
+	Valor          int
+}
+
 func GetNumeroTotalContratoGeneralDVE(vigencia int) (n int) {
 	o := orm.NewOrm()
 	var temp []TotalContratos

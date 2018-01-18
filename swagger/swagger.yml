@@ -106,7 +106,7 @@ paths:
           description: '{int} models.ExpedicionResolucion'
         "403":
           description: body is empty
-  /gestion_desvinculacionesactualizar_vinculaciones:
+  /gestion_desvinculaciones/actualizar_vinculaciones:
     post:
       tags:
       - gestion_desvinculaciones
@@ -115,6 +115,60 @@ paths:
       responses:
         "201":
           description: '{string}'
+        "403":
+          description: body is empty
+  /gestion_desvinculaciones/anular_adicion:
+    post:
+      tags:
+      - gestion_desvinculaciones
+      description: create AnularAdicionDocente
+      operationId: GestionDesvinculacionesController.AnularAdicionDocente
+      responses:
+        "201":
+          description: '{string}'
+        "403":
+          description: body is empty
+  /gestion_desvinculaciones/anular_desvinculacion:
+    post:
+      tags:
+      - gestion_desvinculaciones
+      description: create AnularDesvinculacionDocente
+      operationId: GestionDesvinculacionesController.AnularDesvinculacionDocente
+      responses:
+        "201":
+          description: '{string}'
+        "403":
+          description: body is empty
+  /gestion_desvinculaciones/docentes_cancelados:
+    get:
+      tags:
+      - gestion_desvinculaciones
+      description: create ListarDocentesCancelados
+      operationId: GestionDesvinculacionesController.ListarDocentesCancelados
+      parameters:
+      - in: query
+        name: id_resolucion
+        description: resolucion a consultar
+        type: string
+      responses:
+        "201":
+          description: '{int} models.VinculacionDocente'
+        "403":
+          description: body is empty
+  /gestion_desvinculaciones/docentes_desvinculados:
+    get:
+      tags:
+      - gestion_desvinculaciones
+      description: create ListarDocentesDesvinculados
+      operationId: GestionDesvinculacionesController.ListarDocentesDesvinculados
+      parameters:
+      - in: query
+        name: id_resolucion
+        description: resolucion a consultar
+        type: string
+      responses:
+        "201":
+          description: '{int} models.VinculacionDocente'
         "403":
           description: body is empty
   /gestion_desvinculacionesadicionar_horas:
@@ -126,6 +180,27 @@ paths:
       responses:
         "201":
           description: '{string}'
+        "403":
+          description: body is empty
+  /gestion_documento_resolucionget_contenido_resolucion:
+    get:
+      tags:
+      - gestion_documento_resolucion
+      description: create GetContenidoResolucion
+      operationId: GestionDocumentoResolucionController.ListarDocentesCargaHoraria
+      parameters:
+      - in: query
+        name: id_resolucion
+        description: año a consultar
+        type: string
+      - in: query
+        name: id_facultad
+        description: periodo a listar
+        type: string
+      responses:
+        "201":
+          schema:
+            $ref: '#/definitions/models.ResolucionCompleta'
         "403":
           description: body is empty
   /gestion_previnculacion/docentes_previnculados:
@@ -178,6 +253,10 @@ paths:
         name: facultad
         description: facultad
         type: string
+      - in: query
+        name: nivel_academico
+        description: nivel_academico
+        type: string
       responses:
         "201":
           schema:
@@ -204,6 +283,44 @@ paths:
       responses:
         "201":
           description: '{int} models.Resolucion'
+        "403":
+          description: body is empty
+  /gestion_resolucionesget_resoluciones_aprobadas:
+    get:
+      tags:
+      - gestion_resoluciones
+      description: create  getResolucionesAprobadas
+      operationId: GestionResolucionesController.getResolucionesAprobadas
+      parameters:
+      - in: query
+        name: vigencia
+        description: año a consultar
+        type: string
+      responses:
+        "201":
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/models.ResolucionVinculacion'
+        "403":
+          description: body is empty
+  /gestion_resolucionesget_resoluciones_inscritas:
+    get:
+      tags:
+      - gestion_resoluciones
+      description: create  getResolucionesInscritas
+      operationId: GestionResolucionesController.getResolucionesInscritas
+      parameters:
+      - in: query
+        name: vigencia
+        description: año a consultar
+        type: string
+      responses:
+        "201":
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/models.ResolucionVinculacion'
         "403":
           description: body is empty
   /informacion_proveedor/contratoPersona:
@@ -251,6 +368,22 @@ definitions:
     type: object
   .Docentes_x_Carga:
     type: object
+  models.Articulo:
+    title: Articulo
+    type: object
+    properties:
+      Id:
+        type: integer
+        format: int64
+      Numero:
+        type: integer
+        format: int64
+      Paragrafos:
+        type: array
+        items:
+          $ref: '#/definitions/models.Paragrafo'
+      Texto:
+        type: string
   models.ContratoGeneral:
     title: ContratoGeneral
     type: object
@@ -382,6 +515,32 @@ definitions:
         format: int64
       Sede:
         type: string
+  models.OrdenadorGasto:
+    title: OrdenadorGasto
+    type: object
+    properties:
+      Cargo:
+        type: string
+      DependenciaId:
+        type: integer
+        format: int64
+      Id:
+        type: integer
+        format: int64
+      NombreOrdenador:
+        type: string
+  models.Paragrafo:
+    title: Paragrafo
+    type: object
+    properties:
+      Id:
+        type: integer
+        format: int64
+      Numero:
+        type: integer
+        format: int64
+      Texto:
+        type: string
   models.Parametros:
     title: Parametros
     type: object
@@ -414,6 +573,78 @@ definitions:
       Id:
         type: integer
         format: int64
+  models.ResolucionCompleta:
+    title: ResolucionCompleta
+    type: object
+    properties:
+      Articulos:
+        type: array
+        items:
+          $ref: '#/definitions/models.Articulo'
+      Consideracion:
+        type: string
+      Id:
+        type: integer
+        format: int64
+      Numero:
+        type: string
+      OrdenadorGasto:
+        $ref: '#/definitions/models.OrdenadorGasto'
+      Preambulo:
+        type: string
+      Vigencia:
+        type: integer
+        format: int64
+      Vinculacion:
+        $ref: '#/definitions/models.ResolucionVinculacionDocente'
+  models.ResolucionVinculacion:
+    title: ResolucionVinculacion
+    type: object
+    properties:
+      Dedicacion:
+        type: string
+      Estado:
+        type: string
+      Facultad:
+        type: integer
+        format: int64
+      FacultadNombre:
+        type: string
+      FechaExpedicion:
+        type: string
+        format: string
+      Id:
+        type: integer
+        format: int64
+      NivelAcademico:
+        type: string
+      Numero:
+        type: string
+      NumeroSemanas:
+        type: integer
+        format: int64
+      Periodo:
+        type: integer
+        format: int64
+      TipoResolucion:
+        type: string
+      Vigencia:
+        type: integer
+        format: int64
+  models.ResolucionVinculacionDocente:
+    title: ResolucionVinculacionDocente
+    type: object
+    properties:
+      Dedicacion:
+        type: string
+      Id:
+        type: integer
+        format: int64
+      IdFacultad:
+        type: integer
+        format: int64
+      NivelAcademico:
+        type: string
   models.SupervisorContrato:
     title: SupervisorContrato
     type: object
@@ -459,6 +690,9 @@ tags:
 - name: gestion_resoluciones
   description: |
     GestionResolucionesController operations for Preliquidacion
+- name: gestion_documento_resolucion
+  description: |
+    GestionDocumentoResolucionController operations for Preliquidacion
 - name: gestion_desvinculaciones
   description: |
     PreliquidacionController operations for Preliquidacion
