@@ -1,0 +1,44 @@
+factor(posgrado, hch, asistenteud, 0.16, 2017).
+factor_tiempo(X,P,T):-vinculacion(X,V,P),horas(X,H,P),(V==tco->T is H/160;V==mto->T is H/80; T is H).
+factor_prestaciones(0.2503703,2017).
+horas_semanales_maximas(tco,40).
+horas_semanales_maximas(mto,20).
+horas_semanales_maximas(hcp,16).
+horas_semanales_maximas(hch,8).
+horas_semanales_minimas(tco,24).
+horas_semanales_minimas(mto,16).
+horas_semanales_minimas(hch,4).
+prestaciones(X,P,R):-vinculacion(X,V,P),factor_prestaciones(F,P),(V==hch->R is 0; R is F).
+valor_salario_minimo(737717,2017).
+valor_factor(X,Y,Z):-(X=pregrado->valor_punto(Y,Z); valor_salario_minimo(Y,Z)).
+valor_sin_prestaciones(K,X,P,Y):-categoria(X,C,P),vinculacion(X,V,P),factor(K,V,C,F,P),valor_factor(K,W,P),factor_tiempo(X,P,T),Y is W * F * T.
+cumple_tiempo(D,T,Y):-horas_semanales_maximas(D,M),horas_semanales_minimas(D,N), (N@=<T, T@=<M -> Y is 1; Y is 0).
+valor_contrato(K,X,P,V):-valor_sin_prestaciones(K,X,P,Z),prestaciones(X,P,F),V is ((Z + Z * F) rnd 0).
+horas_semanales_minimas(hcp,2).
+factor(pregrado, hch, auxiliar, 1.8, 2017).
+factor(pregrado, hch, asistente, 2.3, 2017).
+factor(pregrado, hch, asociado, 2.7, 2017).
+factor(pregrado, hch, titular, 3, 2017).
+factor(pregrado, hcp, auxiliar, 1.8, 2017).
+factor(pregrado, hcp, asistente, 2.3, 2017).
+factor(pregrado, hcp, asociado, 2.7, 2017).
+factor(pregrado, hcp, titular, 3, 2017).
+factor(pregrado, mto, auxiliar, 106, 2017).
+factor(pregrado, mto, asistente, 169, 2017).
+factor(pregrado, mto, asociado, 190, 2017).
+factor(pregrado, mto, titular, 211, 2017).
+factor(pregrado, tco, auxiliar, 212, 2017).
+factor(pregrado, tco, asistente, 338, 2017).
+factor(pregrado, tco, asociado, 380, 2017).
+factor(pregrado, tco, titular, 422, 2017).
+factor(posgrado, hch, asistente, 0.13, 2017).
+factor(posgrado, hch, asociado, 0.17, 2017).
+factor(posgrado, hch, titular, 0.2, 2017).
+factor(posgrado, hcp, asistente, 0.13, 2017).
+factor(posgrado, hcp, asociado, 0.17, 2017).
+factor(posgrado, hcp, titular, 0.2, 2017).
+factor(posgrado, hch, asociadoud, 0.19, 2017).
+factor(posgrado, hch, titularud, 0.22, 2017).
+factor(posgrado, hcp, asistenteud, 0.16, 2017).
+factor(posgrado, hcp, asociadoud, 0.19, 2017).
+factor(posgrado, hcp, titularud, 0.22, 2017).
