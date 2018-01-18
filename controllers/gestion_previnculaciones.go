@@ -41,7 +41,7 @@ func (c *GestionPrevinculacionesController) Calcular_total_de_salarios() {
 		totales_de_salario := Calcular_total_de_salario(v)
 		c.Data["json"] = totales_de_salario
 	} else {
-		fmt.Println("ERROR")
+		fmt.Println("ERROR al calcular total de contratos")
 		fmt.Println(err)
 		c.Data["json"] = "Error al calcular totales"
 	}
@@ -62,19 +62,19 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v = CalcularSalarioPrecontratacion(v)
-
+		if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &id_respuesta, &v); err == nil {
+			c.Data["json"] = id_respuesta
+		} else {
+			fmt.Println(err)
+			c.Data["json"] = "Error al insertar docentes"
+		}
 	} else {
-		fmt.Println("ERROR")
-		fmt.Println(err)
+		c.Data["json"]= "ERROR al insertar previn"
+		fmt.Println("Error al hacer unmarshal",err)
 
 	}
 
-	if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &id_respuesta, &v); err == nil {
-		c.Data["json"] = id_respuesta
-	} else {
-		fmt.Println(err)
-		c.Data["json"] = "Error al insertar docentes"
-	}
+
 	c.ServeJSON()
 }
 
@@ -135,6 +135,8 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDocente) (docentes_a_insertar []models.VinculacionDocente) {
 	//id_resolucion := 141
 	nivel_academico := docentes_a_vincular[0].NivelAcademico
+	vigencia:= strconv.Itoa(int(docentes_a_vincular[0].Vigencia.Int64))
+	fmt.Println("vigencia para reglas", vigencia)
 	var a string
 	var categoria string
 
@@ -150,19 +152,19 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 
 		var predicados string
 		if strings.ToLower(nivel_academico) == "posgrado" {
-			predicados = `valor_salario_minimo(` + strconv.Itoa(CargarSalarioMinimo().Valor) + `,2016).` + "\n"
+			predicados = "valor_salario_minimo(" + strconv.Itoa(CargarSalarioMinimo().Valor) + ","+vigencia+")." + "\n"
 		} else if strings.ToLower(nivel_academico) == "pregrado" {
-			predicados = `valor_punto(` + strconv.Itoa(CargarPuntoSalarial().ValorPunto) + `, 2016).` + "\n"
+			predicados = "valor_punto(" + strconv.Itoa(CargarPuntoSalarial().ValorPunto) + ", "+vigencia+")." + "\n"
 		}
 
-		predicados = predicados + `categoria(` + docente.IdPersona + `,` + strings.ToLower(categoria) + `, 2016).` + "\n"
-		predicados = predicados + `vinculacion(` + docente.IdPersona + `,` + strings.ToLower(docente.Dedicacion) + `, 2016).` + "\n"
-		predicados = predicados + `horas(` + docente.IdPersona + `,` + strconv.Itoa(docente.NumeroHorasSemanales*docente.NumeroSemanas) + `, 2016).` + "\n"
+		predicados = predicados + "categoria(" + docente.IdPersona + "," + strings.ToLower(categoria) + ", "+vigencia+")." + "\n"
+		predicados = predicados + "vinculacion(" + docente.IdPersona + "," + strings.ToLower(docente.Dedicacion) + ", "+vigencia+")." + "\n"
+		predicados = predicados + "horas(" + docente.IdPersona + "," + strconv.Itoa(docente.NumeroHorasSemanales*docente.NumeroSemanas) + ", "+vigencia+")." + "\n"
 		reglasbase := CargarReglasBase("CDVE")
 		reglasbase = reglasbase + predicados
 		m := NewMachine().Consult(reglasbase)
 
-		contratos := m.ProveAll(`valor_contrato(` + strings.ToLower(nivel_academico) + `,` + docente.IdPersona + `,2016,X).`)
+		contratos := m.ProveAll("valor_contrato(" + strings.ToLower(nivel_academico) + "," + docente.IdPersona + ","+vigencia+",X).")
 		for _, solution := range contratos {
 			a = fmt.Sprintf("%s", solution.ByName_("X"))
 		}
@@ -263,7 +265,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 		}
 
 	} else {
-		fmt.Println("Error de cosulta en vinculacion", err2)
+		fmt.Println("Error de consulta en vinculacion", err2)
 	}
 
 	c.Ctx.Output.SetStatus(201)
@@ -337,14 +339,12 @@ func HomologarProyectoCurricular(proyecto_old string) (proyecto string) {
 	var id_proyecto string
 	var temp map[string]interface{}
 
-	fmt.Println("proyectoc",proyecto)
 	if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_homologacion_dependencias/proyecto_curricular_cod_proyecto/"+proyecto_old, &temp); err == nil && temp != nil {
 		json_proyecto_curricular, error_json := json.Marshal(temp)
 
 		if error_json == nil {
 			var temp_proy models.ObjetoProyectoCurricular
 			json.Unmarshal(json_proyecto_curricular, &temp_proy)
-			fmt.Println("unmarshal json proyecto cu", temp_proy)
 			id_proyecto = temp_proy.Homologacion.IDOikos
 
 		} else {
