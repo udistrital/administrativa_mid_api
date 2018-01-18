@@ -249,7 +249,42 @@ func Calcular_total_de_salario(v []models.VinculacionDocente) (total float64) {
 // @Param id_resolucion query string false "resolucion a consultar"
 // @Success 201 {int} models.VinculacionDocente
 // @Failure 403 body is empty
+// @router /docentes_previnculados_all [get]
+
+//ESTA FUNCIÓN LISTA LOS DOCENTES PREVINCULADOS EN TRUE O FALSE
+func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
+	id_resolucion := c.GetString("id_resolucion")
+	query := "?limit=-1&query=IdResolucion.Id:" + id_resolucion;
+	var v []models.VinculacionDocente
+
+	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &v); err2 == nil {
+		for x, pos := range v {
+			documento_identidad, _ := strconv.Atoi(pos.IdPersona)
+			v[x].NombreCompleto = BuscarNombreProveedor(documento_identidad)
+			v[x].NumeroDisponibilidad = BuscarNumeroDisponibilidad(pos.Disponibilidad)
+			v[x].Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id)
+			v[x].LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona)
+		}
+
+	} else {
+		fmt.Println("Error de consulta en vinculacion", err2)
+	}
+
+	c.Ctx.Output.SetStatus(201)
+	c.Data["json"] = v
+	c.ServeJSON()
+
+}
+
+// GestionPrevinculacionesController ...
+// @Title ListarDocentesPrevinculados
+// @Description create ListarDocentesPrevinculados
+// @Param id_resolucion query string false "resolucion a consultar"
+// @Success 201 {int} models.VinculacionDocente
+// @Failure 403 body is empty
 // @router /docentes_previnculados [get]
+
+//ESTA FUNCIÓN LISTA LOS DOCENTES PREVINCULADOS EN TRUE
 func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 	id_resolucion := c.GetString("id_resolucion")
 	query := "?limit=-1&query=IdResolucion.Id:" + id_resolucion + ",Estado:true"
