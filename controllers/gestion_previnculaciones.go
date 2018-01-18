@@ -62,6 +62,7 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v = CalcularSalarioPrecontratacion(v)
+		fmt.Println("valor contrato", v)
 		if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &id_respuesta, &v); err == nil {
 			c.Data["json"] = id_respuesta
 		} else {
@@ -398,54 +399,43 @@ func HomologarProyectoCurricular(proyecto_old string) (proyecto string) {
 }
 
 func HomologarFacultad(tipo, facultad string) (facultad_old string) {
+	var id_facultad string
+	var temp map[string]interface{}
+	var string_consulta_servicio string;
 
-	var id_facultad_old string
-	var comparacion string
-	var resultado string
-	homologacion_facultad := `[
-						{
-							"old": "33",
-							"new": "14"
-						},
-						{
-							"old": "24",
-							"new": "17"
-						},
-						{
-							"old": "23",
-							"new": "35"
-						},
-						{
-							"old": "101",
-							"new": "65"
-						},
-						{
-							"old": "32",
-							"new": "66"
-						}
-						]`
-
-	byt := []byte(homologacion_facultad)
-	var arreglo_homologacion []models.Homologacion
-	if err := json.Unmarshal(byt, &arreglo_homologacion); err != nil {
-		panic(err)
+	if(tipo == "new"){
+		string_consulta_servicio = "facultad_gedep_oikos";
+	}else{
+		string_consulta_servicio = "facultad_oikos_gedep";
 	}
 
-	for _, pos := range arreglo_homologacion {
-		if tipo == "new" {
-			comparacion = pos.New
-			resultado = pos.Old
-		} else {
-			comparacion = pos.Old
-			resultado = pos.New
-		}
+	if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_homologacion_dependencias/"+string_consulta_servicio+"/33"+id_facultad, &temp); err == nil && temp != nil {
+	  json_facultad, error_json := json.Marshal(temp)
 
-		if comparacion == facultad {
-			id_facultad_old = resultado
-		}
+	  if error_json == nil {
+	    var temp_proy models.ObjetoFacultad
+	    json.Unmarshal(json_facultad, &temp_proy)
+
+			if(tipo == "new"){
+				  id_facultad = temp_proy.Homologacion.IdGeDep
+			}else{
+		 			id_facultad = temp_proy.Homologacion.IdOikos
+			}
+
+
+
+	  } else {
+	    fmt.Println(error_json.Error())
+	    // c.Data["json"] = error_json.Error()
+	  }
+	} else {
+	  fmt.Println(err)
+
 	}
 
-	return id_facultad_old
+
+	return id_facultad
+
 }
 
 func HomologarDedicacion_nombre(dedicacion string) (vinculacion_old []string) {
