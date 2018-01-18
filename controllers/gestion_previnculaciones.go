@@ -243,15 +243,16 @@ func Calcular_total_de_salario(v []models.VinculacionDocente) (total float64) {
 	return sumatoria
 }
 
+
+//ESTA FUNCIÓN LISTA LOS DOCENTES PREVINCULADOS EN TRUE O FALSE
+
 // GestionPrevinculacionesController ...
-// @Title ListarDocentesPrevinculados
-// @Description create ListarDocentesPrevinculados
+// @Title ListarDocentesPrevinculadosAll
+// @Description create ListarDocentesPrevinculadosAll
 // @Param id_resolucion query string false "resolucion a consultar"
 // @Success 201 {int} models.VinculacionDocente
 // @Failure 403 body is empty
 // @router /docentes_previnculados_all [get]
-
-//ESTA FUNCIÓN LISTA LOS DOCENTES PREVINCULADOS EN TRUE O FALSE
 func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 	id_resolucion := c.GetString("id_resolucion")
 	query := "?limit=-1&query=IdResolucion.Id:" + id_resolucion;
@@ -276,6 +277,8 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 
 }
 
+//ESTA FUNCIÓN LISTA LOS DOCENTES PREVINCULADOS EN TRUE
+
 // GestionPrevinculacionesController ...
 // @Title ListarDocentesPrevinculados
 // @Description create ListarDocentesPrevinculados
@@ -283,8 +286,6 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 // @Success 201 {int} models.VinculacionDocente
 // @Failure 403 body is empty
 // @router /docentes_previnculados [get]
-
-//ESTA FUNCIÓN LISTA LOS DOCENTES PREVINCULADOS EN TRUE
 func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 	id_resolucion := c.GetString("id_resolucion")
 	query := "?limit=-1&query=IdResolucion.Id:" + id_resolucion + ",Estado:true"
