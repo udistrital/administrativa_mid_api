@@ -255,16 +255,18 @@ func Calcular_total_de_salario(v []models.VinculacionDocente) (total float64) {
 // @router /docentes_previnculados_all [get]
 func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 	id_resolucion := c.GetString("id_resolucion")
-	query := "?limit=-1&query=IdResolucion.Id:" + id_resolucion;
 	var v []models.VinculacionDocente
 
-	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &v); err2 == nil {
+	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_vinculaciones_agrupadas/"+id_resolucion, &v); err2 == nil {
+
 		for x, pos := range v {
+
 			documento_identidad, _ := strconv.Atoi(pos.IdPersona)
 			v[x].NombreCompleto = BuscarNombreProveedor(documento_identidad)
 			v[x].NumeroDisponibilidad = BuscarNumeroDisponibilidad(pos.Disponibilidad)
 			v[x].Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id)
 			v[x].LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona)
+			v[x].NumeroHorasSemanales, v[x].ValorContrato = Calcular_totales_vinculacio_pdf(pos.IdPersona,id_resolucion)
 		}
 
 	} else {
@@ -612,4 +614,27 @@ func BuscarLugarExpedicion(Cedula string) (nombre_lugar_exp string) {
 
 	return nombre_ciudad
 
+}
+
+func Calcular_totales_vinculacio_pdf(cedula, id_resolucion string)(suma_total_horas int, suma_total_contrato float64){
+
+	query:="?limit=-1&query=IdPersona:"+cedula+",IdResolucion.Id:"+id_resolucion;
+	var temp []models.VinculacionDocente
+	var total_contrato int
+	var total_horas int
+
+	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &temp); err2 == nil {
+		
+		for _, pos := range temp {
+			total_horas = total_horas + pos.NumeroHorasSemanales
+			total_contrato = total_contrato + int(pos.ValorContrato)
+		}
+
+	}else{
+		fmt.Println("error al guardar en json")
+		total_horas = 0;
+		total_contrato = 0;
+	}
+
+	return total_horas, float64(total_contrato)
 }
