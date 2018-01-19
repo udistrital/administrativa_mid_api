@@ -266,11 +266,10 @@ func CalcularFechaFin(fecha_inicio time.Time, numero_semanas int) (fecha_fin tim
 	return after
 }
 
-/*
 // Cancelar ...
 // @Title Cancelar
 // @Description create Cancelar
-// @Success 201 {int} models.ExpedicionResolucion
+// @Success 201 {int} models.ExpedicionCancelacion
 // @Failure 403 body is empty
 // @router /cancelar [post]
 func (c *ExpedirResolucionController) Cancelar() {
@@ -278,20 +277,72 @@ func (c *ExpedirResolucionController) Cancelar() {
 	flyway := orm.NewOrm()
 	amazon.Using("amazonAdmin")
 	flyway.Using("flywayAdmin")
-	var m models.ExpedicionResolucion
+	var m models.ExpedicionCancelacion
 	var response interface{}
-	var datosAnular models.DatosAnular
+	//var datosAnular models.DatosAnular
+	var contratoCancelado models.ContratoCancelado
 	//If 13 - Unmarshal
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &m); err == nil {
 		v := m.Vinculaciones
 		// for vinculaciones
 		for _, vinculacion := range *v {
 			v := vinculacion.VinculacionDocente
-			numeroContrato := v.NumeroContrato.String
-			vigenciaContrato := v.Vigencia.Int64
+			contratoCancelado.NumeroContrato = v.NumeroContrato.String
+			contratoCancelado.Vigencia = int(v.Vigencia.Int64)
+			contratoCancelado.FechaCancelacion = vinculacion.ContratoCancelado.FechaCancelacion
+			contratoCancelado.MotivoCancelacion = vinculacion.ContratoCancelado.MotivoCancelacion
+			contratoCancelado.Usuario = vinculacion.ContratoCancelado.Usuario
+			contratoCancelado.FechaRegistro = time.Now()
+			contratoCancelado.Estado = vinculacion.ContratoCancelado.Estado
 			//idvinculaciondocente := strconv.Itoa(v.Id)
-			if err := sendJson("http://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/registro_presupuestal/Anular", "POST", &response, &datosAnular); err == nil {
+			//if err := sendJson("http://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/registro_presupuestal/Anular", "POST", &response, &datosAnular); err == nil {
+			// if contrato_cancelado (post)
+			if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_cancelado", "POST", &response, &contratoCancelado); err == nil {
+				// If contrato_estado (post)
+				var ce models.ContratoEstado
+				var ec models.EstadoContrato
+				ce.NumeroContrato = contratoCancelado.NumeroContrato
+				ce.Vigencia = contratoCancelado.Vigencia
+				ce.FechaRegistro = time.Now()
+				ec.Id = 7
+				ce.Estado = &ec
+				// If contrato_estado (post)
+				if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_estado", "POST", &response, &ce); err == nil {
+					var r models.Resolucion
+					r.Id = m.IdResolucion
+					idResolucionDVE := strconv.Itoa(m.IdResolucion)
+					//If 11 - Resolucion (GET)
+					if err := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+idResolucionDVE, &r); err == nil {
+						var e models.ResolucionEstado
+						var er models.EstadoResolucion
+						e.Resolucion = &r
+						er.Id = 2
+						e.Estado = &er
+						e.FechaRegistro = time.Now()
+						//If  Resolucion_estado (post)
+						if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_estado", "POST", &response, &e); err == nil {
+							fmt.Println("Expedición exitosa, ahora va el commit :D")
+							c.Data["json"] = v
+						} else { //If  Resolucion_estado (post)
+							fmt.Println("He fallado un poquito en If  Resolucion_estado (post), solucioname!!! ", err)
+							amazon.Rollback()
+							flyway.Rollback()
+							return
+						}
+					}
+				} else { // If contrato_estado (post)
+					fmt.Println("He fallado un poquito en If contrato_estado (post), solucioname!!! ", err)
+					amazon.Rollback()
+					flyway.Rollback()
+					return
+				}
+			} else { // if contrato_cancelado (post)
+				fmt.Println("He fallado un poquito en if contrato_cancelado (post), solucioname!!! ", err)
+				amazon.Rollback()
+				flyway.Rollback()
+				return
 			}
+			//}
 		} // for vinculaciones
 
 	} else { //If 13 - Unmarshal
@@ -304,4 +355,3 @@ func (c *ExpedirResolucionController) Cancelar() {
 	flyway.Commit()
 	c.ServeJSON()
 }
-*/

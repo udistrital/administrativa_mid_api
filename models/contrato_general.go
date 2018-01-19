@@ -66,6 +66,22 @@ type ContratoVinculacion struct {
 	Cdp                *ContratoDisponibilidad
 }
 
+type ContratoCancelado struct {
+	Id                int       `orm:"column(consecutivo_contrato_cancelado)"`
+	NumeroContrato    string    `orm:"column(numero_contrato)"`
+	Vigencia          int       `orm:"column(vigencia)"`
+	FechaCancelacion  time.Time `orm:"column(fecha_cancelacion);type(date)"`
+	MotivoCancelacion string    `orm:"column(motivo_cancelacion)"`
+	Usuario           string    `orm:"column(usuario)"`
+	FechaRegistro     time.Time `orm:"column(fecha_registro);type(date)"`
+	Estado            bool      `orm:"column(estado)"`
+}
+
+type CancelacionContrato struct {
+	ContratoCancelado  *ContratoCancelado
+	VinculacionDocente *VinculacionDocente
+}
+
 type ContratoDisponibilidad struct {
 	Id             int       `orm:"column(id);pk;auto"`
 	NumeroCdp      int       `orm:"column(numero_cdp);null"`
@@ -81,8 +97,8 @@ type ExpedicionResolucion struct {
 	IdResolucion  int
 }
 
-type CancelarVinculacion struct {
-	Vinculaciones *[]ContratoVinculacion
+type ExpedicionCancelacion struct {
+	Vinculaciones *[]CancelacionContrato
 	IdResolucion  int
 }
 
