@@ -13,7 +13,7 @@
             "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
         }
     },
-    "basePath": "/administrativa_mid_api/v1",
+    "basePath": "/v1",
     "paths": {
         "/cancelacion_valida/{idResolucion}": {
             "post": {
@@ -140,6 +140,23 @@
                         }
                     },
                     "403": {}
+                }
+            }
+        },
+        "/expedir_resolucion/cancelar": {
+            "post": {
+                "tags": [
+                    "expedir_resolucion"
+                ],
+                "description": "create Cancelar",
+                "operationId": "ExpedirResolucionController.Cancelar",
+                "responses": {
+                    "201": {
+                        "description": "{int} models.ExpedicionCancelacion"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
                 }
             }
         },
@@ -318,6 +335,31 @@
                 ],
                 "description": "create ListarDocentesPrevinculados",
                 "operationId": "GestionPrevinculacionesController.ListarDocentesPrevinculados",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "id_resolucion",
+                        "description": "resolucion a consultar",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{int} models.VinculacionDocente"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/gestion_previnculacion/docentes_previnculados_all": {
+            "get": {
+                "tags": [
+                    "gestion_previnculacion"
+                ],
+                "description": "create ListarDocentesPrevinculadosAll",
+                "operationId": "GestionPrevinculacionesController.ListarDocentesPrevinculadosAll",
                 "parameters": [
                     {
                         "in": "query",

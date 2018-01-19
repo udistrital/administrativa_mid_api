@@ -95,6 +95,17 @@ paths:
           schema:
             $ref: '#/definitions/models.Disponibilidad'
         "403": {}
+  /expedir_resolucion/cancelar:
+    post:
+      tags:
+      - expedir_resolucion
+      description: create Cancelar
+      operationId: ExpedirResolucionController.Cancelar
+      responses:
+        "201":
+          description: '{int} models.ExpedicionCancelacion'
+        "403":
+          description: body is empty
   /expedir_resolucion/expedir:
     post:
       tags:
@@ -209,6 +220,22 @@ paths:
       - gestion_previnculacion
       description: create ListarDocentesPrevinculados
       operationId: GestionPrevinculacionesController.ListarDocentesPrevinculados
+      parameters:
+      - in: query
+        name: id_resolucion
+        description: resolucion a consultar
+        type: string
+      responses:
+        "201":
+          description: '{int} models.VinculacionDocente'
+        "403":
+          description: body is empty
+  /gestion_previnculacion/docentes_previnculados_all:
+    get:
+      tags:
+      - gestion_previnculacion
+      description: create ListarDocentesPrevinculadosAll
+      operationId: GestionPrevinculacionesController.ListarDocentesPrevinculadosAll
       parameters:
       - in: query
         name: id_resolucion
