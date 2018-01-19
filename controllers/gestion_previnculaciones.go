@@ -145,7 +145,7 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 		//docentes_a_vincular[x].IdPersona = BuscarIdProveedor(docente.DocumentoIdentidad);
 
 		if EsDocentePlanta(docente.IdPersona) && strings.ToLower(nivel_academico) == "posgrado" {
-			categoria = categoria + "ud"
+			categoria = docente.Categoria + "ud"
 		} else {
 			categoria = docente.Categoria
 		}
