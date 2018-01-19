@@ -16,7 +16,6 @@ import (
 func init() {
 
 	auditoria.InitMiddleware()
-	
 	ns := beego.NewNamespace("/v1",
 		beego.NSNamespace("/informacion_proveedor",
 			beego.NSInclude(

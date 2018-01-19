@@ -137,7 +137,6 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 	//id_resolucion := 141
 	nivel_academico := docentes_a_vincular[0].NivelAcademico
 	vigencia:= strconv.Itoa(int(docentes_a_vincular[0].Vigencia.Int64))
-	fmt.Println("vigencia para reglas", vigencia)
 	var a string
 	var categoria string
 
@@ -409,7 +408,7 @@ func HomologarFacultad(tipo, facultad string) (facultad_old string) {
 		string_consulta_servicio = "facultad_oikos_gedep";
 	}
 
-	if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_homologacion_dependencias/"+string_consulta_servicio+"/33"+id_facultad, &temp); err == nil && temp != nil {
+	if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_homologacion_dependencias/"+string_consulta_servicio+"/"+facultad, &temp); err == nil && temp != nil {
 	  json_facultad, error_json := json.Marshal(temp)
 
 	  if error_json == nil {
