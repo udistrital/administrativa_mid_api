@@ -347,8 +347,8 @@ func Buscar_Categoria_Docente(vigencia, periodo, documento_ident string) (catego
 	var temp map[string]interface{}
 	var nombre_categoria string
 	var id_categoria_old string
-	//*****ojo, está quemada la cédula por falta de datos*****
-	if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_urano_pruebas/categoria_docente/"+vigencia+"/1/79708124", &temp); err == nil && temp != nil {
+
+	if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_urano_pruebas/categoria_docente/"+vigencia+"/"+periodo+"/"+documento_ident, &temp); err == nil && temp != nil {
 		jsonDocentes, error_json := json.Marshal(temp)
 
 		if error_json == nil {
@@ -624,7 +624,7 @@ func Calcular_totales_vinculacio_pdf(cedula, id_resolucion string)(suma_total_ho
 	var total_horas int
 
 	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &temp); err2 == nil {
-		
+
 		for _, pos := range temp {
 			total_horas = total_horas + pos.NumeroHorasSemanales
 			total_contrato = total_contrato + int(pos.ValorContrato)
