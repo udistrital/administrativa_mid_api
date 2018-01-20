@@ -101,7 +101,13 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 
 	//BUSCAR CATEGORÍA DE CADA DOCENTE
 	for x, pos := range docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
+
 		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].CategoriaNombre, docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDCategoria = Buscar_Categoria_Docente(vigencia, periodo, pos.DocDocente)
+		if docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].CategoriaNombre == "" && docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDCategoria == "" && x!= len(docentes_x_carga_horaria.CargasLectivas.CargaLectiva){
+			fmt.Println("no hay cat")
+
+			//docentes_x_carga_horaria.CargasLectivas.CargaLectiva = append(docentes_x_carga_horaria.CargasLectivas.CargaLectiva[:x], docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x+1:]...)
+			}
 	}
 
 	//RETORNAR CON ID DE TIPO DE VINCULACION DE NUEVO MODELO
@@ -126,6 +132,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 	for x, pos := range docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
 		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDProyecto = HomologarProyectoCurricular(pos.IDProyecto)
 	}
+
 
 	c.Ctx.Output.SetStatus(201)
 	c.Data["json"] = docentes_x_carga_horaria.CargasLectivas.CargaLectiva

@@ -133,6 +133,7 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 					Dedicacion:           v.DocentesDesvincular[0].Dedicacion,
 					NivelAcademico:       v.DocentesDesvincular[0].NivelAcademico,
 					Disponibilidad:       v.DisponibilidadNueva,
+					Vigencia:							v.DocentesDesvincular[0].Vigencia,               
 				}
 
 
