@@ -18,17 +18,17 @@ type Resolucion struct {
 	Objeto                  string          `orm:"column(objeto);null"`
 	NumeroSemanas           int             `orm:"column(numero_semanas)"`
 	Periodo                 int             `orm:"column(periodo)"`
+	Titulo                  string          `orm:"column(titulo);null"`
 }
 
-
 type ObjetoResolucion struct {
-	Resolucion       *Resolucion
+	Resolucion                   *Resolucion
 	ResolucionVinculacionDocente *ResolucionVinculacionDocente
-	ResolucionVieja   int
+	ResolucionVieja              int
 }
 
 type ModificacionResolucion struct {
-	Id             int       			`orm:"column(id);pk;auto"`
-	ResolucionNueva       int      `orm:"column(resolucion_nueva)"`
-	ResolucionAnterior     int    `orm:"column(resolucion_anterior)"`
+	Id                 int `orm:"column(id);pk;auto"`
+	ResolucionNueva    int `orm:"column(resolucion_nueva)"`
+	ResolucionAnterior int `orm:"column(resolucion_anterior)"`
 }

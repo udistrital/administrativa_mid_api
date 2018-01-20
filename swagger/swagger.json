@@ -925,6 +925,9 @@
                 "Preambulo": {
                     "type": "string"
                 },
+                "Titulo": {
+                    "type": "string"
+                },
                 "Vigencia": {
                     "type": "integer",
                     "format": "int64"
