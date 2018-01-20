@@ -13,7 +13,7 @@
             "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
         }
     },
-    "basePath": "/v1",
+    "basePath": "/administrativa_mid_api/v1",
     "paths": {
         "/cancelacion_valida/{idResolucion}": {
             "post": {

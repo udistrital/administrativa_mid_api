@@ -93,13 +93,15 @@ type ContratoDisponibilidad struct {
 }
 
 type ExpedicionResolucion struct {
-	Vinculaciones *[]ContratoVinculacion
-	IdResolucion  int
+	Vinculaciones   *[]ContratoVinculacion
+	IdResolucion    int
+	FechaExpedicion time.Time
 }
 
 type ExpedicionCancelacion struct {
-	Vinculaciones *[]CancelacionContrato
-	IdResolucion  int
+	Vinculaciones   *[]CancelacionContrato
+	IdResolucion    int
+	FechaExpedicion time.Time
 }
 
 type EstadoAnulacion struct {
