@@ -25,7 +25,7 @@ func (c *Contrato_generalController) URLMapping() {
 // @Param	vigencia		path 	string	true		"numero del contrato a consultar"
 // @Success 200 {object} models.Contrato_genral
 // @Failure 403
-// @router GetContratoByContratoSuscritoId/:id/:vigencia [get]
+// @router /GetContratoByContratoSuscritoId/:id/:vigencia [get]
 func (c *Contrato_generalController) GetContratoByContratoSuscritoId() {
 	idStr := c.Ctx.Input.Param(":id")
 	vigenciaStr := c.Ctx.Input.Param(":vigencia")
@@ -79,7 +79,7 @@ func FormatoInfoContratoContratoSuscrito(contratoIntfc interface{}, params ...in
 // @Param	query	query	string	false	"query de filtrado para la lista de los cdp"
 // @Success 200 {object} models.Disponibilidad
 // @Failure 403
-// @router ListaContratoContratoSuscrito/:vigencia [get]
+// @router /ListaContratoContratoSuscrito/:vigencia [get]
 func (c *Contrato_generalController) ListaContratoContratoSuscrito() {
 	var infoContrato []interface{}
 	var respuesta []map[string]interface{}
