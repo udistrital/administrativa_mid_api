@@ -43,7 +43,7 @@ func (c *GestionPrevinculacionesController) Calcular_total_de_salarios() {
 		vigencia := strconv.Itoa(int(v[0].Vigencia.Int64))
 		periodo := strconv.Itoa(v[0].Periodo)
 		disponibilidad := strconv.Itoa(v[0].Disponibilidad)
-		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_valores_totales_x_disponibilidad/?anio="+vigencia+"&periodo="+periodo+"&id_disponibilidad="+disponibilidad+"",&totales_disponibilidad); err == nil {
+		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_valores_totales_x_disponibilidad/"+vigencia+"/"+periodo+"/"+disponibilidad+"",&totales_disponibilidad); err == nil {
 			fmt.Println("totales disponibilidad",totales_disponibilidad)
 			total = int(totales_de_salario) + totales_disponibilidad;
 			c.Data["json"] = total
