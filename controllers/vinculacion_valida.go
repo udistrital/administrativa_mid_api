@@ -7,7 +7,7 @@ import (
 
 	"github.com/astaxie/beego"
 	//. "github.com/mndrix/golog"
-	."github.com/udistrital/golog"
+	. "github.com/udistrital/golog"
 )
 
 type ValidarContratoController struct {

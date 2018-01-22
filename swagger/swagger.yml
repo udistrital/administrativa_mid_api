@@ -11,17 +11,6 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 basePath: /v1
 paths:
-  /cancelacion_valida/{idResolucion}:
-    post:
-      tags:
-      - cancelacion_valida
-      description: create ValidarCancelacion
-      operationId: CancelacionValidaController.ValidarCancelacion
-      responses:
-        "201":
-          description: '{int} models.ContratoGeneral'
-        "403":
-          description: body is empty
   /consultar_disponibilidades/listar_apropiaciones:
     post:
       tags:
@@ -33,7 +22,7 @@ paths:
           description: '{int} models.DisponibilidadApropiacion'
         "403":
           description: body is empty
-  /contrato_generalGetContratoByContratoSuscritoId/{id}/{vigencia}:
+  /contrato_general/GetContratoByContratoSuscritoId/{id}/{vigencia}:
     get:
       tags:
       - contrato_general
@@ -55,7 +44,7 @@ paths:
           schema:
             $ref: '#/definitions/.Contrato_genral'
         "403": {}
-  /contrato_generalListaContratoContratoSuscrito/{vigencia}:
+  /contrato_general/ListaContratoContratoSuscrito/{vigencia}:
     get:
       tags:
       - contrato_general
@@ -128,6 +117,17 @@ paths:
           description: '{string}'
         "403":
           description: body is empty
+  /gestion_desvinculaciones/adicionar_horas:
+    post:
+      tags:
+      - gestion_desvinculaciones
+      description: create AdicionarHoras
+      operationId: GestionDesvinculacionesController.AdicionarHoras
+      responses:
+        "201":
+          description: '{string}'
+        "403":
+          description: body is empty
   /gestion_desvinculaciones/anular_adicion:
     post:
       tags:
@@ -182,18 +182,7 @@ paths:
           description: '{int} models.VinculacionDocente'
         "403":
           description: body is empty
-  /gestion_desvinculacionesadicionar_horas:
-    post:
-      tags:
-      - gestion_desvinculaciones
-      description: create AdicionarHoras
-      operationId: GestionDesvinculacionesController.AdicionarHoras
-      responses:
-        "201":
-          description: '{string}'
-        "403":
-          description: body is empty
-  /gestion_documento_resolucionget_contenido_resolucion:
+  /gestion_documento_resolucion/get_contenido_resolucion:
     get:
       tags:
       - gestion_documento_resolucion
@@ -212,6 +201,61 @@ paths:
         "201":
           schema:
             $ref: '#/definitions/models.ResolucionCompleta'
+        "403":
+          description: body is empty
+  /gestion_previnculacion/Precontratacion/calcular_valor_contratos:
+    post:
+      tags:
+      - gestion_previnculacion
+      description: create InsertarPrevinculaciones
+      operationId: GestionPrevinculacionesController.InsetarPrevinculaciones
+      responses:
+        "201":
+          description: '{int} models.VinculacionDocente'
+        "403":
+          description: body is empty
+  /gestion_previnculacion/Precontratacion/docentes_x_carga_horaria:
+    get:
+      tags:
+      - gestion_previnculacion
+      description: create ListarDocentesCargaHoraria
+      operationId: GestionPrevinculacionesController.ListarDocentesCargaHoraria
+      parameters:
+      - in: query
+        name: vigencia
+        description: año a consultar
+        type: string
+      - in: query
+        name: periodo
+        description: periodo a listar
+        type: string
+      - in: query
+        name: tipo_vinculacion
+        description: vinculacion del docente
+        type: string
+      - in: query
+        name: facultad
+        description: facultad
+        type: string
+      - in: query
+        name: nivel_academico
+        description: nivel_academico
+        type: string
+      responses:
+        "201":
+          schema:
+            $ref: '#/definitions/.Docentes_x_Carga'
+        "403":
+          description: body is empty
+  /gestion_previnculacion/Precontratacion/insertar_previnculaciones:
+    post:
+      tags:
+      - gestion_previnculacion
+      description: create InsertarPrevinculaciones
+      operationId: GestionPrevinculacionesController.InsetarPrevinculaciones
+      responses:
+        "201":
+          description: '{int} models.VinculacionDocente'
         "403":
           description: body is empty
   /gestion_previnculacion/docentes_previnculados:
@@ -246,73 +290,7 @@ paths:
           description: '{int} models.VinculacionDocente'
         "403":
           description: body is empty
-  /gestion_previnculacionPrecontratacion/calcular_valor_contratos:
-    post:
-      tags:
-      - gestion_previnculacion
-      description: create InsertarPrevinculaciones
-      operationId: GestionPrevinculacionesController.InsetarPrevinculaciones
-      responses:
-        "201":
-          description: '{int} models.VinculacionDocente'
-        "403":
-          description: body is empty
-  /gestion_previnculacionPrecontratacion/docentes_x_carga_horaria:
-    get:
-      tags:
-      - gestion_previnculacion
-      description: create ListarDocentesCargaHoraria
-      operationId: GestionPrevinculacionesController.ListarDocentesCargaHoraria
-      parameters:
-      - in: query
-        name: vigencia
-        description: año a consultar
-        type: string
-      - in: query
-        name: periodo
-        description: periodo a listar
-        type: string
-      - in: query
-        name: tipo_vinculacion
-        description: vinculacion del docente
-        type: string
-      - in: query
-        name: facultad
-        description: facultad
-        type: string
-      - in: query
-        name: nivel_academico
-        description: nivel_academico
-        type: string
-      responses:
-        "201":
-          schema:
-            $ref: '#/definitions/.Docentes_x_Carga'
-        "403":
-          description: body is empty
-  /gestion_previnculacionPrecontratacion/insertar_previnculaciones:
-    post:
-      tags:
-      - gestion_previnculacion
-      description: create InsertarPrevinculaciones
-      operationId: GestionPrevinculacionesController.InsetarPrevinculaciones
-      responses:
-        "201":
-          description: '{int} models.VinculacionDocente'
-        "403":
-          description: body is empty
-  /gestion_resoluciones/insertar_resolucion_completa:
-    post:
-      tags:
-      - gestion_resoluciones
-      description: create InsertarResolucionCompleta
-      operationId: GestionResolucionesController.InsertarResolucionCompleta
-      responses:
-        "201":
-          description: '{int} models.Resolucion'
-        "403":
-          description: body is empty
-  /gestion_resolucionesget_resoluciones_aprobadas:
+  /gestion_resoluciones/get_resoluciones_aprobadas:
     get:
       tags:
       - gestion_resoluciones
@@ -331,7 +309,7 @@ paths:
               $ref: '#/definitions/models.ResolucionVinculacion'
         "403":
           description: body is empty
-  /gestion_resolucionesget_resoluciones_inscritas:
+  /gestion_resoluciones/get_resoluciones_inscritas:
     get:
       tags:
       - gestion_resoluciones
@@ -350,22 +328,15 @@ paths:
               $ref: '#/definitions/models.ResolucionVinculacion'
         "403":
           description: body is empty
-  /informacion_proveedor/contratoPersona:
+  /gestion_resoluciones/insertar_resolucion_completa:
     post:
       tags:
-      - informacion_proveedor
-      description: create InformacionProveedor
-      operationId: InformacionProveedorController.contratoProveedor
-      parameters:
-      - in: body
-        name: body
-        description: body for ContratoGeneral content
-        required: true
-        schema:
-          $ref: '#/definitions/models.ContratoGeneral'
+      - gestion_resoluciones
+      description: create InsertarResolucionCompleta
+      operationId: GestionResolucionesController.InsertarResolucionCompleta
       responses:
         "201":
-          description: '{int} models.ContratoGeneral'
+          description: '{int} models.Resolucion'
         "403":
           description: body is empty
   /validar_contrato/{dedicacion}/{numHoras}:
@@ -411,108 +382,6 @@ definitions:
           $ref: '#/definitions/models.Paragrafo'
       Texto:
         type: string
-  models.ContratoGeneral:
-    title: ContratoGeneral
-    type: object
-    properties:
-      ClaseContratista:
-        type: integer
-        format: int64
-      ClausulaRegistroPresupuestal:
-        type: boolean
-      Condiciones:
-        type: string
-      Contratista:
-        type: integer
-        format: int64
-      Convenio:
-        type: string
-      DependenciaSolicitante:
-        type: string
-      DescripcionFormaPago:
-        type: string
-      Estado:
-        type: boolean
-      FechaRegistro:
-        type: string
-        format: string
-      FormaPago:
-        $ref: '#/definitions/models.Parametros'
-      Id:
-        type: string
-      Justificacion:
-        type: string
-      LugarEjecucion:
-        $ref: '#/definitions/models.LugarEjecucion'
-      ModalidadSeleccion:
-        type: integer
-        format: int64
-      NumeroConstancia:
-        type: integer
-        format: int64
-      ObjetoContrato:
-        type: string
-      Observaciones:
-        type: string
-      OrdenadorGasto:
-        type: integer
-        format: int64
-      OrigenPresupueso:
-        type: integer
-        format: int64
-      OrigenRecursos:
-        type: integer
-        format: int64
-      PlazoEjecucion:
-        type: integer
-        format: int64
-      Procedimiento:
-        type: integer
-        format: int64
-      RegimenContratacion:
-        type: integer
-        format: int64
-      SedeSolicitante:
-        type: string
-      Supervisor:
-        $ref: '#/definitions/models.SupervisorContrato'
-      TemaGastoInversion:
-        type: integer
-        format: int64
-      TipoCompromiso:
-        type: integer
-        format: int64
-      TipoContrato:
-        $ref: '#/definitions/models.TipoContrato'
-      TipoControl:
-        type: integer
-        format: int64
-      TipoGasto:
-        type: integer
-        format: int64
-      TipoMoneda:
-        type: integer
-        format: int64
-      TipologiaContrato:
-        type: integer
-        format: int64
-      UnidadEjecucion:
-        $ref: '#/definitions/models.Parametros'
-      UnidadEjecutora:
-        type: integer
-        format: int64
-      ValorContrato:
-        type: number
-        format: double
-      ValorContratoMe:
-        type: number
-        format: double
-      ValorTasaCambio:
-        type: number
-        format: double
-      VigenciaContrato:
-        type: integer
-        format: int64
   models.Disponibilidad:
     title: Disponibilidad
     type: object
@@ -526,22 +395,6 @@ definitions:
       Vigencia:
         type: number
         format: double
-  models.LugarEjecucion:
-    title: LugarEjecucion
-    type: object
-    properties:
-      Ciudad:
-        type: number
-        format: double
-      Dependencia:
-        type: string
-      Direccion:
-        type: string
-      Id:
-        type: integer
-        format: int64
-      Sede:
-        type: string
   models.OrdenadorGasto:
     title: OrdenadorGasto
     type: object
@@ -568,38 +421,6 @@ definitions:
         format: int64
       Texto:
         type: string
-  models.Parametros:
-    title: Parametros
-    type: object
-    properties:
-      CodigoContraloria:
-        type: string
-      Descripcion:
-        type: string
-      EstadoRegistro:
-        type: boolean
-      FechaRegistro:
-        type: string
-        format: string
-      Id:
-        type: integer
-        format: int64
-      RelParametro:
-        $ref: '#/definitions/models.RelacionParametro'
-  models.RelacionParametro:
-    title: RelacionParametro
-    type: object
-    properties:
-      Descripcion:
-        type: string
-      EstadoRegistro:
-        type: boolean
-      FechaRegistro:
-        type: string
-        format: string
-      Id:
-        type: integer
-        format: int64
   models.ResolucionCompleta:
     title: ResolucionCompleta
     type: object
@@ -674,45 +495,7 @@ definitions:
         format: int64
       NivelAcademico:
         type: string
-  models.SupervisorContrato:
-    title: SupervisorContrato
-    type: object
-    properties:
-      Cargo:
-        type: string
-      DependenciaSupervisor:
-        type: string
-      DigitoVerificacion:
-        type: integer
-        format: int64
-      Documento:
-        type: integer
-        format: int64
-      Estado:
-        type: boolean
-      Id:
-        type: integer
-        format: int64
-      Nombre:
-        type: string
-      SedeSupervisor:
-        type: string
-      Tipo:
-        type: integer
-        format: int64
-  models.TipoContrato:
-    title: TipoContrato
-    type: object
-    properties:
-      Id:
-        type: integer
-        format: int64
-      TipoContrato:
-        type: string
 tags:
-- name: informacion_proveedor
-  description: |
-    InformacionProveedorController operations for InformacionProveedor
 - name: gestion_previnculacion
   description: |
     PreliquidacionController operations for Preliquidacion

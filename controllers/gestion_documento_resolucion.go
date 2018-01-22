@@ -28,7 +28,7 @@ func (c *GestionDocumentoResolucionController) URLMapping() {
 // @Param id_facultad query string false "periodo a listar"
 // @Success 201 {object} models.ResolucionCompleta
 // @Failure 403 body is empty
-// @router get_contenido_resolucion [get]
+// @router /get_contenido_resolucion [get]
 func (c *GestionDocumentoResolucionController) GetContenidoResolucion() {
 	id_resolucion := c.GetString("id_resolucion")
 	id_facultad := c.GetString("id_facultad")

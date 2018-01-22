@@ -17,11 +17,6 @@ func init() {
 
 	auditoria.InitMiddleware()
 	ns := beego.NewNamespace("/v1",
-		beego.NSNamespace("/informacion_proveedor",
-			beego.NSInclude(
-				&controllers.InformacionProveedorController{},
-			),
-		),
 
 		beego.NSNamespace("/gestion_previnculacion",
 			beego.NSInclude(
@@ -62,12 +57,6 @@ func init() {
 		beego.NSNamespace("/validar_contrato",
 			beego.NSInclude(
 				&controllers.ValidarContratoController{},
-			),
-		),
-
-		beego.NSNamespace("/cancelacion_valida",
-			beego.NSInclude(
-				&controllers.CancelacionValidaController{},
 			),
 		),
 

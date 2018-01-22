@@ -30,7 +30,7 @@ func (c *GestionPrevinculacionesController) URLMapping() {
 // @Description create InsertarPrevinculaciones
 // @Success 201 {int} models.VinculacionDocente
 // @Failure 403 body is empty
-// @router Precontratacion/calcular_valor_contratos [post]
+// @router /Precontratacion/calcular_valor_contratos [post]
 func (c *GestionPrevinculacionesController) Calcular_total_de_salarios() {
 
 	var v []models.VinculacionDocente
@@ -54,7 +54,7 @@ func (c *GestionPrevinculacionesController) Calcular_total_de_salarios() {
 // @Description create InsertarPrevinculaciones
 // @Success 201 {int} models.VinculacionDocente
 // @Failure 403 body is empty
-// @router Precontratacion/insertar_previnculaciones [post]
+// @router /Precontratacion/insertar_previnculaciones [post]
 func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 
 	var v []models.VinculacionDocente
@@ -70,11 +70,10 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 			c.Data["json"] = "Error al insertar docentes"
 		}
 	} else {
-		c.Data["json"]= "ERROR al insertar previn"
-		fmt.Println("Error al hacer unmarshal",err)
+		c.Data["json"] = "ERROR al insertar previn"
+		fmt.Println("Error al hacer unmarshal", err)
 
 	}
-
 
 	c.ServeJSON()
 }
@@ -89,7 +88,7 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 // @Param nivel_academico query string false "nivel_academico"
 // @Success 201 {object} models.Docentes_x_Carga
 // @Failure 403 body is empty
-// @router Precontratacion/docentes_x_carga_horaria [get]
+// @router /Precontratacion/docentes_x_carga_horaria [get]
 func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 	vigencia := c.GetString("vigencia")
 	periodo := c.GetString("periodo")
@@ -136,7 +135,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDocente) (docentes_a_insertar []models.VinculacionDocente) {
 	//id_resolucion := 141
 	nivel_academico := docentes_a_vincular[0].NivelAcademico
-	vigencia:= strconv.Itoa(int(docentes_a_vincular[0].Vigencia.Int64))
+	vigencia := strconv.Itoa(int(docentes_a_vincular[0].Vigencia.Int64))
 	var a string
 	var categoria string
 
@@ -152,19 +151,19 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 
 		var predicados string
 		if strings.ToLower(nivel_academico) == "posgrado" {
-			predicados = "valor_salario_minimo(" + strconv.Itoa(CargarSalarioMinimo().Valor) + ","+vigencia+")." + "\n"
+			predicados = "valor_salario_minimo(" + strconv.Itoa(CargarSalarioMinimo().Valor) + "," + vigencia + ")." + "\n"
 		} else if strings.ToLower(nivel_academico) == "pregrado" {
-			predicados = "valor_punto(" + strconv.Itoa(CargarPuntoSalarial().ValorPunto) + ", "+vigencia+")." + "\n"
+			predicados = "valor_punto(" + strconv.Itoa(CargarPuntoSalarial().ValorPunto) + ", " + vigencia + ")." + "\n"
 		}
 
-		predicados = predicados + "categoria(" + docente.IdPersona + "," + strings.ToLower(categoria) + ", "+vigencia+")." + "\n"
-		predicados = predicados + "vinculacion(" + docente.IdPersona + "," + strings.ToLower(docente.Dedicacion) + ", "+vigencia+")." + "\n"
-		predicados = predicados + "horas(" + docente.IdPersona + "," + strconv.Itoa(docente.NumeroHorasSemanales*docente.NumeroSemanas) + ", "+vigencia+")." + "\n"
+		predicados = predicados + "categoria(" + docente.IdPersona + "," + strings.ToLower(categoria) + ", " + vigencia + ")." + "\n"
+		predicados = predicados + "vinculacion(" + docente.IdPersona + "," + strings.ToLower(docente.Dedicacion) + ", " + vigencia + ")." + "\n"
+		predicados = predicados + "horas(" + docente.IdPersona + "," + strconv.Itoa(docente.NumeroHorasSemanales*docente.NumeroSemanas) + ", " + vigencia + ")." + "\n"
 		reglasbase := CargarReglasBase("CDVE")
 		reglasbase = reglasbase + predicados
 		m := NewMachine().Consult(reglasbase)
 
-		contratos := m.ProveAll("valor_contrato(" + strings.ToLower(nivel_academico) + "," + docente.IdPersona + ","+vigencia+",X).")
+		contratos := m.ProveAll("valor_contrato(" + strings.ToLower(nivel_academico) + "," + docente.IdPersona + "," + vigencia + ",X).")
 		for _, solution := range contratos {
 			a = fmt.Sprintf("%s", solution.ByName_("X"))
 		}
@@ -230,7 +229,6 @@ func BuscarIdProveedor(DocumentoIdentidad int) (id_proveedor_docente int) {
 
 	return id_proveedor
 
-
 }
 
 func Calcular_total_de_salario(v []models.VinculacionDocente) (total float64) {
@@ -242,7 +240,6 @@ func Calcular_total_de_salario(v []models.VinculacionDocente) (total float64) {
 
 	return sumatoria
 }
-
 
 //ESTA FUNCIÓN LISTA LOS DOCENTES PREVINCULADOS EN TRUE O FALSE
 
@@ -266,7 +263,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 			v[x].NumeroDisponibilidad = BuscarNumeroDisponibilidad(pos.Disponibilidad)
 			v[x].Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id)
 			v[x].LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona)
-			v[x].NumeroHorasSemanales, v[x].ValorContrato = Calcular_totales_vinculacio_pdf(pos.IdPersona,id_resolucion)
+			v[x].NumeroHorasSemanales, v[x].ValorContrato = Calcular_totales_vinculacio_pdf(pos.IdPersona, id_resolucion)
 		}
 
 	} else {
@@ -394,46 +391,41 @@ func HomologarProyectoCurricular(proyecto_old string) (proyecto string) {
 
 	}
 
-
-
 	return id_proyecto
 }
 
 func HomologarFacultad(tipo, facultad string) (facultad_old string) {
 	var id_facultad string
 	var temp map[string]interface{}
-	var string_consulta_servicio string;
+	var string_consulta_servicio string
 
-	if(tipo == "new"){
-		string_consulta_servicio = "facultad_gedep_oikos";
-	}else{
-		string_consulta_servicio = "facultad_oikos_gedep";
+	if tipo == "new" {
+		string_consulta_servicio = "facultad_gedep_oikos"
+	} else {
+		string_consulta_servicio = "facultad_oikos_gedep"
 	}
 
 	if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_homologacion_dependencias/"+string_consulta_servicio+"/"+facultad, &temp); err == nil && temp != nil {
-	  json_facultad, error_json := json.Marshal(temp)
+		json_facultad, error_json := json.Marshal(temp)
 
-	  if error_json == nil {
-	    var temp_proy models.ObjetoFacultad
-	    json.Unmarshal(json_facultad, &temp_proy)
+		if error_json == nil {
+			var temp_proy models.ObjetoFacultad
+			json.Unmarshal(json_facultad, &temp_proy)
 
-			if(tipo == "new"){
-				  id_facultad = temp_proy.Homologacion.IdGeDep
-			}else{
-		 			id_facultad = temp_proy.Homologacion.IdOikos
+			if tipo == "new" {
+				id_facultad = temp_proy.Homologacion.IdGeDep
+			} else {
+				id_facultad = temp_proy.Homologacion.IdOikos
 			}
 
-
-
-	  } else {
-	    fmt.Println(error_json.Error())
-	    // c.Data["json"] = error_json.Error()
-	  }
+		} else {
+			fmt.Println(error_json.Error())
+			// c.Data["json"] = error_json.Error()
+		}
 	} else {
-	  fmt.Println(err)
+		fmt.Println(err)
 
 	}
-
 
 	return id_facultad
 
@@ -545,7 +537,6 @@ func BuscarNombreProveedor(DocumentoIdentidad int) (nombre_prov string) {
 
 	return nom_proveedor
 
-
 }
 
 func BuscarNombreDedicacion(id_dedicacion int) (nombre_dedicacion string) {
@@ -581,7 +572,6 @@ func BuscarNumeroDisponibilidad(IdCDP int) (numero_disp int) {
 	}
 	return numero_disponibilidad
 
-
 }
 
 func BuscarLugarExpedicion(Cedula string) (nombre_lugar_exp string) {
@@ -616,9 +606,9 @@ func BuscarLugarExpedicion(Cedula string) (nombre_lugar_exp string) {
 
 }
 
-func Calcular_totales_vinculacio_pdf(cedula, id_resolucion string)(suma_total_horas int, suma_total_contrato float64){
+func Calcular_totales_vinculacio_pdf(cedula, id_resolucion string) (suma_total_horas int, suma_total_contrato float64) {
 
-	query:="?limit=-1&query=IdPersona:"+cedula+",IdResolucion.Id:"+id_resolucion;
+	query := "?limit=-1&query=IdPersona:" + cedula + ",IdResolucion.Id:" + id_resolucion
 	var temp []models.VinculacionDocente
 	var total_contrato int
 	var total_horas int
@@ -630,10 +620,10 @@ func Calcular_totales_vinculacio_pdf(cedula, id_resolucion string)(suma_total_ho
 			total_contrato = total_contrato + int(pos.ValorContrato)
 		}
 
-	}else{
+	} else {
 		fmt.Println("error al guardar en json")
-		total_horas = 0;
-		total_contrato = 0;
+		total_horas = 0
+		total_contrato = 0
 	}
 
 	return total_horas, float64(total_contrato)

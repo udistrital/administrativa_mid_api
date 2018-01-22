@@ -30,7 +30,7 @@ func (c *GestionResolucionesController) URLMapping() {
 // @Param vigencia query string false "año a consultar"
 // @Success 201 {object} []models.ResolucionVinculacion
 // @Failure 403 body is empty
-// @router get_resoluciones_inscritas [get]
+// @router /get_resoluciones_inscritas [get]
 func (c *GestionResolucionesController) GetResolucionesInscritas() {
 	var resolucion_vinculacion []models.ResolucionVinculacion
 
@@ -55,7 +55,7 @@ func (c *GestionResolucionesController) GetResolucionesInscritas() {
 // @Param vigencia query string false "año a consultar"
 // @Success 201 {object} []models.ResolucionVinculacion
 // @Failure 403 body is empty
-// @router get_resoluciones_aprobadas [get]
+// @router /get_resoluciones_aprobadas [get]
 func (c *GestionResolucionesController) GetResolucionesAprobadas() {
 	var resolucion_vinculacion_aprobada []models.ResolucionVinculacion
 
