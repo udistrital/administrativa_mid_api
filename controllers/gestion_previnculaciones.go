@@ -34,16 +34,27 @@ func (c *GestionPrevinculacionesController) URLMapping() {
 func (c *GestionPrevinculacionesController) Calcular_total_de_salarios() {
 
 	var v []models.VinculacionDocente
-
+	var totales_disponibilidad int
+	var total int;
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 
 		v = CalcularSalarioPrecontratacion(v)
 		totales_de_salario := Calcular_total_de_salario(v)
-		c.Data["json"] = totales_de_salario
+		vigencia := strconv.Itoa(int(v[0].Vigencia.Int64))
+		periodo := strconv.Itoa(v[0].Periodo)
+		disponibilidad := strconv.Itoa(v[0].Disponibilidad)
+		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_valores_totales_x_disponibilidad/?anio="+vigencia+"&periodo="+periodo+"&id_disponibilidad="+disponibilidad+"",&totales_disponibilidad); err == nil {
+			fmt.Println("totales disponibilidad",totales_disponibilidad)
+			total = int(totales_de_salario) + totales_disponibilidad;
+			c.Data["json"] = total
+		} else {
+			fmt.Println("ERROR al calcular total de contratos")
+			fmt.Println(err,err2)
+			c.Data["json"] = "ERROR al calcular total de contratos"
+		}
+
 	} else {
-		fmt.Println("ERROR al calcular total de contratos")
-		fmt.Println(err)
-		c.Data["json"] = "Error al calcular totales"
+		c.Data["json"] = "Error al leer json"
 	}
 
 	c.ServeJSON()

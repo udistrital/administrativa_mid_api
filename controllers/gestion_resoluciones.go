@@ -126,7 +126,8 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 	temp.Vigencia, _, _ = time.Now().Date()
 	temp.FechaRegistro = time.Now()
 	temp.Estado = true
-
+	temp.Titulo = "Por la cual se vinculan docentes para el Primer Periodo Académico de 2018 en la modalidad de Docentes de HORA CÁTEDRA (Vinculación Especial) para la "+resolucion.NomDependencia+" en "+resolucion.ResolucionVinculacionDocente.NivelAcademico+".”"
+	temp.PreambuloResolucion = "El decano de la "+resolucion.NomDependencia+" de la Universidad Distrital Francisco José de Caldas en uso de sus facultades legales y estatuarias y"
 	if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion", "POST", &respuesta, &temp); err == nil {
 		id_creada = respuesta.Id
 		cont = true
