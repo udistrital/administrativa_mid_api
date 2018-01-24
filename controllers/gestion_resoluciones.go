@@ -83,9 +83,19 @@ func (c *GestionResolucionesController) GetResolucionesAprobadas() {
 func (c *GestionResolucionesController) InsertarResolucionCompleta() {
 	var v models.ObjetoResolucion
 	var id_resolucion_creada int
+	var texto_resolucion models.ResolucionCompleta
+
 	var control bool
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		//****MANEJO DE TRANSACCIONES!***!//
+
+		//Se trae cuerpo de resolución según tipo
+		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/contenido_resolucion/ResolucionTemplate/"+v.ResolucionVinculacionDocente.Dedicacion+"/"+v.ResolucionVinculacionDocente.NivelAcademico, &texto_resolucion); err2 == nil {
+			v.Resolucion.ConsideracionResolucion = texto_resolucion.Consideracion
+		} else {
+			fmt.Println("Error de consulta en texto de resolucion", err2)
+		}
+
 		//Primero se inserta la resolución, si eso se realiza correctamente
 		control, id_resolucion_creada = InsertarResolucion(v)
 		if control {
@@ -94,7 +104,7 @@ func (c *GestionResolucionesController) InsertarResolucionCompleta() {
 			control = InsertarResolucionEstado(id_resolucion_creada)
 			//Si todo sigue bien, se inserta en componente_resolucion
 			if control {
-				InsertarTexto(id_resolucion_creada)
+				InsertarTexto(id_resolucion_creada,v.ResolucionVinculacionDocente.Dedicacion, v.ResolucionVinculacionDocente.NivelAcademico)
 			} else {
 				fmt.Println("enviar error al insertar en resolucion_vinculacion_docente")
 			}
@@ -192,10 +202,10 @@ func InsertarResolucionVinDocente(id_res int, resvindoc *models.ResolucionVincul
 	return cont
 }
 
-func InsertarTexto(id_res int) {
+func InsertarTexto(id_res int, dedicacion, nivel_academico string) {
 	var texto_resolucion models.ResolucionCompleta
 
-	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/contenido_resolucion/ResolucionTemplate", &texto_resolucion); err2 == nil {
+	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/contenido_resolucion/ResolucionTemplate/"+dedicacion+"/"+nivel_academico, &texto_resolucion); err2 == nil {
 		InsertarArticulos(id_res, texto_resolucion.Articulos)
 
 	} else {
