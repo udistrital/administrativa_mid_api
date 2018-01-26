@@ -102,6 +102,7 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 // @Failure 403 body is empty
 // @router /Precontratacion/docentes_x_carga_horaria [get]
 func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
+	fmt.Println("")
 	vigencia := c.GetString("vigencia")
 	periodo := c.GetString("periodo")
 	tipo_vinculacion := c.GetString("tipo_vinculacion")
@@ -115,7 +116,6 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 
 		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].CategoriaNombre, docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDCategoria = Buscar_Categoria_Docente(vigencia, periodo, pos.DocDocente)
 		if docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].CategoriaNombre == "" && docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDCategoria == "" && x!= len(docentes_x_carga_horaria.CargasLectivas.CargaLectiva){
-			fmt.Println("no hay cat")
 
 			//docentes_x_carga_horaria.CargasLectivas.CargaLectiva = append(docentes_x_carga_horaria.CargasLectivas.CargaLectiva[:x], docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x+1:]...)
 			}
@@ -283,6 +283,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 			v[x].NumeroDisponibilidad = BuscarNumeroDisponibilidad(pos.Disponibilidad)
 			v[x].Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id)
 			v[x].LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona)
+			v[x].TipoDocumento = BuscarTipoDocumento(pos.IdPersona)
 			v[x].NumeroHorasSemanales, v[x].ValorContrato = Calcular_totales_vinculacio_pdf(pos.IdPersona, id_resolucion)
 		}
 
@@ -317,6 +318,8 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 			v[x].NumeroDisponibilidad = BuscarNumeroDisponibilidad(pos.Disponibilidad)
 			v[x].Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id)
 			v[x].LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona)
+			v[x].TipoDocumento = BuscarTipoDocumento(pos.IdPersona)
+
 		}
 
 	} else {
@@ -365,7 +368,7 @@ func Buscar_Categoria_Docente(vigencia, periodo, documento_ident string) (catego
 	var nombre_categoria string
 	var id_categoria_old string
 
-	if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_urano_pruebas/categoria_docente/"+vigencia+"/"+periodo+"/"+documento_ident, &temp); err == nil && temp != nil {
+	if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_urano_produccion/categoria_docente/"+vigencia+"/"+periodo+"/"+documento_ident, &temp); err == nil && temp != nil {
 		jsonDocentes, error_json := json.Marshal(temp)
 
 		if error_json == nil {
@@ -556,6 +559,24 @@ func BuscarNombreProveedor(DocumentoIdentidad int) (nombre_prov string) {
 	}
 
 	return nom_proveedor
+
+}
+
+func BuscarTipoDocumento(Cedula string) (nombre_tipo_doc string) {
+	var tipo_documento string
+	var temp []models.InformacionPersonaNatural
+	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_persona_natural?limit=-1&query=Id:"+Cedula, &temp); err2 == nil {
+		if temp != nil {
+			tipo_documento = temp[0].TipoDocumento.ValorParametro
+		} else {
+			tipo_documento = "N/A"
+		}
+	} else {
+		fmt.Println("error en json", err2)
+		tipo_documento = "N/A";
+	}
+
+	return tipo_documento
 
 }
 
