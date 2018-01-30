@@ -45,7 +45,7 @@ func (c *GestionPrevinculacionesController) Calcular_total_de_salarios() {
 		disponibilidad := strconv.Itoa(v[0].Disponibilidad)
 
 		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_valores_totales_x_disponibilidad/"+vigencia+"/"+periodo+"/"+disponibilidad+"",&totales_disponibilidad); err == nil {
-			fmt.Println("totales dispo", totales_disponibilidad)
+
 			total = int(totales_de_salario) + totales_disponibilidad;
 			c.Data["json"] = total
 		} else {
@@ -74,7 +74,7 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v = CalcularSalarioPrecontratacion(v)
-		fmt.Println("valor contrato", v)
+
 		if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &id_respuesta, &v); err == nil {
 			c.Data["json"] = id_respuesta
 		} else {
@@ -102,7 +102,7 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 // @Failure 403 body is empty
 // @router /Precontratacion/docentes_x_carga_horaria [get]
 func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
-	fmt.Println("")
+
 	vigencia := c.GetString("vigencia")
 	periodo := c.GetString("periodo")
 	tipo_vinculacion := c.GetString("tipo_vinculacion")
@@ -225,10 +225,10 @@ func CargarSalarioMinimo() (p models.SalarioMinimo) {
 func EsDocentePlanta(idPersona string) (docentePlanta bool) {
 	var v []models.DocentePlanta
 	if err := getJson("http://10.20.0.127/urano/index.php?data=B-7djBQWvIdLAEEycbH1n6e-3dACi5eLUOb63vMYhGq0kPBs7NGLYWFCL0RSTCu1yTlE5hH854MOgmjuVfPWyvdpaJDUOyByX-ksEPFIrrQQ7t1p4BkZcBuGD2cgJXeD&documento="+idPersona, &v); err == nil {
-		fmt.Println(v[0].Nombres)
+
 		return true
 	} else {
-		//fmt.Println("false")
+
 		return false
 	}
 }
@@ -284,7 +284,9 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 			v[x].Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id)
 			v[x].LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona)
 			v[x].TipoDocumento = BuscarTipoDocumento(pos.IdPersona)
-			v[x].NumeroHorasSemanales, v[x].ValorContrato = Calcular_totales_vinculacio_pdf(pos.IdPersona, id_resolucion)
+			v[x].NumeroHorasSemanales, v[x].ValorContrato = Calcular_totales_vinculacion_pdf(pos.IdPersona, id_resolucion)
+			v[x].NumeroMeses = strconv.FormatFloat(float64(pos.NumeroSemanas) / 4, 'f', 1, 64) + " meses";
+			v[x].ValorContratoFormato = FormatMoney(int(v[x].ValorContrato),2)
 		}
 
 	} else {
@@ -319,7 +321,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 			v[x].Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id)
 			v[x].LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona)
 			v[x].TipoDocumento = BuscarTipoDocumento(pos.IdPersona)
-
+			v[x].ValorContratoFormato = FormatMoney(int(v[x].ValorContrato),2)
 		}
 
 	} else {
@@ -565,7 +567,7 @@ func BuscarNombreProveedor(DocumentoIdentidad int) (nombre_prov string) {
 func BuscarTipoDocumento(Cedula string) (nombre_tipo_doc string) {
 	var tipo_documento string
 	var temp []models.InformacionPersonaNatural
-	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_persona_natural?limit=-1&query=Id:"+Cedula, &temp); err2 == nil {
+	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_persona_natural/?limit=-1&query=Id:"+Cedula, &temp); err2 == nil {
 		if temp != nil {
 			tipo_documento = temp[0].TipoDocumento.ValorParametro
 		} else {
@@ -620,10 +622,11 @@ func BuscarLugarExpedicion(Cedula string) (nombre_lugar_exp string) {
 	var nombre_ciudad string
 	var temp []models.InformacionPersonaNatural
 	var temp2 []models.Ciudad
-	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_persona_natural?limit=-1&query=Id:"+Cedula, &temp); err2 == nil {
+
+	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_persona_natural/?limit=-1&query=Id:"+Cedula, &temp); err2 == nil {
 		if temp != nil {
 			id_ciudad := temp[0].IdCiudadExpedicionDocumento
-			if err := getJson("http://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ciudad?limit=-1&query=Id:"+strconv.Itoa(int(id_ciudad)), &temp2); err2 == nil {
+			if err := getJson("http://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ciudad/?limit=-1&query=Id:"+strconv.Itoa(int(id_ciudad)), &temp2); err2 == nil {
 				if temp2 != nil {
 					nombre_ciudad = temp2[0].Nombre
 
@@ -647,7 +650,7 @@ func BuscarLugarExpedicion(Cedula string) (nombre_lugar_exp string) {
 
 }
 
-func Calcular_totales_vinculacio_pdf(cedula, id_resolucion string) (suma_total_horas int, suma_total_contrato float64) {
+func Calcular_totales_vinculacion_pdf(cedula, id_resolucion string) (suma_total_horas int, suma_total_contrato float64) {
 
 	query := "?limit=-1&query=IdPersona:" + cedula + ",IdResolucion.Id:" + id_resolucion
 	var temp []models.VinculacionDocente
