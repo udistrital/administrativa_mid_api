@@ -7,6 +7,14 @@ import (
 
 func init() {
 
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
+		beego.ControllerComments{
+			Method: "ObtenerInfoCoordinador",
+			Router: `/informacion_coordinador/:id_dependencia_oikos`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:CambioEstadoContratoValidoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:CambioEstadoContratoValidoController"],
 		beego.ControllerComments{
 			Method: "ValidarCambioEstado",
