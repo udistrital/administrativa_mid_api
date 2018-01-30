@@ -25,6 +25,30 @@ func (c *GestionPrevinculacionesController) URLMapping() {
 	c.Mapping("ListarDocentesCargaHoraria", c.ListarDocentesCargaHoraria)
 }
 
+// Calcular_total_de_salarios_seleccionados ...
+// @Title Calcular_total_de_salarios_seleccionados
+// @Description createCalcular_total_de_salarios_seleccionados
+// @Success 201 {int} int
+// @Failure 403 body is empty
+// @router /Precontratacion/calcular_valor_contratos_seleccionados [post]
+func (c *GestionPrevinculacionesController) Calcular_total_de_salarios_seleccionados() {
+
+	var v []models.VinculacionDocente
+	var total int;
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+
+		v = CalcularSalarioPrecontratacion(v)
+		total = int(Calcular_total_de_salario(v))
+		c.Data["json"] = total
+
+
+	} else {
+		c.Data["json"] = "Error al leer json"
+	}
+
+	c.ServeJSON()
+}
+
 // InsertarPrevinculaciones ...
 // @Title InsetarPrevinculaciones
 // @Description create InsertarPrevinculaciones
@@ -196,7 +220,7 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 	f, _ := strconv.ParseFloat(a, 64)
 	salario := int(f)
 
-	fmt.Println(salario)
+
 
 	return docentes_a_vincular
 
