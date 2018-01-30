@@ -30,4 +30,6 @@ type VinculacionDocente struct {
 	NumeroHorasNuevas     int
 	Periodo               int
 	TipoDocumento 			  string
+	NumeroMeses						string
+	ValorContratoFormato  string
 }
