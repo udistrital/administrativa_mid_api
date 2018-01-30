@@ -71,6 +71,12 @@ func init() {
 				&controllers.Contrato_generalController{},
 			),
 		),
+
+		beego.NSNamespace("/aprobacion_pago",
+			beego.NSInclude(
+				&controllers.AprobacionPagoController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }
