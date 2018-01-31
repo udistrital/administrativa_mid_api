@@ -121,14 +121,6 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"],
 		beego.ControllerComments{
-			Method:           "Calcular_total_de_salarios",
-			Router:           `/Precontratacion/calcular_valor_contratos`,
-			AllowHTTPMethods: []string{"post"},
-			MethodParams:     param.Make(),
-			Params:           nil})
-
-	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"],
-		beego.ControllerComments{
 			Method:           "Calcular_total_de_salarios_seleccionados",
 			Router:           `/Precontratacion/calcular_valor_contratos_seleccionados`,
 			AllowHTTPMethods: []string{"post"},
@@ -137,9 +129,9 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"],
 		beego.ControllerComments{
-			Method:           "ListarDocentesCargaHoraria",
-			Router:           `/Precontratacion/docentes_x_carga_horaria`,
-			AllowHTTPMethods: []string{"get"},
+			Method:           "Calcular_total_de_salarios",
+			Router:           `/Precontratacion/calcular_valor_contratos`,
+			AllowHTTPMethods: []string{"post"},
 			MethodParams:     param.Make(),
 			Params:           nil})
 

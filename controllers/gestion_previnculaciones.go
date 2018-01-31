@@ -34,13 +34,12 @@ func (c *GestionPrevinculacionesController) URLMapping() {
 func (c *GestionPrevinculacionesController) Calcular_total_de_salarios_seleccionados() {
 
 	var v []models.VinculacionDocente
-	var total int;
+	var total int
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 
 		v = CalcularSalarioPrecontratacion(v)
 		total = int(Calcular_total_de_salario(v))
 		c.Data["json"] = total
-
 
 	} else {
 		c.Data["json"] = "Error al leer json"
@@ -59,7 +58,7 @@ func (c *GestionPrevinculacionesController) Calcular_total_de_salarios() {
 
 	var v []models.VinculacionDocente
 	var totales_disponibilidad int
-	var total int;
+	var total int
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 
 		v = CalcularSalarioPrecontratacion(v)
@@ -68,13 +67,13 @@ func (c *GestionPrevinculacionesController) Calcular_total_de_salarios() {
 		periodo := strconv.Itoa(v[0].Periodo)
 		disponibilidad := strconv.Itoa(v[0].Disponibilidad)
 
-		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_valores_totales_x_disponibilidad/"+vigencia+"/"+periodo+"/"+disponibilidad+"",&totales_disponibilidad); err == nil {
+		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_valores_totales_x_disponibilidad/"+vigencia+"/"+periodo+"/"+disponibilidad+"", &totales_disponibilidad); err == nil {
 
-			total = int(totales_de_salario) + totales_disponibilidad;
+			total = int(totales_de_salario) + totales_disponibilidad
 			c.Data["json"] = total
 		} else {
 			fmt.Println("ERROR al calcular total de contratos")
-			fmt.Println(err,err2)
+			fmt.Println(err, err2)
 			c.Data["json"] = "ERROR al calcular total de contratos"
 		}
 
@@ -139,10 +138,10 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 	for x, pos := range docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
 
 		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].CategoriaNombre, docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDCategoria = Buscar_Categoria_Docente(vigencia, periodo, pos.DocDocente)
-		if docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].CategoriaNombre == "" && docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDCategoria == "" && x!= len(docentes_x_carga_horaria.CargasLectivas.CargaLectiva){
+		if docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].CategoriaNombre == "" && docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDCategoria == "" && x != len(docentes_x_carga_horaria.CargasLectivas.CargaLectiva) {
 
 			//docentes_x_carga_horaria.CargasLectivas.CargaLectiva = append(docentes_x_carga_horaria.CargasLectivas.CargaLectiva[:x], docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x+1:]...)
-			}
+		}
 	}
 
 	//RETORNAR CON ID DE TIPO DE VINCULACION DE NUEVO MODELO
@@ -167,7 +166,6 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 	for x, pos := range docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
 		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDProyecto = HomologarProyectoCurricular(pos.IDProyecto)
 	}
-
 
 	c.Ctx.Output.SetStatus(201)
 	c.Data["json"] = docentes_x_carga_horaria.CargasLectivas.CargaLectiva
@@ -195,7 +193,7 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 		var predicados string
 		if strings.ToLower(nivel_academico) == "posgrado" {
 			predicados = "valor_salario_minimo(" + strconv.Itoa(CargarSalarioMinimo().Valor) + "," + vigencia + ")." + "\n"
-			docente.NumeroSemanas = 1;
+			docente.NumeroSemanas = 1
 		} else if strings.ToLower(nivel_academico) == "pregrado" {
 			predicados = "valor_punto(" + strconv.Itoa(CargarPuntoSalarial().ValorPunto) + ", " + vigencia + ")." + "\n"
 		}
@@ -219,8 +217,6 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 
 	f, _ := strconv.ParseFloat(a, 64)
 	salario := int(f)
-
-
 
 	return docentes_a_vincular
 
@@ -309,8 +305,8 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 			v[x].LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona)
 			v[x].TipoDocumento = BuscarTipoDocumento(pos.IdPersona)
 			v[x].NumeroHorasSemanales, v[x].ValorContrato = Calcular_totales_vinculacion_pdf(pos.IdPersona, id_resolucion)
-			v[x].NumeroMeses = strconv.FormatFloat(float64(pos.NumeroSemanas) / 4, 'f', 1, 64) + " meses";
-			v[x].ValorContratoFormato = FormatMoney(int(v[x].ValorContrato),2)
+			v[x].NumeroMeses = strconv.FormatFloat(float64(pos.NumeroSemanas)/4, 'f', 1, 64) + " meses"
+			v[x].ValorContratoFormato = FormatMoney(int(v[x].ValorContrato), 2)
 		}
 
 	} else {
@@ -345,7 +341,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 			v[x].Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id)
 			v[x].LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona)
 			v[x].TipoDocumento = BuscarTipoDocumento(pos.IdPersona)
-			v[x].ValorContratoFormato = FormatMoney(int(v[x].ValorContrato),2)
+			v[x].ValorContratoFormato = FormatMoney(int(v[x].ValorContrato), 2)
 		}
 
 	} else {
@@ -599,7 +595,7 @@ func BuscarTipoDocumento(Cedula string) (nombre_tipo_doc string) {
 		}
 	} else {
 		fmt.Println("error en json", err2)
-		tipo_documento = "N/A";
+		tipo_documento = "N/A"
 	}
 
 	return tipo_documento

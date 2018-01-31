@@ -82,86 +82,95 @@ func (c *ExpedirResolucionController) Expedir() {
 					contrato.Condiciones = "Sin condiciones"
 					// If 5 - Informacion_Proveedor
 					if err := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+strconv.Itoa(contrato.Contratista), &proveedor); err == nil {
-						temp = proveedor[0].NumDocumento
-						_, err = amazon.Raw("INSERT INTO argo.contrato_general(numero_contrato, vigencia, objeto_contrato, plazo_ejecucion, forma_pago, ordenador_gasto, sede_solicitante, dependencia_solicitante, contratista, unidad_ejecucion, valor_contrato, justificacion, descripcion_forma_pago, condiciones, unidad_ejecutora, fecha_registro, tipologia_contrato, tipo_compromiso, modalidad_seleccion, procedimiento, regimen_contratacion, tipo_gasto, tema_gasto_inversion, origen_presupueso, origen_recursos, tipo_moneda, tipo_control, observaciones, supervisor,clase_contratista, tipo_contrato, lugar_ejecucion) VALUES (?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)", contrato.Id, contrato.VigenciaContrato, contrato.ObjetoContrato, contrato.PlazoEjecucion, contrato.FormaPago.Id, contrato.OrdenadorGasto, contrato.SedeSolicitante, contrato.DependenciaSolicitante, temp[0], contrato.UnidadEjecucion.Id, contrato.ValorContrato, contrato.Justificacion, contrato.DescripcionFormaPago, contrato.Condiciones, contrato.UnidadEjecutora, contrato.FechaRegistro.Format(time.RFC1123), contrato.TipologiaContrato, contrato.TipoCompromiso, contrato.ModalidadSeleccion, contrato.Procedimiento, contrato.RegimenContratacion, contrato.TipoGasto, contrato.TemaGastoInversion, contrato.OrigenPresupueso, contrato.OrigenRecursos, contrato.TipoMoneda, contrato.TipoControl, contrato.Observaciones, 192, contrato.ClaseContratista, contrato.TipoContrato.Id, contrato.LugarEjecucion.Id).Exec()
-						aux1 := contrato.Id
-						aux2 := contrato.VigenciaContrato
-						var ce models.ContratoEstado
-						var ec models.EstadoContrato
-						ce.NumeroContrato = aux1
-						ce.Vigencia = aux2
-						ce.FechaRegistro = time.Now()
-						ec.Id = 4
-						ce.Estado = &ec
-						// If 4 - contrato_estado
-						if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_estado", "POST", &response, &ce); err == nil {
-							a := vinculacion.VinculacionDocente
-							var ai models.ActaInicio
-							ai.NumeroContrato = aux1
-							ai.Vigencia = aux2
-							ai.Descripcion = acta.Descripcion
-							ai.FechaInicio = acta.FechaInicio
-							ai.FechaFin = acta.FechaFin
-							ai.FechaFin = CalcularFechaFin(acta.FechaInicio, a.NumeroSemanas)
-							// If 3 - Acta_inicio
-							if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/acta_inicio", "POST", &response, &ai); err == nil {
-								var cd models.ContratoDisponibilidad
-								cd.NumeroContrato = aux1
-								cd.Vigencia = aux2
-								cd.Estado = true
-								cd.FechaRegistro = time.Now()
-								// If 2.5.2 - Get disponibildad_apropiacion
-								if err := getJson("http://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad_apropiacion/"+strconv.Itoa(v.Disponibilidad), &dispoap); err == nil {
-									// If 2.5.1 - Get disponibildad
-									if err := getJson("http://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad/"+strconv.Itoa(dispoap.Disponibilidad.Id), &disponibilidad); err == nil {
-										cd.NumeroCdp = int(disponibilidad.NumeroDisponibilidad)
-										cd.VigenciaCdp = int(disponibilidad.Vigencia)
-										// If 2 - contrato_disponibilidad
-										if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad", "POST", &response, &cd); err == nil {
-											a.IdPuntoSalarial = vinculacion.VinculacionDocente.IdPuntoSalarial
-											a.IdSalarioMinimo = vinculacion.VinculacionDocente.IdSalarioMinimo
-											v := a
-											v.NumeroContrato.String = aux1
-											v.NumeroContrato.Valid = true
-											v.Vigencia.Int64 = int64(aux2)
-											v.Vigencia.Valid = true
-											// If 1 - vinculacion_docente
-											if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(v.Id), "PUT", &response, &v); err == nil {
-												fmt.Println("Vinculacion docente actualizada y lista, vamos por la otra")
-											} else { // If 1 - vinculacion_docente
-												fmt.Println("He fallado un poquito en If 1 - vinculacion_docente, solucioname!!! ", err)
+						if proveedor != nil { //Nuevo If
+							temp = proveedor[0].NumDocumento
+							_, err = amazon.Raw("INSERT INTO argo.contrato_general(numero_contrato, vigencia, objeto_contrato, plazo_ejecucion, forma_pago, ordenador_gasto, sede_solicitante, dependencia_solicitante, contratista, unidad_ejecucion, valor_contrato, justificacion, descripcion_forma_pago, condiciones, unidad_ejecutora, fecha_registro, tipologia_contrato, tipo_compromiso, modalidad_seleccion, procedimiento, regimen_contratacion, tipo_gasto, tema_gasto_inversion, origen_presupueso, origen_recursos, tipo_moneda, tipo_control, observaciones, supervisor,clase_contratista, tipo_contrato, lugar_ejecucion) VALUES (?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)", contrato.Id, contrato.VigenciaContrato, contrato.ObjetoContrato, contrato.PlazoEjecucion, contrato.FormaPago.Id, contrato.OrdenadorGasto, contrato.SedeSolicitante, contrato.DependenciaSolicitante, temp[0], contrato.UnidadEjecucion.Id, contrato.ValorContrato, contrato.Justificacion, contrato.DescripcionFormaPago, contrato.Condiciones, contrato.UnidadEjecutora, contrato.FechaRegistro.Format(time.RFC1123), contrato.TipologiaContrato, contrato.TipoCompromiso, contrato.ModalidadSeleccion, contrato.Procedimiento, contrato.RegimenContratacion, contrato.TipoGasto, contrato.TemaGastoInversion, contrato.OrigenPresupueso, contrato.OrigenRecursos, contrato.TipoMoneda, contrato.TipoControl, contrato.Observaciones, 192, contrato.ClaseContratista, contrato.TipoContrato.Id, contrato.LugarEjecucion.Id).Exec()
+							aux1 := contrato.Id
+							aux2 := contrato.VigenciaContrato
+							var ce models.ContratoEstado
+							var ec models.EstadoContrato
+							ce.NumeroContrato = aux1
+							ce.Vigencia = aux2
+							ce.FechaRegistro = time.Now()
+							ec.Id = 4
+							ce.Estado = &ec
+							// If 4 - contrato_estado
+							if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_estado", "POST", &response, &ce); err == nil {
+								a := vinculacion.VinculacionDocente
+								var ai models.ActaInicio
+								ai.NumeroContrato = aux1
+								ai.Vigencia = aux2
+								ai.Descripcion = acta.Descripcion
+								ai.FechaInicio = acta.FechaInicio
+								ai.FechaFin = acta.FechaFin
+								ai.FechaFin = CalcularFechaFin(acta.FechaInicio, a.NumeroSemanas)
+								// If 3 - Acta_inicio
+								if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/acta_inicio", "POST", &response, &ai); err == nil {
+									var cd models.ContratoDisponibilidad
+									cd.NumeroContrato = aux1
+									cd.Vigencia = aux2
+									cd.Estado = true
+									cd.FechaRegistro = time.Now()
+									// If 2.5.2 - Get disponibildad_apropiacion
+									if err := getJson("http://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad_apropiacion/"+strconv.Itoa(v.Disponibilidad), &dispoap); err == nil {
+										// If 2.5.1 - Get disponibildad
+										if err := getJson("http://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad/"+strconv.Itoa(dispoap.Disponibilidad.Id), &disponibilidad); err == nil {
+											cd.NumeroCdp = int(disponibilidad.NumeroDisponibilidad)
+											cd.VigenciaCdp = int(disponibilidad.Vigencia)
+											// If 2 - contrato_disponibilidad
+											if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad", "POST", &response, &cd); err == nil {
+												a.IdPuntoSalarial = vinculacion.VinculacionDocente.IdPuntoSalarial
+												a.IdSalarioMinimo = vinculacion.VinculacionDocente.IdSalarioMinimo
+												v := a
+												v.NumeroContrato.String = aux1
+												v.NumeroContrato.Valid = true
+												v.Vigencia.Int64 = int64(aux2)
+												v.Vigencia.Valid = true
+												// If 1 - vinculacion_docente
+												if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(v.Id), "PUT", &response, &v); err == nil {
+													fmt.Println("Vinculacion docente actualizada y lista, vamos por la otra")
+												} else { // If 1 - vinculacion_docente
+													fmt.Println("He fallado un poquito en If 1 - vinculacion_docente, solucioname!!! ", err)
+													amazon.Rollback()
+													flyway.Rollback()
+													return
+												}
+											} else { // If 2 - contrato_disponibilidad
+												fmt.Println("He fallado un poquito en  If 2 - contrato_disponibilidad, solucioname!!!", err)
 												amazon.Rollback()
 												flyway.Rollback()
 												return
 											}
-										} else { // If 2 - contrato_disponibilidad
-											fmt.Println("He fallado un poquito en  If 2 - contrato_disponibilidad, solucioname!!!", err)
+										} else { // If 2.5.1 - Get disponibildad
+											fmt.Println("He fallado un poquito en If 2.5.1 - Get disponibildad, solucioname!!!", err)
 											amazon.Rollback()
 											flyway.Rollback()
 											return
 										}
-									} else { // If 2.5.1 - Get disponibildad
-										fmt.Println("He fallado un poquito en If 2.5.1 - Get disponibildad, solucioname!!!", err)
+									} else { // If 2.5.2 - Get disponibildad_apropiacion
+										fmt.Println("He fallado un poquito en If 2.5.2 - Get disponibildad_apropiacion, solucioname!!!", err)
 										amazon.Rollback()
 										flyway.Rollback()
 										return
 									}
-								} else { // If 2.5.2 - Get disponibildad_apropiacion
-									fmt.Println("He fallado un poquito en If 2.5.2 - Get disponibildad_apropiacion, solucioname!!!", err)
+								} else { // If 3 - Acta_inicio
+									fmt.Println("He fallado un poquito en If 3 - Acta_inicio, solucioname!!!", err)
 									amazon.Rollback()
 									flyway.Rollback()
 									return
 								}
-							} else { // If 3 - Acta_inicio
-								fmt.Println("He fallado un poquito en If 3 - Acta_inicio, solucioname!!!", err)
+							} else { // If 4 - contrato_estado
+								fmt.Println("He fallado un poquito en If 4 - contrato_estado, solucioname!!!", err)
 								amazon.Rollback()
 								flyway.Rollback()
 								return
 							}
-						} else { // If 4 - contrato_estado
-							fmt.Println("He fallado un poquito en If 4 - contrato_estado, solucioname!!!", err)
+						} else { // Nuevo If
+							fmt.Println("He fallado un poquito en If 5 - Informacion_Proveedor nuevo, solucioname!!!", err)
 							amazon.Rollback()
 							flyway.Rollback()
+							c.Ctx.Output.SetStatus(233)
+							c.Ctx.Output.Body([]byte("No existe el docente con número de documento " + strconv.Itoa(contrato.Contratista) + " en Ágora"))
 							return
 						}
 					} else { // If 5 - Informacion_Proveedor
