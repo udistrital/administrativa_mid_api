@@ -20,6 +20,7 @@ type ExpedirResolucionController struct {
 func (c *ExpedirResolucionController) URLMapping() {
 	c.Mapping("Expedir", c.Expedir)
 	//c.Mapping("Cancelar", c.Cancelar)
+	c.Mapping("ValidarDatosExpedicion", c.ValidarDatosExpedicion)
 }
 
 // Expedir ...
@@ -362,5 +363,75 @@ func (c *ExpedirResolucionController) Cancelar() {
 	}
 	amazon.Commit()
 	flyway.Commit()
+	c.ServeJSON()
+}
+
+// ExpedirResolucionController ...
+// @Title ValidarDatosExpedicion
+// @Description create ValidarDatosExpedicion
+// @Success 201 {int}
+// @Failure 403 body is empty
+// @router /validar_datos_expedicion [post]
+func (c *ExpedirResolucionController) ValidarDatosExpedicion() {
+	var m models.ExpedicionResolucion
+	//If Unmarshal
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &m); err == nil {
+		v := m.Vinculaciones
+		// for vinculaciones
+		for _, vinculacion := range *v {
+			v := vinculacion.VinculacionDocente
+			idvinculaciondocente := strconv.Itoa(v.Id)
+			//if Vinculacion_docente (GET)
+			if err := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+idvinculaciondocente, &v); err == nil {
+				contrato := vinculacion.ContratoGeneral
+				var proveedor []models.InformacionProveedor
+				//If informacion_proveedor
+				if err := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+strconv.Itoa(contrato.Contratista), &proveedor); err == nil {
+					//If proveedor nulo
+					if proveedor != nil {
+						var dispoap []models.DisponibilidadApropiacion
+						// If Get disponibildad_apropiacion
+						if err := getJson("http://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad_apropiacion/?query=Id:"+strconv.Itoa(v.Disponibilidad), &dispoap); err == nil {
+							//If disponibilidad nula
+							if dispoap != nil {
+								c.Ctx.Output.SetStatus(201)
+								c.Data["json"] = v
+							} else { //If disponibilidad nula
+								fmt.Println("disponibilidad nula")
+								c.Ctx.Output.SetStatus(233)
+								c.Ctx.Output.Body([]byte("Disponibilidad no válida asociada al docente identificado con número de documento " + strconv.Itoa(contrato.Contratista) + " en Ágora"))
+								return
+							}
+						} else { // If Get disponibildad_apropiacion
+							fmt.Println("disponibilidad_apropiacion error ", err.Error())
+							c.Ctx.Output.SetStatus(233)
+							c.Ctx.Output.Body([]byte("Disponibilidad no válida asociada al docente identificado con número de documento " + strconv.Itoa(contrato.Contratista) + " en Ágora"))
+							return
+						}
+					} else { //If proveedor nulo
+						fmt.Println("proveedor nulo")
+						c.Ctx.Output.SetStatus(233)
+						c.Ctx.Output.Body([]byte("No existe el docente con número de documento " + strconv.Itoa(contrato.Contratista) + " en Ágora"))
+						return
+					}
+				} else { //If informacion_proveedor
+					fmt.Println("informacion_proveedor error")
+					c.Ctx.Output.SetStatus(233)
+					c.Ctx.Output.Body([]byte("Docente no válido en Ágora, se encuentra identificado con el documento número " + strconv.Itoa(contrato.Contratista) + " : " + err.Error()))
+					return
+				}
+			} else { //if Vinculacion_docente (GET)
+				fmt.Println("informacion_proveedor error")
+				c.Ctx.Output.SetStatus(233)
+				c.Ctx.Output.Body([]byte("Previnculación no válida : " + err.Error()))
+				return
+			}
+		} //for vinculaciones
+	} else { //If Unmarshal
+		fmt.Println("Unmarshal error")
+		c.Ctx.Output.SetStatus(233)
+		c.Ctx.Output.Body([]byte("La resolución no es válida: " + err.Error()))
+		return
+	}
 	c.ServeJSON()
 }

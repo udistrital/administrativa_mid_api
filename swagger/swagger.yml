@@ -11,6 +11,24 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 basePath: /v1
 paths:
+  /aprobacion_pago/informacion_coordinador/{id_dependencia_oikos}:
+    get:
+      tags:
+      - aprobacion_pago
+      description: create ObtenerInfoCoordinador
+      operationId: AprobacionPagoController.ObtenerInfoCoordinador
+      parameters:
+      - in: query
+        name: id_dependencia_oikos
+        description: Proyecto a obtener información coordinador
+        required: true
+        type: integer
+        format: int64
+      responses:
+        "201":
+          description: '{int} models.InformacionCoordinador'
+        "403":
+          description: :id_dependencia_oikos is empty
   /consultar_disponibilidades/listar_apropiaciones:
     post:
       tags:
@@ -104,6 +122,17 @@ paths:
       responses:
         "201":
           description: '{int} models.ExpedicionResolucion'
+        "403":
+          description: body is empty
+  /expedir_resolucion/validar_datos_expedicion:
+    post:
+      tags:
+      - expedir_resolucion
+      description: create ValidarDatosExpedicion
+      operationId: ExpedirResolucionController.ValidarDatosExpedicion
+      responses:
+        "201":
+          description: '{int}'
         "403":
           description: body is empty
   /gestion_desvinculaciones/actualizar_vinculaciones:
@@ -212,6 +241,17 @@ paths:
       responses:
         "201":
           description: '{int} models.VinculacionDocente'
+        "403":
+          description: body is empty
+  /gestion_previnculacion/Precontratacion/calcular_valor_contratos_seleccionados:
+    post:
+      tags:
+      - gestion_previnculacion
+      description: createCalcular_total_de_salarios_seleccionados
+      operationId: GestionPrevinculacionesController.Calcular_total_de_salarios_seleccionados
+      responses:
+        "201":
+          description: '{int} int'
         "403":
           description: body is empty
   /gestion_previnculacion/Precontratacion/docentes_x_carga_horaria:
@@ -520,3 +560,6 @@ tags:
 - name: contrato_general
   description: |
     Contrato_generalController operations for Contrato_genral
+- name: aprobacion_pago
+  description: |
+    AprobacionPagoController operations for AprobacionPago
