@@ -220,7 +220,7 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 	f, _ := strconv.ParseFloat(a, 64)
 	salario := int(f)
 
-
+	fmt.Println(salario)
 
 	return docentes_a_vincular
 
