@@ -90,7 +90,7 @@ func (c *AprobacionPagoController) GetContratosDocente() {
 	//If informacion_proveedor get
 	if err := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=num_documento:"+numDocumento, &proveedor); err == nil {
 		//If vinculacion_docente get
-		if err := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?query=id_persona:"+numDocumento, &vinculaciones); err == nil {
+		if err := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?query=id_persona:"+numDocumento+"&limit=-1", &vinculaciones); err == nil {
 			//for vinculaciones
 			for _, vinculacion := range vinculaciones {
 				//If dependencia get
@@ -147,104 +147,97 @@ func (c *AprobacionPagoController) GetContratosDocente() {
 // @Failure 403 :vigencia is empty
 // @router /informacion_ordenador/:numero_contrato/:vigencia [get]
 func (c *AprobacionPagoController) ObtenerInfoOrdenador() {
-	numero_contrato:= c.GetString(":numero_contrato")
-	vigencia:= c.GetString(":vigencia")
+	numero_contrato := c.GetString(":numero_contrato")
+	vigencia := c.GetString(":vigencia")
 
-   var temp map[string]interface{}
-  // var temp_ordenador_gasto map[string]interface{}
-   //var temp_snies map[string]interface{}
-   var contrato_elaborado models.ContratoElaborado
+	var temp map[string]interface{}
+	// var temp_ordenador_gasto map[string]interface{}
+	//var temp_snies map[string]interface{}
+	var contrato_elaborado models.ContratoElaborado
 	var ordenadores_gasto []models.OrdenadorGasto
 	var jefes_dependencia []models.JefeDependencia
 	var informacion_proveedores []models.InformacionProveedor
 	var informacion_ordenador models.InformacionOrdenador
 	var ordenadores []models.Ordenador
 
-   if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/contratoSuscritoProxyService/contrato_elaborado/"+numero_contrato+"/"+vigencia, &temp); err == nil && temp != nil {
-	   json_contrato_elaborado, error_json := json.Marshal(temp)
+	if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/contratoSuscritoProxyService/contrato_elaborado/"+numero_contrato+"/"+vigencia, &temp); err == nil && temp != nil {
+		json_contrato_elaborado, error_json := json.Marshal(temp)
 
-	   if error_json == nil {
-		 //  var temp_contrato_elaborado models.ContratoElaborado
-		   json.Unmarshal(json_contrato_elaborado, &contrato_elaborado)
-            
-		   //contrato_elaborado = temp_contrato_elaborado
-		   //c.Data["json"] = contrato_elaborado
+		if error_json == nil {
+			//  var temp_contrato_elaborado models.ContratoElaborado
+			json.Unmarshal(json_contrato_elaborado, &contrato_elaborado)
 
-		   if contrato_elaborado.Contrato.TipoContrato == "2" || contrato_elaborado.Contrato.TipoContrato == "3" || contrato_elaborado.Contrato.TipoContrato == "18" {
-			if err := getJson("http://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ordenador_gasto/?query=Id:"+contrato_elaborado.Contrato.OrdenadorGasto, &ordenadores_gasto); err == nil {
-			
-				//c.Data["json"] = ordenador_gasto
-				for _, ordenador_gasto := range ordenadores_gasto{
+			//contrato_elaborado = temp_contrato_elaborado
+			//c.Data["json"] = contrato_elaborado
 
-					if err := getJson("http://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/jefe_dependencia/?query=DependenciaId:"+strconv.Itoa(ordenador_gasto.DependenciaId)+"&sortby=FechaInicio&order=desc&limit=1", &jefes_dependencia); err == nil {
+			if contrato_elaborado.Contrato.TipoContrato == "2" || contrato_elaborado.Contrato.TipoContrato == "3" || contrato_elaborado.Contrato.TipoContrato == "18" {
+				if err := getJson("http://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ordenador_gasto/?query=Id:"+contrato_elaborado.Contrato.OrdenadorGasto, &ordenadores_gasto); err == nil {
 
-						for _, jefe_dependencia := range jefes_dependencia{
+					//c.Data["json"] = ordenador_gasto
+					for _, ordenador_gasto := range ordenadores_gasto {
 
-							if err := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+strconv.Itoa(jefe_dependencia.TerceroId), &informacion_proveedores); err == nil {
-								
-								for _, informacion_proveedor := range informacion_proveedores{
+						if err := getJson("http://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/jefe_dependencia/?query=DependenciaId:"+strconv.Itoa(ordenador_gasto.DependenciaId)+"&sortby=FechaInicio&order=desc&limit=1", &jefes_dependencia); err == nil {
 
-								informacion_ordenador.NumeroDocumento = jefe_dependencia.TerceroId
-								informacion_ordenador.Cargo = ordenador_gasto.Cargo
-								informacion_ordenador.Nombre = informacion_proveedor.NomProveedor
-								c.Data["json"] = informacion_ordenador
+							for _, jefe_dependencia := range jefes_dependencia {
 
+								if err := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+strconv.Itoa(jefe_dependencia.TerceroId), &informacion_proveedores); err == nil {
+
+									for _, informacion_proveedor := range informacion_proveedores {
+
+										informacion_ordenador.NumeroDocumento = jefe_dependencia.TerceroId
+										informacion_ordenador.Cargo = ordenador_gasto.Cargo
+										informacion_ordenador.Nombre = informacion_proveedor.NomProveedor
+										c.Data["json"] = informacion_ordenador
+
+									}
+
+								} else {
+
+									fmt.Println(err)
 								}
 
-
-							}else{
-
-								fmt.Println(err)
 							}
 
-
+							//c.Data["json"] = jefes_dependencia
+						} else {
+							fmt.Println(err)
 						}
 
-
-
-						//c.Data["json"] = jefes_dependencia
-					}else{
-						fmt.Println(err)
 					}
 
+				} else {
+					fmt.Println(err)
 				}
 
-			}else{
-				fmt.Println(err)
-			}
-			
-			//fmt.Println(temp)
-		   }else{//si no son docentes
+				//fmt.Println(temp)
+			} else { //si no son docentes
 
-			if err := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/ordenadores/?query=IdOrdenador:"+contrato_elaborado.Contrato.OrdenadorGasto+"&sortby=FechaInicio&order=desc&limit=1", &ordenadores); err == nil {
-				
-				for _, ordenador := range ordenadores{
-					informacion_ordenador.NumeroDocumento = ordenador.Documento
-					informacion_ordenador.Cargo = ordenador.RolOrdenador
-					informacion_ordenador.Nombre = ordenador.NombreOrdenador
-					c.Data["json"] = informacion_ordenador
+				if err := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/ordenadores/?query=IdOrdenador:"+contrato_elaborado.Contrato.OrdenadorGasto+"&sortby=FechaInicio&order=desc&limit=1", &ordenadores); err == nil {
+
+					for _, ordenador := range ordenadores {
+						informacion_ordenador.NumeroDocumento = ordenador.Documento
+						informacion_ordenador.Cargo = ordenador.RolOrdenador
+						informacion_ordenador.Nombre = ordenador.NombreOrdenador
+						c.Data["json"] = informacion_ordenador
+
+					}
+
+				} else {
+
+					fmt.Println(err)
 
 				}
 
-
-			}else{
-
-				fmt.Println(err)
-
 			}
+		} else {
+			fmt.Println(error_json.Error())
+			return
+			// c.Data["json"] = error_json.Error()
+		}
+	} else {
+		fmt.Println(err)
 
+	}
 
-		   }
-	   } else {
-		   fmt.Println(error_json.Error())
-		   return
-		   // c.Data["json"] = error_json.Error()
-	   }
-   } else {
-	   fmt.Println(err)
-
-   }
-
-   
-   c.ServeJSON()
+	c.ServeJSON()
 }
