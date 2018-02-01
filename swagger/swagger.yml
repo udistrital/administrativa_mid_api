@@ -11,6 +11,26 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 basePath: /v1
 paths:
+  /aprobacion_pago/get_contratos_docente:
+    get:
+      tags:
+      - aprobacion_pago
+      description: create  GetContratosDocente
+      operationId: AprobacionPagoController.GetContratosDocente
+      parameters:
+      - in: query
+        name: numDocumento
+        description: Docente a consultar
+        required: true
+        type: string
+      responses:
+        "201":
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/.ContratosDocentes'
+        "403":
+          description: body is empty
   /aprobacion_pago/informacion_coordinador/{id_dependencia_oikos}:
     get:
       tags:
@@ -403,6 +423,8 @@ paths:
           description: body is empty
 definitions:
   .Contrato_genral:
+    type: object
+  .ContratosDocentes:
     type: object
   .Docentes_x_Carga:
     type: object
