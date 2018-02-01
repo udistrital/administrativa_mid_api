@@ -18,10 +18,11 @@ type AprobacionPagoController struct {
 func (c *AprobacionPagoController) URLMapping() {
 	c.Mapping("ObtenerInfoCoordinador", c.ObtenerInfoCoordinador)
 	c.Mapping("GetContratosDocente", c.GetContratosDocente)
+	c.Mapping("ObtenerInfoOrdenador", c.ObtenerInfoOrdenador)
 
 }
 
-// GestionPrevinculacionesController ...
+// AprobacionPagoController ...
 // @Title ObtenerInfoCoordinador
 // @Description create ObtenerInfoCoordinador
 // @Param id_dependencia_oikos query int true "Proyecto a obtener información coordinador"
@@ -75,9 +76,9 @@ func (c *AprobacionPagoController) ObtenerInfoCoordinador() {
 // @Param numDocumento query string true "Docente a consultar"
 // @Success 201 {object} []models.ContratosDocentes
 // @Failure 403 body is empty
-// @router /get_contratos_docente [get]
+// @router /get_contratos_docente/:numDocumento [get]
 func (c *AprobacionPagoController) GetContratosDocente() {
-	numDocumento := c.GetString("numDocumento")
+	numDocumento := c.GetString(":numDocumento")
 	var contratosDocentes []models.ContratosDocente
 	var cd models.ContratosDocente
 	var proveedor []models.InformacionProveedor
@@ -134,4 +135,44 @@ func (c *AprobacionPagoController) GetContratosDocente() {
 		return
 	}
 	c.ServeJSON()
+}
+
+// AprobacionPagoController ...
+// @Title ObtenerInfoOrdenador
+// @Description create ObtenerInfoOrdenador
+// @Param numero_contrato query int true "Numero de contrato en la tabla contrato general"
+// @Param vigencia query int true "Vigencia del contrato en la tabla contrato general"
+// @Success 201 {int} models.ContratoElaborado
+// @Failure 403 :numero_contrato is empty
+// @Failure 403 :vigencia is empty
+// @router /informacion_ordenador/:numero_contrato/:vigencia [get]
+func (c *AprobacionPagoController) ObtenerInfoOrdenador() {
+	numero_contrato:= c.GetString(":numero_contrato")
+	vigencia:= c.GetString(":vigencia")
+
+   var temp map[string]interface{}
+   //var temp_snies map[string]interface{}
+   var contrato_elaborado models.ContratoElaborado
+
+   if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/contratoSuscritoProxyService/contrato_elaborado/"+numero_contrato+"/"+vigencia, &temp); err == nil && temp != nil {
+	   json_contrato_elaborado, error_json := json.Marshal(temp)
+
+	   if error_json == nil {
+		   var temp_contrato_elaborado models.ContratoElaborado
+		   json.Unmarshal(json_contrato_elaborado, &temp_contrato_elaborado)
+   
+		   contrato_elaborado = temp_contrato_elaborado
+			fmt.Println(temp)
+
+	   } else {
+		   fmt.Println(error_json.Error())
+		   // c.Data["json"] = error_json.Error()
+	   }
+   } else {
+	   fmt.Println(err)
+
+   }
+
+   c.Data["json"] = contrato_elaborado
+   c.ServeJSON()
 }

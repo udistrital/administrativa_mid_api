@@ -11,7 +11,7 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 basePath: /v1
 paths:
-  /aprobacion_pago/get_contratos_docente:
+  /aprobacion_pago/get_contratos_docente/{numDocumento}:
     get:
       tags:
       - aprobacion_pago
@@ -25,6 +25,7 @@ paths:
         type: string
       responses:
         "201":
+          description: ""
           schema:
             type: array
             items:
@@ -49,6 +50,30 @@ paths:
           description: '{int} models.InformacionCoordinador'
         "403":
           description: :id_dependencia_oikos is empty
+  /aprobacion_pago/informacion_ordenador/{numero_contrato}/{vigencia}:
+    get:
+      tags:
+      - aprobacion_pago
+      description: create ObtenerInfoOrdenador
+      operationId: AprobacionPagoController.ObtenerInfoOrdenador
+      parameters:
+      - in: query
+        name: numero_contrato
+        description: Numero de contrato en la tabla contrato general
+        required: true
+        type: integer
+        format: int64
+      - in: query
+        name: vigencia
+        description: Vigencia del contrato en la tabla contrato general
+        required: true
+        type: integer
+        format: int64
+      responses:
+        "201":
+          description: '{int} models.ContratoElaborado'
+        "403":
+          description: :vigencia is empty
   /consultar_disponibilidades/listar_apropiaciones:
     post:
       tags:
@@ -79,9 +104,11 @@ paths:
         type: string
       responses:
         "200":
+          description: ""
           schema:
             $ref: '#/definitions/.Contrato_genral'
-        "403": {}
+        "403":
+          description: ""
   /contrato_general/ListaContratoContratoSuscrito/{vigencia}:
     get:
       tags:
@@ -119,9 +146,11 @@ paths:
         type: string
       responses:
         "200":
+          description: ""
           schema:
             $ref: '#/definitions/models.Disponibilidad'
-        "403": {}
+        "403":
+          description: ""
   /expedir_resolucion/cancelar:
     post:
       tags:
@@ -248,6 +277,7 @@ paths:
         type: string
       responses:
         "201":
+          description: ""
           schema:
             $ref: '#/definitions/models.ResolucionCompleta'
         "403":
@@ -303,6 +333,7 @@ paths:
         type: string
       responses:
         "201":
+          description: ""
           schema:
             $ref: '#/definitions/.Docentes_x_Carga'
         "403":
@@ -363,6 +394,7 @@ paths:
         type: string
       responses:
         "201":
+          description: ""
           schema:
             type: array
             items:
@@ -382,6 +414,7 @@ paths:
         type: string
       responses:
         "201":
+          description: ""
           schema:
             type: array
             items:

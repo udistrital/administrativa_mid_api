@@ -77,6 +77,7 @@ func init() {
 				&controllers.AprobacionPagoController{},
 			),
 		),
+		
 	)
 	beego.AddNamespace(ns)
 }

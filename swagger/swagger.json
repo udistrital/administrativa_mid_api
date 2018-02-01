@@ -15,7 +15,7 @@
     },
     "basePath": "/administrativa_mid_api/v1",
     "paths": {
-        "/aprobacion_pago/get_contratos_docente": {
+        "/aprobacion_pago/get_contratos_docente/{numDocumento}": {
             "get": {
                 "tags": [
                     "aprobacion_pago"
@@ -33,6 +33,7 @@
                 ],
                 "responses": {
                     "201": {
+                        "description": "",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -69,6 +70,41 @@
                     },
                     "403": {
                         "description": ":id_dependencia_oikos is empty"
+                    }
+                }
+            }
+        },
+        "/aprobacion_pago/informacion_ordenador/{numero_contrato}/{vigencia}": {
+            "get": {
+                "tags": [
+                    "aprobacion_pago"
+                ],
+                "description": "create ObtenerInfoOrdenador",
+                "operationId": "AprobacionPagoController.ObtenerInfoOrdenador",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "numero_contrato",
+                        "description": "Numero de contrato en la tabla contrato general",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "vigencia",
+                        "description": "Vigencia del contrato en la tabla contrato general",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{int} models.ContratoElaborado"
+                    },
+                    "403": {
+                        "description": ":vigencia is empty"
                     }
                 }
             }
@@ -115,11 +151,14 @@
                 ],
                 "responses": {
                     "200": {
+                        "description": "",
                         "schema": {
                             "$ref": "#/definitions/.Contrato_genral"
                         }
                     },
-                    "403": {}
+                    "403": {
+                        "description": ""
+                    }
                 }
             }
         },
@@ -176,11 +215,14 @@
                 ],
                 "responses": {
                     "200": {
+                        "description": "",
                         "schema": {
                             "$ref": "#/definitions/models.Disponibilidad"
                         }
                     },
-                    "403": {}
+                    "403": {
+                        "description": ""
+                    }
                 }
             }
         },
@@ -376,6 +418,7 @@
                 ],
                 "responses": {
                     "201": {
+                        "description": "",
                         "schema": {
                             "$ref": "#/definitions/models.ResolucionCompleta"
                         }
@@ -461,6 +504,7 @@
                 ],
                 "responses": {
                     "201": {
+                        "description": "",
                         "schema": {
                             "$ref": "#/definitions/.Docentes_x_Carga"
                         }
@@ -555,6 +599,7 @@
                 ],
                 "responses": {
                     "201": {
+                        "description": "",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -585,6 +630,7 @@
                 ],
                 "responses": {
                     "201": {
+                        "description": "",
                         "schema": {
                             "type": "array",
                             "items": {
