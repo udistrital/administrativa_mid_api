@@ -104,7 +104,7 @@ func (c *GestionResolucionesController) InsertarResolucionCompleta() {
 			control = InsertarResolucionEstado(id_resolucion_creada)
 			//Si todo sigue bien, se inserta en componente_resolucion
 			if control {
-				InsertarTexto(id_resolucion_creada,v.ResolucionVinculacionDocente.Dedicacion, v.ResolucionVinculacionDocente.NivelAcademico)
+				InsertarTexto(id_resolucion_creada, v.ResolucionVinculacionDocente.Dedicacion, v.ResolucionVinculacionDocente.NivelAcademico)
 			} else {
 				fmt.Println("enviar error al insertar en resolucion_vinculacion_docente")
 			}

@@ -9,8 +9,24 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
 		beego.ControllerComments{
+			Method: "GetContratosDocente",
+			Router: `/get_contratos_docente/:numDocumento`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
+		beego.ControllerComments{
 			Method: "ObtenerInfoCoordinador",
 			Router: `/informacion_coordinador/:id_dependencia_oikos`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
+		beego.ControllerComments{
+			Method: "ObtenerInfoOrdenador",
+			Router: `/informacion_ordenador/:numero_contrato/:vigencia`,
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
@@ -51,6 +67,14 @@ func init() {
 		beego.ControllerComments{
 			Method: "Expedir",
 			Router: `/expedir`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:ExpedirResolucionController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:ExpedirResolucionController"],
+		beego.ControllerComments{
+			Method: "ValidarDatosExpedicion",
+			Router: `/validar_datos_expedicion`,
 			AllowHTTPMethods: []string{"post"},
 			MethodParams: param.Make(),
 			Params: nil})

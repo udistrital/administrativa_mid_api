@@ -15,6 +15,100 @@
     },
     "basePath": "/administrativa_mid_api/v1",
     "paths": {
+        "/aprobacion_pago/get_contratos_docente/{numDocumento}": {
+            "get": {
+                "tags": [
+                    "aprobacion_pago"
+                ],
+                "description": "create  GetContratosDocente",
+                "operationId": "AprobacionPagoController.GetContratosDocente",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "numDocumento",
+                        "description": "Docente a consultar",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/.ContratosDocentes"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/aprobacion_pago/informacion_coordinador/{id_dependencia_oikos}": {
+            "get": {
+                "tags": [
+                    "aprobacion_pago"
+                ],
+                "description": "create ObtenerInfoCoordinador",
+                "operationId": "AprobacionPagoController.ObtenerInfoCoordinador",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "id_dependencia_oikos",
+                        "description": "Proyecto a obtener información coordinador",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{int} models.InformacionCoordinador"
+                    },
+                    "403": {
+                        "description": ":id_dependencia_oikos is empty"
+                    }
+                }
+            }
+        },
+        "/aprobacion_pago/informacion_ordenador/{numero_contrato}/{vigencia}": {
+            "get": {
+                "tags": [
+                    "aprobacion_pago"
+                ],
+                "description": "create ObtenerInfoOrdenador",
+                "operationId": "AprobacionPagoController.ObtenerInfoOrdenador",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "numero_contrato",
+                        "description": "Numero de contrato en la tabla contrato general",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "query",
+                        "name": "vigencia",
+                        "description": "Vigencia del contrato en la tabla contrato general",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{int} models.ContratoElaborado"
+                    },
+                    "403": {
+                        "description": ":vigencia is empty"
+                    }
+                }
+            }
+        },
         "/consultar_disponibilidades/listar_apropiaciones": {
             "post": {
                 "tags": [
@@ -57,11 +151,14 @@
                 ],
                 "responses": {
                     "200": {
+                        "description": "",
                         "schema": {
                             "$ref": "#/definitions/.Contrato_genral"
                         }
                     },
-                    "403": {}
+                    "403": {
+                        "description": ""
+                    }
                 }
             }
         },
@@ -118,11 +215,14 @@
                 ],
                 "responses": {
                     "200": {
+                        "description": "",
                         "schema": {
                             "$ref": "#/definitions/models.Disponibilidad"
                         }
                     },
-                    "403": {}
+                    "403": {
+                        "description": ""
+                    }
                 }
             }
         },
@@ -153,6 +253,23 @@
                 "responses": {
                     "201": {
                         "description": "{int} models.ExpedicionResolucion"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/expedir_resolucion/validar_datos_expedicion": {
+            "post": {
+                "tags": [
+                    "expedir_resolucion"
+                ],
+                "description": "create ValidarDatosExpedicion",
+                "operationId": "ExpedirResolucionController.ValidarDatosExpedicion",
+                "responses": {
+                    "201": {
+                        "description": "{int}"
                     },
                     "403": {
                         "description": "body is empty"
@@ -301,6 +418,7 @@
                 ],
                 "responses": {
                     "201": {
+                        "description": "",
                         "schema": {
                             "$ref": "#/definitions/models.ResolucionCompleta"
                         }
@@ -321,6 +439,23 @@
                 "responses": {
                     "201": {
                         "description": "{int} models.VinculacionDocente"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/gestion_previnculacion/Precontratacion/calcular_valor_contratos_seleccionados": {
+            "post": {
+                "tags": [
+                    "gestion_previnculacion"
+                ],
+                "description": "createCalcular_total_de_salarios_seleccionados",
+                "operationId": "GestionPrevinculacionesController.Calcular_total_de_salarios_seleccionados",
+                "responses": {
+                    "201": {
+                        "description": "{int} int"
                     },
                     "403": {
                         "description": "body is empty"
@@ -369,6 +504,7 @@
                 ],
                 "responses": {
                     "201": {
+                        "description": "",
                         "schema": {
                             "$ref": "#/definitions/.Docentes_x_Carga"
                         }
@@ -463,6 +599,7 @@
                 ],
                 "responses": {
                     "201": {
+                        "description": "",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -493,6 +630,7 @@
                 ],
                 "responses": {
                     "201": {
+                        "description": "",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -560,6 +698,9 @@
     },
     "definitions": {
         ".Contrato_genral": {
+            "type": "object"
+        },
+        ".ContratosDocentes": {
             "type": "object"
         },
         ".Docentes_x_Carga": {
@@ -782,6 +923,10 @@
         {
             "name": "contrato_general",
             "description": "Contrato_generalController operations for Contrato_genral\n"
+        },
+        {
+            "name": "aprobacion_pago",
+            "description": "AprobacionPagoController operations for AprobacionPago\n"
         }
     ]
 }
