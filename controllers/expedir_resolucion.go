@@ -20,7 +20,7 @@ type ExpedirResolucionController struct {
 func (c *ExpedirResolucionController) URLMapping() {
 	c.Mapping("Expedir", c.Expedir)
 	//c.Mapping("Cancelar", c.Cancelar)
-	//c.Mapping("ValidarDatosExpedicion", c.ValidarDatosExpedicion)
+	c.Mapping("ValidarDatosExpedicion", c.ValidarDatosExpedicion)
 }
 
 // Expedir ...
