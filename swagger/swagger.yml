@@ -71,7 +71,7 @@ paths:
         format: int64
       responses:
         "201":
-          description: '{int} models.ContratoElaborado'
+          description: '{int} models.InformacionOrdenador'
         "403":
           description: :vigencia is empty
   /consultar_disponibilidades/listar_apropiaciones:

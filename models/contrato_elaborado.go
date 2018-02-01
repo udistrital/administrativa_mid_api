@@ -23,6 +23,7 @@ type ContratoElaborado struct {
 			NumeroContrato string `json:"numero_contrato"`
 			PlazoEjecucion string `json:"plazo_ejecucion"`
 			ValorContrato string `json:"valor_contrato"`
+			OrdenadorGasto string `json:"ordenador_gasto"`
 	} `json:"contrato"`
 }
 
