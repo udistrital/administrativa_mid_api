@@ -215,10 +215,7 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 
 	}
 
-	f, _ := strconv.ParseFloat(a, 64)
-	salario := int(f)
-
-	fmt.Println(salario)
+	
 
 	return docentes_a_vincular
 
@@ -245,14 +242,35 @@ func CargarSalarioMinimo() (p models.SalarioMinimo) {
 }
 
 func EsDocentePlanta(idPersona string) (docentePlanta bool) {
-	var v []models.DocentePlanta
-	if err := getJson("http://10.20.0.127/urano/index.php?data=B-7djBQWvIdLAEEycbH1n6e-3dACi5eLUOb63vMYhGq0kPBs7NGLYWFCL0RSTCu1yTlE5hH854MOgmjuVfPWyvdpaJDUOyByX-ksEPFIrrQQ7t1p4BkZcBuGD2cgJXeD&documento="+idPersona, &v); err == nil {
+	var temp map[string]interface{}
+	var es_de_planta bool
 
-		return true
+	if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/academicaProxy/consultar_datos_docente/"+idPersona, &temp); err == nil && temp != nil {
+		jsonDocentes, error_json := json.Marshal(temp)
+
+		if error_json == nil {
+			var temp_docentes models.ObjetoDocentePlanta
+			json.Unmarshal(jsonDocentes, &temp_docentes)
+
+			if (temp_docentes.DocenteCollection.Docente[0].Planta == "true"){
+				es_de_planta = true;
+			}else{
+				es_de_planta = false;
+			}
+
+
+		} else {
+			es_de_planta = false
+			fmt.Println("errorcito")
+
+		}
 	} else {
+		es_de_planta = false
+		fmt.Println(err)
 
-		return false
 	}
+
+	return es_de_planta
 }
 
 func BuscarIdProveedor(DocumentoIdentidad int) (id_proveedor_docente int) {

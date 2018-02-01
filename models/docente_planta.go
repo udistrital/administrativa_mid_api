@@ -17,3 +17,11 @@ type DocentePlanta struct {
 	Id_carrera        string
 	Carrera           string
 }
+
+type ObjetoDocentePlanta struct {
+	DocenteCollection struct {
+		Docente []struct {
+			Planta                  string `json:"planta"`
+		} `json:"docentes"`
+	} `json:"docentesCollection"`
+}
