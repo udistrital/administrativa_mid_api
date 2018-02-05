@@ -241,3 +241,53 @@ func (c *AprobacionPagoController) ObtenerInfoOrdenador() {
 
 	c.ServeJSON()
 }
+
+// AprobacionPagoController ...
+// @Title PagoAprobado
+// @Description create PagoAprobado
+// @Param numero_contrato query int true "Numero de contrato en la tabla contrato general"
+// @Param vigencia query int true "Vigencia del contrato en la tabla contrato general"
+// @Param mes query int true "Mes del pago mensual"
+// @Param anio query int true "Año del pago mensual"
+// @Success 201 
+// @Failure 403 :numero_contrato is empty
+// @Failure 403 :vigencia is empty
+// @Failure 403 :mes is empty
+// @Failure 403 :anio is empty
+// @router /pago_aprobado/:numero_contrato/:vigencia/:mes/:anio [get]
+func (c *AprobacionPagoController) PagoAprobado() {
+	numero_contrato := c.GetString(":numero_contrato")
+	vigencia := c.GetString(":vigencia")
+	mes := c.GetString(":mes")
+	anio := c.GetString(":anio")
+
+	var pagos_mensuales []models.PagoMensual
+
+	if err := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?query=NumeroContrato:"+numero_contrato+",VigenciaContrato:"+vigencia+",Mes:"+mes+",Ano:"+anio, &pagos_mensuales); err == nil {
+		
+		if  pagos_mensuales != nil{
+
+			for _, pago_mensual := range pagos_mensuales {
+
+				if pago_mensual.EstadoPagoMensual.CodigoAbreviacion == "AP"{
+
+					c.Data["json"] = "True"
+				}else{
+
+					c.Data["json"] = "False"
+				}
+				
+
+			}
+		}else{
+			c.Data["json"] = "False"
+		}
+	
+
+	} else { //If pago_mensual get
+		fmt.Println("Mirenme, me morí en If pago_mensual get, solucioname!!! ", err)
+		return
+	}
+
+	c.ServeJSON()
+}

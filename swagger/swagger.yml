@@ -74,6 +74,42 @@ paths:
           description: '{int} models.InformacionOrdenador'
         "403":
           description: :vigencia is empty
+  /aprobacion_pago/pago_aprobado/{numero_contrato}/{vigencia}/{mes}/{anio}:
+    get:
+      tags:
+      - aprobacion_pago
+      description: create PagoAprobado
+      operationId: AprobacionPagoController.PagoAprobado
+      parameters:
+      - in: query
+        name: numero_contrato
+        description: Numero de contrato en la tabla contrato general
+        required: true
+        type: integer
+        format: int64
+      - in: query
+        name: vigencia
+        description: Vigencia del contrato en la tabla contrato general
+        required: true
+        type: integer
+        format: int64
+      - in: query
+        name: mes
+        description: Mes del pago mensual
+        required: true
+        type: integer
+        format: int64
+      - in: query
+        name: anio
+        description: Año del pago mensual
+        required: true
+        type: integer
+        format: int64
+      responses:
+        "201":
+          description: ""
+        "403":
+          description: :anio is empty
   /consultar_disponibilidades/listar_apropiaciones:
     post:
       tags:
