@@ -215,7 +215,7 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 
 	}
 
-	
+
 
 	return docentes_a_vincular
 
@@ -325,7 +325,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 			v[x].LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona)
 			v[x].TipoDocumento = BuscarTipoDocumento(pos.IdPersona)
 			v[x].NumeroHorasSemanales, v[x].ValorContrato = Calcular_totales_vinculacion_pdf(pos.IdPersona, id_resolucion)
-			v[x].NumeroMeses = strconv.FormatFloat(float64(pos.NumeroSemanas)/4, 'f', 1, 64) + " meses"
+			v[x].NumeroMeses = strconv.FormatFloat(float64(pos.NumeroSemanas)/4, 'f', 2, 64) + " meses"
 			v[x].ValorContratoFormato = FormatMoney(int(v[x].ValorContrato), 2)
 		}
 
