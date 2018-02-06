@@ -11,6 +11,66 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 basePath: /v1
 paths:
+  /aprobacion_pago/certificacion_documentos_aprobados/{dependencia}/{mes}/{anio}:
+    get:
+      tags:
+      - aprobacion_pago
+      description: create CertificacionDocumentosAprobados
+      operationId: AprobacionPagoController.CertificacionDocumentosAprobados
+      parameters:
+      - in: query
+        name: dependencia
+        description: Dependencia del contrato en la tabla ordenador_gasto
+        required: true
+        type: integer
+        format: int64
+      - in: query
+        name: mes
+        description: Mes del pago mensual
+        required: true
+        type: integer
+        format: int64
+      - in: query
+        name: anio
+        description: Año del pago mensual
+        required: true
+        type: integer
+        format: int64
+      responses:
+        "201":
+          description: ""
+        "403":
+          description: :anio is empty
+  /aprobacion_pago/certificacion_visto_bueno/{dependencia}/{mes}/{anio}:
+    get:
+      tags:
+      - aprobacion_pago
+      description: create CertificacionVistoBueno
+      operationId: AprobacionPagoController.CertificacionVistoBueno
+      parameters:
+      - in: query
+        name: dependencia
+        description: Dependencia del contrato en la tabla vinculacion
+        required: true
+        type: integer
+        format: int64
+      - in: query
+        name: mes
+        description: Mes del pago mensual
+        required: true
+        type: integer
+        format: int64
+      - in: query
+        name: anio
+        description: Año del pago mensual
+        required: true
+        type: integer
+        format: int64
+      responses:
+        "201":
+          description: ""
+        "403":
+          description: :anio is empty
   /aprobacion_pago/get_contratos_docente/{numDocumento}:
     get:
       tags:
