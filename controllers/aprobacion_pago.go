@@ -495,8 +495,8 @@ func (c *AprobacionPagoController) GetSolicitudesSupervisor() {
 
 
 	if err := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?query=EstadoPagoMensual.CodigoAbreviacion:PAD,Responsable:"+doc_supervisor, &pagos_mensuales); err == nil {
-
-		for _,pago_mensual:= range pagos_mensuales{
+		
+		for x,pago_mensual:= range pagos_mensuales{
 			
 			if err := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pago_mensual.Persona, &contratistas); err == nil {
 
@@ -509,12 +509,11 @@ func (c *AprobacionPagoController) GetSolicitudesSupervisor() {
 
 						if err := getJson("http://"+beego.AppConfig.String("UrlcrudOikos")+"/"+beego.AppConfig.String("NscrudOikos")+"/dependencia/"+strconv.Itoa(vinculacion.IdProyectoCurricular), &dep); err == nil {
 
-					
-					pago_personas_proyecto.PagoMensual = &pago_mensual
+							
+					pago_personas_proyecto.PagoMensual = &pagos_mensuales[x]
 					pago_personas_proyecto.NombrePersona = contratista.NomProveedor
 					pago_personas_proyecto.Dependencia = &dep
 					
-				
 					pagos_personas_proyecto = append(pagos_personas_proyecto, pago_personas_proyecto)
 					
 
@@ -539,13 +538,15 @@ func (c *AprobacionPagoController) GetSolicitudesSupervisor() {
 				fmt.Println("Mirenme, me morí en If informacion_proveedor get, solucioname!!! ", err)
 				return
 			}
+
+	c.Data["json"] = pagos_personas_proyecto
 		}		
 	}else{//If pago_mensual get
 
 		fmt.Println("Mirenme, me morí en If pago_mensual get, solucioname!!! ", err)
 		return
 	}
-	c.Data["json"] = pagos_personas_proyecto
+
 	c.ServeJSON()
 
 }
@@ -575,7 +576,7 @@ func (c *AprobacionPagoController) GetSolicitudesCoordinador() {
 
 	if err := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?query=EstadoPagoMensual.CodigoAbreviacion:PRC,Responsable:"+doc_coordinador, &pagos_mensuales); err == nil {
 
-		for _,pago_mensual:= range pagos_mensuales{
+		for x,pago_mensual:= range pagos_mensuales{
 			
 			if err := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pago_mensual.Persona, &contratistas); err == nil {
 
@@ -589,7 +590,7 @@ func (c *AprobacionPagoController) GetSolicitudesCoordinador() {
 						if err := getJson("http://"+beego.AppConfig.String("UrlcrudOikos")+"/"+beego.AppConfig.String("NscrudOikos")+"/dependencia/"+strconv.Itoa(vinculacion.IdProyectoCurricular), &dep); err == nil {
 
 					
-					pago_personas_proyecto.PagoMensual = &pago_mensual
+					pago_personas_proyecto.PagoMensual = &pagos_mensuales[x]
 					pago_personas_proyecto.NombrePersona = contratista.NomProveedor
 					pago_personas_proyecto.Dependencia = &dep
 					
@@ -652,8 +653,7 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenador() {
 
 
 	if err := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?query=EstadoPagoMensual.CodigoAbreviacion:AD,Responsable:"+doc_ordenador, &pagos_mensuales); err == nil {
-
-		for _,pago_mensual:= range pagos_mensuales{
+		for x,pago_mensual:= range pagos_mensuales{
 			
 			if err := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pago_mensual.Persona, &contratistas); err == nil {
 
@@ -667,7 +667,7 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenador() {
 						if err := getJson("http://"+beego.AppConfig.String("UrlcrudOikos")+"/"+beego.AppConfig.String("NscrudOikos")+"/dependencia/"+strconv.Itoa(vinculacion.IdProyectoCurricular), &dep); err == nil {
 
 					
-					pago_personas_proyecto.PagoMensual = &pago_mensual
+					pago_personas_proyecto.PagoMensual = &pagos_mensuales[x]
 					pago_personas_proyecto.NombrePersona = contratista.NomProveedor
 					pago_personas_proyecto.Dependencia = &dep
 					
