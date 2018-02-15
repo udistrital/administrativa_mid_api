@@ -471,3 +471,238 @@ func (c *AprobacionPagoController) CertificacionDocumentosAprobados() {
 	c.ServeJSON()
 
 }
+
+// AprobacionPagoController ...
+// @Title GetSolicitudesSupervisor
+// @Description create GetSolicitudesSupervisor
+// @Param docsupervisor query string true "Número del documento del supervisor"
+// @Success 201
+// @Failure 403 :docsupervisor is empty
+// @router /solicitudes_supervisor/:docsupervisor [get]
+func (c *AprobacionPagoController) GetSolicitudesSupervisor() {
+
+
+	doc_supervisor := c.GetString(":docsupervisor")
+
+	var pagos_mensuales []models.PagoMensual
+	var contratistas []models.InformacionProveedor
+	var pagos_personas_proyecto []models.PagoPersonaProyecto
+	var pago_personas_proyecto models.PagoPersonaProyecto
+	var vinculaciones_docente []models.VinculacionDocente
+	var dep models.Dependencia
+
+
+
+
+	if err := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?query=EstadoPagoMensual.CodigoAbreviacion:PAD,Responsable:"+doc_supervisor, &pagos_mensuales); err == nil {
+
+		for _,pago_mensual:= range pagos_mensuales{
+			
+			if err := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pago_mensual.Persona, &contratistas); err == nil {
+
+				for _, contratista := range contratistas {
+					 
+
+					if err := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?limit=-1&query=NumeroContrato:"+pago_mensual.NumeroContrato+",Vigencia:"+strconv.FormatFloat(pago_mensual.VigenciaContrato,'f', 0,64), &vinculaciones_docente); err == nil {
+
+					for _,vinculacion := range vinculaciones_docente{
+
+						if err := getJson("http://"+beego.AppConfig.String("UrlcrudOikos")+"/"+beego.AppConfig.String("NscrudOikos")+"/dependencia/"+strconv.Itoa(vinculacion.IdProyectoCurricular), &dep); err == nil {
+
+					
+					pago_personas_proyecto.PagoMensual = &pago_mensual
+					pago_personas_proyecto.NombrePersona = contratista.NomProveedor
+					pago_personas_proyecto.Dependencia = &dep
+					
+				
+					pagos_personas_proyecto = append(pagos_personas_proyecto, pago_personas_proyecto)
+					
+
+						}else{//If dependencia get
+
+							fmt.Println("Mirenme, me morí en If dependencia get, solucioname!!! ", err)
+							return
+
+						}
+
+					}
+
+
+					}else{// If vinculacion_docente_get
+
+						fmt.Println("Mirenme, me morí en If vinculacion_docente get, solucioname!!! ", err)
+						return
+					}
+				}
+			}else{//If informacion_proveedor get
+
+				fmt.Println("Mirenme, me morí en If informacion_proveedor get, solucioname!!! ", err)
+				return
+			}
+		}		
+	}else{//If pago_mensual get
+
+		fmt.Println("Mirenme, me morí en If pago_mensual get, solucioname!!! ", err)
+		return
+	}
+	c.Data["json"] = pagos_personas_proyecto
+	c.ServeJSON()
+
+}
+
+
+// AprobacionPagoController ...
+// @Title GetSolicitudesCoordinador
+// @Description create GetSolicitudesCoordinador
+// @Param doccoordinador query string true "Número del documento del coordinador"
+// @Success 201
+// @Failure 403 :doccoordinador is empty
+// @router /solicitudes_coordinador/:doccoordinador [get]
+func (c *AprobacionPagoController) GetSolicitudesCoordinador() {
+
+
+	doc_coordinador := c.GetString(":doccoordinador")
+
+	var pagos_mensuales []models.PagoMensual
+	var contratistas []models.InformacionProveedor
+	var pagos_personas_proyecto []models.PagoPersonaProyecto
+	var pago_personas_proyecto models.PagoPersonaProyecto
+	var vinculaciones_docente []models.VinculacionDocente
+	var dep models.Dependencia
+
+
+
+
+	if err := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?query=EstadoPagoMensual.CodigoAbreviacion:PRC,Responsable:"+doc_coordinador, &pagos_mensuales); err == nil {
+
+		for _,pago_mensual:= range pagos_mensuales{
+			
+			if err := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pago_mensual.Persona, &contratistas); err == nil {
+
+				for _, contratista := range contratistas {
+					 
+
+					if err := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?limit=-1&query=NumeroContrato:"+pago_mensual.NumeroContrato+",Vigencia:"+strconv.FormatFloat(pago_mensual.VigenciaContrato,'f', 0,64), &vinculaciones_docente); err == nil {
+
+					for _,vinculacion := range vinculaciones_docente{
+
+						if err := getJson("http://"+beego.AppConfig.String("UrlcrudOikos")+"/"+beego.AppConfig.String("NscrudOikos")+"/dependencia/"+strconv.Itoa(vinculacion.IdProyectoCurricular), &dep); err == nil {
+
+					
+					pago_personas_proyecto.PagoMensual = &pago_mensual
+					pago_personas_proyecto.NombrePersona = contratista.NomProveedor
+					pago_personas_proyecto.Dependencia = &dep
+					
+				
+					pagos_personas_proyecto = append(pagos_personas_proyecto, pago_personas_proyecto)
+					
+
+						}else{//If dependencia get
+
+							fmt.Println("Mirenme, me morí en If dependencia get, solucioname!!! ", err)
+							return
+
+						}
+
+					}
+
+
+					}else{// If vinculacion_docente_get
+
+						fmt.Println("Mirenme, me morí en If vinculacion_docente get, solucioname!!! ", err)
+						return
+					}
+				}
+			}else{//If informacion_proveedor get
+
+				fmt.Println("Mirenme, me morí en If informacion_proveedor get, solucioname!!! ", err)
+				return
+			}
+		}		
+	}else{//If pago_mensual get
+
+		fmt.Println("Mirenme, me morí en If pago_mensual get, solucioname!!! ", err)
+		return
+	}
+	c.Data["json"] = pagos_personas_proyecto
+	c.ServeJSON()
+
+}
+
+// AprobacionPagoController ...
+// @Title GetSolicitudesOrdenador
+// @Description create GetSolicitudesOrdenador
+// @Param docordenador query string true "Número del documento del ordenador"
+// @Success 201
+// @Failure 403 :docordenador is empty
+// @router /solicitudes_ordenador/:docordenador [get]
+func (c *AprobacionPagoController) GetSolicitudesOrdenador() {
+
+
+	doc_ordenador := c.GetString(":docordenador")
+
+	var pagos_mensuales []models.PagoMensual
+	var contratistas []models.InformacionProveedor
+	var pagos_personas_proyecto []models.PagoPersonaProyecto
+	var pago_personas_proyecto models.PagoPersonaProyecto
+	var vinculaciones_docente []models.VinculacionDocente
+	var dep models.Dependencia
+
+
+
+
+	if err := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?query=EstadoPagoMensual.CodigoAbreviacion:AD,Responsable:"+doc_ordenador, &pagos_mensuales); err == nil {
+
+		for _,pago_mensual:= range pagos_mensuales{
+			
+			if err := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pago_mensual.Persona, &contratistas); err == nil {
+
+				for _, contratista := range contratistas {
+					 
+
+					if err := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?limit=-1&query=NumeroContrato:"+pago_mensual.NumeroContrato+",Vigencia:"+strconv.FormatFloat(pago_mensual.VigenciaContrato,'f', 0,64), &vinculaciones_docente); err == nil {
+
+					for _,vinculacion := range vinculaciones_docente{
+
+						if err := getJson("http://"+beego.AppConfig.String("UrlcrudOikos")+"/"+beego.AppConfig.String("NscrudOikos")+"/dependencia/"+strconv.Itoa(vinculacion.IdProyectoCurricular), &dep); err == nil {
+
+					
+					pago_personas_proyecto.PagoMensual = &pago_mensual
+					pago_personas_proyecto.NombrePersona = contratista.NomProveedor
+					pago_personas_proyecto.Dependencia = &dep
+					
+				
+					pagos_personas_proyecto = append(pagos_personas_proyecto, pago_personas_proyecto)
+					
+
+						}else{//If dependencia get
+
+							fmt.Println("Mirenme, me morí en If dependencia get, solucioname!!! ", err)
+							return
+
+						}
+
+					}
+
+
+					}else{// If vinculacion_docente_get
+
+						fmt.Println("Mirenme, me morí en If vinculacion_docente get, solucioname!!! ", err)
+						return
+					}
+				}
+			}else{//If informacion_proveedor get
+
+				fmt.Println("Mirenme, me morí en If informacion_proveedor get, solucioname!!! ", err)
+				return
+			}
+		}		
+	}else{//If pago_mensual get
+
+		fmt.Println("Mirenme, me morí en If pago_mensual get, solucioname!!! ", err)
+		return
+	}
+	c.Data["json"] = pagos_personas_proyecto
+	c.ServeJSON()
+
+}

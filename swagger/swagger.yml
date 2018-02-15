@@ -170,6 +170,57 @@ paths:
           description: ""
         "403":
           description: :anio is empty
+  /aprobacion_pago/solicitudes_coordinador/{doccoordinador}:
+    get:
+      tags:
+      - aprobacion_pago
+      description: create GetSolicitudesCoordinador
+      operationId: AprobacionPagoController.GetSolicitudesCoordinador
+      parameters:
+      - in: query
+        name: doccoordinador
+        description: Número del documento del coordinador
+        required: true
+        type: string
+      responses:
+        "201":
+          description: ""
+        "403":
+          description: :doccoordinador is empty
+  /aprobacion_pago/solicitudes_ordenador/{docordenador}:
+    get:
+      tags:
+      - aprobacion_pago
+      description: create GetSolicitudesOrdenador
+      operationId: AprobacionPagoController.GetSolicitudesOrdenador
+      parameters:
+      - in: query
+        name: docordenador
+        description: Número del documento del ordenador
+        required: true
+        type: string
+      responses:
+        "201":
+          description: ""
+        "403":
+          description: :docordenador is empty
+  /aprobacion_pago/solicitudes_supervisor/{docsupervisor}:
+    get:
+      tags:
+      - aprobacion_pago
+      description: create GetSolicitudesSupervisor
+      operationId: AprobacionPagoController.GetSolicitudesSupervisor
+      parameters:
+      - in: query
+        name: docsupervisor
+        description: Número del documento del supervisor
+        required: true
+        type: string
+      responses:
+        "201":
+          description: ""
+        "403":
+          description: :docsupervisor is empty
   /consultar_disponibilidades/listar_apropiaciones:
     post:
       tags:

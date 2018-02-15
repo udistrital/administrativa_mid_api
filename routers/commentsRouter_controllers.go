@@ -55,6 +55,30 @@ func init() {
 			MethodParams: param.Make(),
 			Params: nil})
 
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
+		beego.ControllerComments{
+			Method: "GetSolicitudesCoordinador",
+			Router: `/solicitudes_coordinador/:doccoordinador`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
+		beego.ControllerComments{
+			Method: "GetSolicitudesOrdenador",
+			Router: `/solicitudes_ordenador/:docordenador`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
+		beego.ControllerComments{
+			Method: "GetSolicitudesSupervisor",
+			Router: `/solicitudes_supervisor/:docsupervisor`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:CambioEstadoContratoValidoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:CambioEstadoContratoValidoController"],
 		beego.ControllerComments{
 			Method: "ValidarCambioEstado",
