@@ -2,6 +2,7 @@ package models
 
 type InformacionOrdenador struct {
 	NumeroDocumento int
-	Nombre string
-	Cargo string
+	Nombre          string
+	Cargo           string
+	IdDependencia   int
 }
