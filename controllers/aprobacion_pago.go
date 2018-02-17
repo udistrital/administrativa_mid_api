@@ -680,3 +680,46 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenador() {
 	c.ServeJSON()
 
 }
+
+// AprobacionPagoController ...
+// @Title ObtenerDependenciaOrdenador
+// @Description create ObtenerDependenciaOrdenador
+// @Param docordenador query string true "Número del documento del ordenador"
+// @Success 201
+// @Failure 403 :docordenador is empty
+// @router /dependencia_ordenador/:docordenador [get]
+func (c *AprobacionPagoController) ObtenerDependenciaOrdenador() {
+
+	doc_ordenador := c.GetString(":docordenador")
+
+	var ordenadores_gasto []models.OrdenadorGasto
+	var jefes_dependencia []models.JefeDependencia
+
+
+		if err := getJson("http://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/jefe_dependencia/?query=TerceroId:"+doc_ordenador+"&sortby=FechaInicio&order=desc&limit=1", &jefes_dependencia); err == nil {
+				for _,jefe := range jefes_dependencia{
+
+					if err := getJson("http://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ordenador_gasto/?query=Id:"+, &ordenadores_gasto); err == nil {
+
+						for _,ordenador := range ordenadores_gasto {
+
+							
+
+
+						}
+
+					}else{
+
+					}
+
+				}
+
+		}
+		else{// If jefe_dependencia get
+			fmt.Println("Mirenme, me morí en If jefe_dependencia get, solucioname!!! ", err)
+		}
+
+	c.Data["json"] = pagos_personas_proyecto
+	c.ServeJSON()
+
+}
