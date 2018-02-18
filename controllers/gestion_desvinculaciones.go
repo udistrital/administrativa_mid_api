@@ -37,7 +37,7 @@ func (c *GestionDesvinculacionesController) ListarDocentesDesvinculados() {
 	query := "?limit=-1&query=IdResolucion.Id:" + id_resolucion + ",Estado:false"
 	var v []models.VinculacionDocente
 
-	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &v); err2 == nil {
+	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &v); err2 == nil {
 		for x, pos := range v {
 			documento_identidad, _ := strconv.Atoi(pos.IdPersona)
 			v[x].NombreCompleto = BuscarNombreProveedor(documento_identidad)
@@ -72,7 +72,7 @@ func (c *GestionDesvinculacionesController) ActualizarVinculaciones() {
 		fmt.Println("para poner en false", v)
 
 		for _, pos := range v.DocentesDesvincular {
-			if err2 := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.Id), "PUT", &respuesta, pos); err2 == nil {
+			if err2 := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.Id), "PUT", &respuesta, pos); err2 == nil {
 				fmt.Println("respuesta", respuesta)
 			} else {
 				fmt.Println("error en json", err2)
@@ -83,7 +83,7 @@ func (c *GestionDesvinculacionesController) ActualizarVinculaciones() {
 
 		for _, pos := range v.DocentesDesvincular {
 			temp := models.ModificacionVinculacion{ModificacionResolucion: &models.ModificacionResolucion{Id: v.IdModificacionResolucion}, VinculacionDocenteCancelada: &models.VinculacionDocente{Id: pos.Id}}
-			if err2 := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/", "POST", &respuesta, temp); err2 == nil {
+			if err2 := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/", "POST", &respuesta, temp); err2 == nil {
 				fmt.Println("respuesta", respuesta)
 			} else {
 				fmt.Println("error en json de modificacion vinculacion", err2)
@@ -119,7 +119,7 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 
 		//CAMBIAR ESTADO DE VINCULACIÓN DOCNETE
 		for _, pos := range v.DocentesDesvincular {
-			if err2 := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.Id), "PUT", &respuesta, pos); err2 == nil {
+			if err2 := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.Id), "PUT", &respuesta, pos); err2 == nil {
 				fmt.Println("respuesta", respuesta)
 
 				temp_vinculacion[0] = models.VinculacionDocente{
@@ -147,7 +147,7 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 					//INSERCION  TABLA  DE TRAZA MODIFICACION VINCULACION
 					for _, pos := range v.DocentesDesvincular {
 						temp := models.ModificacionVinculacion{ModificacionResolucion: &models.ModificacionResolucion{Id: v.IdModificacionResolucion}, VinculacionDocenteCancelada: &models.VinculacionDocente{Id: pos.Id}, VinculacionDocenteRegistrada: &models.VinculacionDocente{Id: vinculacion_nueva}, Horas: pos.NumeroHorasNuevas}
-						if err2 := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/", "POST", &respuesta_mod_vin, temp); err2 == nil {
+						if err2 := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/", "POST", &respuesta_mod_vin, temp); err2 == nil {
 							fmt.Println("respuesta modificacion vin", respuesta_mod_vin)
 							respuesta = "OK"
 						} else {
@@ -193,20 +193,20 @@ func (c *GestionDesvinculacionesController) AnularDesvinculacionDocente() {
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		respuesta_total = "OK"
-		if err2 := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(v.DocentesDesvincular[0].Id), "PUT", &respuesta_vinculacion, v.DocentesDesvincular[0]); err2 == nil {
+		if err2 := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(v.DocentesDesvincular[0].Id), "PUT", &respuesta_vinculacion, v.DocentesDesvincular[0]); err2 == nil {
 			respuesta_total = "OK"
 		} else {
 			respuesta_total = "error"
 		}
 
 		query := "?limit=-1&query=ModificacionResolucion.Id:" + strconv.Itoa(v.IdModificacionResolucion) + ",VinculacionDocenteCancelada.Id:" + strconv.Itoa(v.DocentesDesvincular[0].Id)
-		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion"+query, &respuesta_modificacion_vinculacion); err2 == nil {
+		if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion"+query, &respuesta_modificacion_vinculacion); err2 == nil {
 			respuesta_total = "OK"
 		} else {
 			respuesta_total = "error"
 		}
 
-		if err2 := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/"+strconv.Itoa(respuesta_modificacion_vinculacion[0].Id), "DELETE", &respuesta_delete, respuesta_modificacion_vinculacion[0]); err2 == nil {
+		if err2 := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/"+strconv.Itoa(respuesta_modificacion_vinculacion[0].Id), "DELETE", &respuesta_delete, respuesta_modificacion_vinculacion[0]); err2 == nil {
 			respuesta_total = "OK"
 		} else {
 			respuesta_total = "error"
@@ -241,7 +241,7 @@ func (c *GestionDesvinculacionesController) AnularAdicionDocente() {
 
 		//Se trae información de tabla de traza modificacion_vinculacion, para saber cuál vinculación hay que poner en true y cuál eliminar
 		query := "?limit=-1&query=ModificacionResolucion.Id:" + strconv.Itoa(v.IdModificacionResolucion) + ",VinculacionDocenteRegistrada.Id:" + strconv.Itoa(v.DocentesDesvincular[0].Id)
-		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion"+query, &respuesta_modificacion_vinculacion); err2 == nil {
+		if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion"+query, &respuesta_modificacion_vinculacion); err2 == nil {
 			fmt.Println("modificacion_vinculacion", respuesta_modificacion_vinculacion)
 			respuesta_total = "OK"
 		} else {
@@ -250,7 +250,7 @@ func (c *GestionDesvinculacionesController) AnularAdicionDocente() {
 
 		//se trae informacion de vinculacion que fue cancelada
 		query2 := "?limit=-1&query=Id:" + strconv.Itoa(respuesta_modificacion_vinculacion[0].VinculacionDocenteCancelada.Id)
-		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query2, &vinculacion_cancelada); err2 == nil {
+		if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query2, &vinculacion_cancelada); err2 == nil {
 			fmt.Println("vinculacion_cancelada", vinculacion_cancelada)
 			respuesta_total = "OK"
 		} else {
@@ -262,7 +262,7 @@ func (c *GestionDesvinculacionesController) AnularAdicionDocente() {
 
 		//Se le cambia estado en bd a vinculacion cancelada
 
-		if err2 := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(vinculacion_cancelada[0].Id), "PUT", &respuesta_vinculacion, vinculacion_cancelada[0]); err2 == nil {
+		if err2 := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(vinculacion_cancelada[0].Id), "PUT", &respuesta_vinculacion, vinculacion_cancelada[0]); err2 == nil {
 			fmt.Println("respuesta_vinculacion", respuesta_vinculacion)
 			respuesta_total = "OK"
 		} else {
@@ -271,14 +271,14 @@ func (c *GestionDesvinculacionesController) AnularAdicionDocente() {
 
 		//se elimina registro en modificacion_vinculacion
 
-		if err2 := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/"+strconv.Itoa(respuesta_modificacion_vinculacion[0].Id), "DELETE", &respuesta_delete, respuesta_modificacion_vinculacion[0]); err2 == nil {
+		if err2 := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/"+strconv.Itoa(respuesta_modificacion_vinculacion[0].Id), "DELETE", &respuesta_delete, respuesta_modificacion_vinculacion[0]); err2 == nil {
 			respuesta_total = "OK"
 		} else {
 			respuesta_total = "error"
 		}
 
 		//Se elimina vinculacion nueva
-		if err2 := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(v.DocentesDesvincular[0].Id), "DELETE", &respuesta_delete_vin, v.DocentesDesvincular[0]); err2 == nil {
+		if err2 := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(v.DocentesDesvincular[0].Id), "DELETE", &respuesta_delete_vin, v.DocentesDesvincular[0]); err2 == nil {
 			fmt.Println("respuesta_eliminar_vin_nueva", respuesta_delete_vin)
 			respuesta_total = "OK"
 		} else {
@@ -310,7 +310,7 @@ func InsertarDesvinculaciones(v [1]models.VinculacionDocente) (id int, cont stri
 
 	}
 
-	if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &id_respuesta, &d); err == nil {
+	if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &id_respuesta, &d); err == nil {
 		fmt.Println("no hay error", id_respuesta)
 		control_respuesta = "OK"
 	} else {
@@ -334,14 +334,14 @@ func (c *GestionDesvinculacionesController) ListarDocentesCancelados() {
 	var modVin []models.ModificacionVinculacion
 	var cv models.VinculacionDocente
 	// if 3 - modificacion_resolucion
-	if err := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=resolucionNueva:"+id_resolucion, &modRes); err == nil {
+	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=resolucionNueva:"+id_resolucion, &modRes); err == nil {
 		// if 2 - modificacion_vinculacion
 		fmt.Println("Primer if", modRes[0])
-		if err := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/?limit=-1&query=modificacion_resolucion:"+strconv.Itoa(modRes[0].Id), &modVin); err == nil {
+		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/?limit=-1&query=modificacion_resolucion:"+strconv.Itoa(modRes[0].Id), &modVin); err == nil {
 			//for vinculaciones
 			for _, vinculacion := range modVin {
 				// if 1 - vinculacion_docente
-				if err := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(vinculacion.VinculacionDocenteCancelada.Id), &cv); err == nil {
+				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(vinculacion.VinculacionDocenteCancelada.Id), &cv); err == nil {
 					documento_identidad, _ := strconv.Atoi(vinculacion.VinculacionDocenteCancelada.IdPersona)
 					cv.NombreCompleto = BuscarNombreProveedor(documento_identidad)
 					cv.NumeroDisponibilidad = BuscarNumeroDisponibilidad(vinculacion.VinculacionDocenteCancelada.Disponibilidad)

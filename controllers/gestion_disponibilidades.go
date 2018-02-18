@@ -36,7 +36,7 @@ func (c *GestionDisponibilidadController) ListarApropiaciones() {
 
 		for x, pos := range v {
 
-			if err2 := sendJson("http://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad/SaldoCdp", "POST", &respuesta, &pos); err2 == nil {
+			if err2 := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad/SaldoCdp", "POST", &respuesta, &pos); err2 == nil {
 				v[x].Apropiacion.Saldo = int(respuesta.Saldo)
 				fmt.Println("respuesta", respuesta)
 

@@ -45,7 +45,7 @@ func getJson(url string, target interface{}) error {
 
 func getJsonWSO2(urlp string, target interface{}) error {
 	b := new(bytes.Buffer)
-	//proxyUrl, err := url.Parse("http://10.20.4.15:3128")
+	//proxyUrl, err := url.Parse(beego.AppConfig.String("ProtocolAdmin")+"://10.20.4.15:3128")
 	//http.DefaultTransport = &http.Transport{Proxy: http.ProxyURL(proxyUrl)}
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", urlp, b)
@@ -104,7 +104,7 @@ func CargarReglasBase(dominio string) (reglas string) {
 	//carga de reglas desde el ruler
 	var reglasbase string = ``
 	var v []models.Predicado
-	if err := getJson("http://10.20.0.254/ruler/v1/predicado/?query=Dominio.Nombre:"+dominio+"&limit=-1", &v); err == nil {
+	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://10.20.0.254/ruler/v1/predicado/?query=Dominio.Nombre:"+dominio+"&limit=-1", &v); err == nil {
 
 		reglasbase = reglasbase + FormatoReglas(v) //funcion general para dar formato a reglas cargadas desde el ruler
 		} else {

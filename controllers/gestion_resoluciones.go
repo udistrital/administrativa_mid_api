@@ -33,8 +33,8 @@ func (c *GestionResolucionesController) URLMapping() {
 // @router /get_resoluciones_inscritas [get]
 func (c *GestionResolucionesController) GetResolucionesInscritas() {
 	var resolucion_vinculacion []models.ResolucionVinculacion
-
-	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion", &resolucion_vinculacion); err2 == nil {
+  fmt.Println("sadasddsss")
+	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion", &resolucion_vinculacion); err2 == nil {
 		for x, pos := range resolucion_vinculacion {
 			resolucion_vinculacion[x].FacultadNombre = BuscarNombreFacultad(pos.Facultad)
 
@@ -59,7 +59,7 @@ func (c *GestionResolucionesController) GetResolucionesInscritas() {
 func (c *GestionResolucionesController) GetResolucionesAprobadas() {
 	var resolucion_vinculacion_aprobada []models.ResolucionVinculacion
 
-	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion/Aprobada", &resolucion_vinculacion_aprobada); err2 == nil {
+	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion/Aprobada", &resolucion_vinculacion_aprobada); err2 == nil {
 		for x, pos := range resolucion_vinculacion_aprobada {
 			resolucion_vinculacion_aprobada[x].FacultadNombre = BuscarNombreFacultad(pos.Facultad)
 
@@ -90,7 +90,7 @@ func (c *GestionResolucionesController) InsertarResolucionCompleta() {
 		//****MANEJO DE TRANSACCIONES!***!//
 
 		//Se trae cuerpo de resolución según tipo
-		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/contenido_resolucion/ResolucionTemplate/"+v.ResolucionVinculacionDocente.Dedicacion+"/"+v.ResolucionVinculacionDocente.NivelAcademico, &texto_resolucion); err2 == nil {
+		if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/contenido_resolucion/ResolucionTemplate/"+v.ResolucionVinculacionDocente.Dedicacion+"/"+v.ResolucionVinculacionDocente.NivelAcademico, &texto_resolucion); err2 == nil {
 			v.Resolucion.ConsideracionResolucion = texto_resolucion.Consideracion
 		} else {
 			fmt.Println("Error de consulta en texto de resolucion", err2)
@@ -138,7 +138,7 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 	temp.Estado = true
 	temp.Titulo = "Por la cual se vinculan docentes para el Primer Periodo Académico de 2018 en la modalidad de Docentes de HORA CÁTEDRA (Vinculación Especial) para la " + resolucion.NomDependencia + " en " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ".”"
 	temp.PreambuloResolucion = "El decano de la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas en uso de sus facultades legales y estatuarias y"
-	if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion", "POST", &respuesta, &temp); err == nil {
+	if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion", "POST", &respuesta, &temp); err == nil {
 		id_creada = respuesta.Id
 		cont = true
 	} else {
@@ -152,7 +152,7 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 			ResolucionAnterior: resolucion.ResolucionVieja,
 			ResolucionNueva:    id_creada,
 		}
-		if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion", "POST", &respuesta_modificacion_res, &objeto_modificacion_res); err == nil {
+		if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion", "POST", &respuesta_modificacion_res, &objeto_modificacion_res); err == nil {
 			cont = true
 		} else {
 			fmt.Println("error al insertar en modificacion resolucion", err)
@@ -175,7 +175,7 @@ func InsertarResolucionEstado(id_res int) (contr bool) {
 		Resolucion:    &models.Resolucion{Id: id_res},
 	}
 
-	if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_estado", "POST", &respuesta, &temp); err == nil {
+	if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_estado", "POST", &respuesta, &temp); err == nil {
 		cont = true
 	} else {
 		cont = false
@@ -191,7 +191,7 @@ func InsertarResolucionVinDocente(id_res int, resvindoc *models.ResolucionVincul
 	var cont bool
 	temp.Id = id_res
 
-	if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion_docente", "POST", &respuesta, &temp); err == nil {
+	if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion_docente", "POST", &respuesta, &temp); err == nil {
 
 		cont = true
 	} else {
@@ -205,7 +205,7 @@ func InsertarResolucionVinDocente(id_res int, resvindoc *models.ResolucionVincul
 func InsertarTexto(id_res int, dedicacion, nivel_academico string) {
 	var texto_resolucion models.ResolucionCompleta
 
-	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/contenido_resolucion/ResolucionTemplate/"+dedicacion+"/"+nivel_academico, &texto_resolucion); err2 == nil {
+	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/contenido_resolucion/ResolucionTemplate/"+dedicacion+"/"+nivel_academico, &texto_resolucion); err2 == nil {
 		InsertarArticulos(id_res, texto_resolucion.Articulos)
 
 	} else {
@@ -223,7 +223,7 @@ func InsertarArticulos(id_resolucion int, articulos []models.Articulo) {
 			ResolucionId:   &models.Resolucion{Id: id_resolucion},
 			Texto:          pos.Texto,
 			TipoComponente: "Articulo"}
-		if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/componente_resolucion", "POST", &respuesta, &temp); err == nil {
+		if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/componente_resolucion", "POST", &respuesta, &temp); err == nil {
 			for y, pos2 := range pos.Paragrafos {
 				temp2 := models.ComponenteResolucion{
 					Numero:          y + 1,
@@ -233,7 +233,7 @@ func InsertarArticulos(id_resolucion int, articulos []models.Articulo) {
 					ComponentePadre: &models.ComponenteResolucion{Id: respuesta.Id},
 				}
 
-				if err2 := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/componente_resolucion", "POST", &respuesta, &temp2); err == nil {
+				if err2 := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/componente_resolucion", "POST", &respuesta, &temp2); err == nil {
 
 				} else {
 					fmt.Println("error al insertar parágrafos", err2)
@@ -251,7 +251,7 @@ func BuscarNombreFacultad(id_facultad int) (nombre_facultad string) {
 
 	var facultad []models.Facultad
 	var nom string
-	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudOikos")+"/"+beego.AppConfig.String("NscrudOikos")+"/dependencia?query=Id:"+strconv.Itoa(id_facultad), &facultad); err2 == nil {
+	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudOikos")+"/"+beego.AppConfig.String("NscrudOikos")+"/dependencia?query=Id:"+strconv.Itoa(id_facultad), &facultad); err2 == nil {
 		nom = facultad[0].Nombre
 	} else {
 		nom = "N/A"

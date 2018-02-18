@@ -67,7 +67,7 @@ func (c *GestionPrevinculacionesController) Calcular_total_de_salarios() {
 		periodo := strconv.Itoa(v[0].Periodo)
 		disponibilidad := strconv.Itoa(v[0].Disponibilidad)
 
-		if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_valores_totales_x_disponibilidad/"+vigencia+"/"+periodo+"/"+disponibilidad+"", &totales_disponibilidad); err == nil {
+		if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_valores_totales_x_disponibilidad/"+vigencia+"/"+periodo+"/"+disponibilidad+"", &totales_disponibilidad); err == nil {
 
 			total = int(totales_de_salario) + totales_disponibilidad
 			c.Data["json"] = total
@@ -98,7 +98,7 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		v = CalcularSalarioPrecontratacion(v)
 
-		if err := sendJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &id_respuesta, &v); err == nil {
+		if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &id_respuesta, &v); err == nil {
 			c.Data["json"] = id_respuesta
 		} else {
 			fmt.Println(err)
@@ -224,7 +224,7 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 func CargarPuntoSalarial() (p models.PuntoSalarial) {
 	var v []models.PuntoSalarial
 
-	if err := getJson("http://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/punto_salarial/?sortby=Vigencia&order=desc&limit=1", &v); err == nil {
+	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/punto_salarial/?sortby=Vigencia&order=desc&limit=1", &v); err == nil {
 	} else {
 	}
 
@@ -234,7 +234,7 @@ func CargarPuntoSalarial() (p models.PuntoSalarial) {
 func CargarSalarioMinimo() (p models.SalarioMinimo) {
 	var v []models.SalarioMinimo
 
-	if err := getJson("http://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/salario_minimo/?sortby=Vigencia&order=desc&limit=1", &v); err == nil {
+	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/salario_minimo/?sortby=Vigencia&order=desc&limit=1", &v); err == nil {
 	} else {
 	}
 
@@ -245,7 +245,7 @@ func EsDocentePlanta(idPersona string) (docentePlanta bool) {
 	var temp map[string]interface{}
 	var es_de_planta bool
 
-	if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/academicaProxy/consultar_datos_docente/"+idPersona, &temp); err == nil && temp != nil {
+	if err := getJsonWSO2(beego.AppConfig.String("ProtocolAdmin")+"://jbpm.udistritaloas.edu.co:8280/services/academicaProxy/consultar_datos_docente/"+idPersona, &temp); err == nil && temp != nil {
 		jsonDocentes, error_json := json.Marshal(temp)
 
 		if error_json == nil {
@@ -278,7 +278,7 @@ func BuscarIdProveedor(DocumentoIdentidad int) (id_proveedor_docente int) {
 	var id_proveedor int
 	queryInformacionProveedor := "?query=NumDocumento:" + strconv.Itoa(DocumentoIdentidad)
 	var informacion_proveedor []models.InformacionProveedor
-	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/"+queryInformacionProveedor, &informacion_proveedor); err2 == nil {
+	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/"+queryInformacionProveedor, &informacion_proveedor); err2 == nil {
 		if informacion_proveedor != nil {
 			id_proveedor = informacion_proveedor[0].Id
 		} else {
@@ -314,7 +314,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 	id_resolucion := c.GetString("id_resolucion")
 	var v []models.VinculacionDocente
 
-	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_vinculaciones_agrupadas/"+id_resolucion, &v); err2 == nil {
+	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_vinculaciones_agrupadas/"+id_resolucion, &v); err2 == nil {
 
 		for x, pos := range v {
 
@@ -353,7 +353,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 	query := "?limit=-1&query=IdResolucion.Id:" + id_resolucion + ",Estado:true"
 	var v []models.VinculacionDocente
 
-	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &v); err2 == nil {
+	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &v); err2 == nil {
 		for x, pos := range v {
 			documento_identidad, _ := strconv.Atoi(pos.IdPersona)
 			v[x].NombreCompleto = BuscarNombreProveedor(documento_identidad)
@@ -383,7 +383,7 @@ func ListarDocentesHorasLectivas(vigencia, periodo, tipo_vinculacion, facultad, 
 	var docentes_x_carga models.ObjetoCargaLectiva
 
 	for _, pos := range tipo_vinculacion_old {
-		if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/academicaProxyProduccion/carga_lectiva/"+vigencia+"/"+periodo+"/"+pos+"/"+facultad_old+"/"+nivel_academico, &temp); err == nil && temp != nil {
+		if err := getJsonWSO2(beego.AppConfig.String("ProtocolAdmin")+"://jbpm.udistritaloas.edu.co:8280/services/academicaProxyProduccion/carga_lectiva/"+vigencia+"/"+periodo+"/"+pos+"/"+facultad_old+"/"+nivel_academico, &temp); err == nil && temp != nil {
 			jsonDocentes, error_json := json.Marshal(temp)
 
 			if error_json == nil {
@@ -410,7 +410,7 @@ func Buscar_Categoria_Docente(vigencia, periodo, documento_ident string) (catego
 	var nombre_categoria string
 	var id_categoria_old string
 
-	if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_urano_produccion/categoria_docente/"+vigencia+"/"+periodo+"/"+documento_ident, &temp); err == nil && temp != nil {
+	if err := getJsonWSO2(beego.AppConfig.String("ProtocolAdmin")+"://jbpm.udistritaloas.edu.co:8280/services/servicios_urano_produccion/categoria_docente/"+vigencia+"/"+periodo+"/"+documento_ident, &temp); err == nil && temp != nil {
 		jsonDocentes, error_json := json.Marshal(temp)
 
 		if error_json == nil {
@@ -439,7 +439,7 @@ func HomologarProyectoCurricular(proyecto_old string) (proyecto string) {
 	var id_proyecto string
 	var temp map[string]interface{}
 
-	if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_homologacion_dependencias/proyecto_curricular_cod_proyecto/"+proyecto_old, &temp); err == nil && temp != nil {
+	if err := getJsonWSO2(beego.AppConfig.String("ProtocolAdmin")+"://jbpm.udistritaloas.edu.co:8280/services/servicios_homologacion_dependencias/proyecto_curricular_cod_proyecto/"+proyecto_old, &temp); err == nil && temp != nil {
 		json_proyecto_curricular, error_json := json.Marshal(temp)
 
 		if error_json == nil {
@@ -470,7 +470,7 @@ func HomologarFacultad(tipo, facultad string) (facultad_old string) {
 		string_consulta_servicio = "facultad_oikos_gedep"
 	}
 
-	if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_homologacion_dependencias/"+string_consulta_servicio+"/"+facultad, &temp); err == nil && temp != nil {
+	if err := getJsonWSO2(beego.AppConfig.String("ProtocolAdmin")+"://jbpm.udistritaloas.edu.co:8280/services/servicios_homologacion_dependencias/"+string_consulta_servicio+"/"+facultad, &temp); err == nil && temp != nil {
 		json_facultad, error_json := json.Marshal(temp)
 
 		if error_json == nil {
@@ -591,7 +591,7 @@ func BuscarNombreProveedor(DocumentoIdentidad int) (nombre_prov string) {
 	var nom_proveedor string
 	queryInformacionProveedor := "?query=NumDocumento:" + strconv.Itoa(DocumentoIdentidad)
 	var informacion_proveedor []models.InformacionProveedor
-	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/"+queryInformacionProveedor, &informacion_proveedor); err2 == nil {
+	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/"+queryInformacionProveedor, &informacion_proveedor); err2 == nil {
 		if informacion_proveedor != nil {
 			nom_proveedor = informacion_proveedor[0].NomProveedor
 		} else {
@@ -607,7 +607,7 @@ func BuscarNombreProveedor(DocumentoIdentidad int) (nombre_prov string) {
 func BuscarTipoDocumento(Cedula string) (nombre_tipo_doc string) {
 	var tipo_documento string
 	var temp []models.InformacionPersonaNatural
-	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_persona_natural/?limit=-1&query=Id:"+Cedula, &temp); err2 == nil {
+	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_persona_natural/?limit=-1&query=Id:"+Cedula, &temp); err2 == nil {
 		if temp != nil {
 			tipo_documento = temp[0].TipoDocumento.ValorParametro
 		} else {
@@ -626,7 +626,7 @@ func BuscarNombreDedicacion(id_dedicacion int) (nombre_dedicacion string) {
 	var nom_dedicacion string
 	query := "?limit=-1&query=Id:" + strconv.Itoa(id_dedicacion)
 	var dedicaciones []models.Dedicacion
-	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/dedicacion"+query, &dedicaciones); err2 == nil {
+	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/dedicacion"+query, &dedicaciones); err2 == nil {
 		if dedicaciones != nil {
 			nom_dedicacion = dedicaciones[0].Descripcion
 		} else {
@@ -642,7 +642,7 @@ func BuscarNumeroDisponibilidad(IdCDP int) (numero_disp int) {
 
 	var temp []models.Disponibilidad
 	var numero_disponibilidad int
-	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad?limit=-1&query=DisponibilidadApropiacion.Id:"+strconv.Itoa(IdCDP), &temp); err2 == nil {
+	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad?limit=-1&query=DisponibilidadApropiacion.Id:"+strconv.Itoa(IdCDP), &temp); err2 == nil {
 		if temp != nil {
 			numero_disponibilidad = int(temp[0].NumeroDisponibilidad)
 
@@ -663,10 +663,10 @@ func BuscarLugarExpedicion(Cedula string) (nombre_lugar_exp string) {
 	var temp []models.InformacionPersonaNatural
 	var temp2 []models.Ciudad
 
-	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_persona_natural/?limit=-1&query=Id:"+Cedula, &temp); err2 == nil {
+	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_persona_natural/?limit=-1&query=Id:"+Cedula, &temp); err2 == nil {
 		if temp != nil {
 			id_ciudad := temp[0].IdCiudadExpedicionDocumento
-			if err := getJson("http://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ciudad/?limit=-1&query=Id:"+strconv.Itoa(int(id_ciudad)), &temp2); err2 == nil {
+			if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ciudad/?limit=-1&query=Id:"+strconv.Itoa(int(id_ciudad)), &temp2); err2 == nil {
 				if temp2 != nil {
 					nombre_ciudad = temp2[0].Nombre
 
@@ -697,7 +697,7 @@ func Calcular_totales_vinculacion_pdf(cedula, id_resolucion string) (suma_total_
 	var total_contrato int
 	var total_horas int
 
-	if err2 := getJson("http://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &temp); err2 == nil {
+	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &temp); err2 == nil {
 
 		for _, pos := range temp {
 			total_horas = total_horas + pos.NumeroHorasSemanales
