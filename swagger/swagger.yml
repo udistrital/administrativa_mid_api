@@ -71,6 +71,23 @@ paths:
           description: ""
         "403":
           description: :anio is empty
+  /aprobacion_pago/dependencia_ordenador/{docordenador}:
+    get:
+      tags:
+      - aprobacion_pago
+      description: create ObtenerDependenciaOrdenador
+      operationId: AprobacionPagoController.ObtenerDependenciaOrdenador
+      parameters:
+      - in: query
+        name: docordenador
+        description: Número del documento del ordenador
+        required: true
+        type: string
+      responses:
+        "201":
+          description: ""
+        "403":
+          description: :docordenador is empty
   /aprobacion_pago/get_contratos_docente/{numDocumento}:
     get:
       tags:

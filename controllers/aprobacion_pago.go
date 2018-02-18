@@ -22,6 +22,7 @@ func (c *AprobacionPagoController) URLMapping() {
 	c.Mapping("PagoAprobado", c.PagoAprobado)
 	c.Mapping("CertificacionVistoBueno", c.CertificacionVistoBueno)
 	c.Mapping("CertificacionDocumentosAprobados", c.CertificacionDocumentosAprobados)
+	c.Mapping("ObtenerDependenciaOrdenador", c.ObtenerDependenciaOrdenador)
 
 }
 
@@ -681,7 +682,7 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenador() {
 
 }
 
-/*
+
 // AprobacionPagoController ...
 // @Title ObtenerDependenciaOrdenador
 // @Description create ObtenerDependenciaOrdenador
@@ -689,8 +690,6 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenador() {
 // @Success 201
 // @Failure 403 :docordenador is empty
 // @router /dependencia_ordenador/:docordenador [get]
-
-
 func (c *AprobacionPagoController) ObtenerDependenciaOrdenador() {
 
 	doc_ordenador := c.GetString(":docordenador")
@@ -701,18 +700,18 @@ func (c *AprobacionPagoController) ObtenerDependenciaOrdenador() {
 
 		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/jefe_dependencia/?query=TerceroId:"+doc_ordenador+"&sortby=FechaInicio&order=desc&limit=1", &jefes_dependencia); err == nil {
 				for _,jefe := range jefes_dependencia{
-
-					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ordenador_gasto/?query=Id:", &ordenadores_gasto); err == nil {
+					
+					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ordenador_gasto/?query=DependenciaId:"+strconv.Itoa(jefe.DependenciaId), &ordenadores_gasto); err == nil {
 
 						for _,ordenador := range ordenadores_gasto {
 
 
-
+							c.Data["json"] = ordenador.DependenciaId
 
 						}
 
-					}else{
-
+					}else{// If ordenador_gasto get
+						fmt.Println("Mirenme, me morí en If ordenador_gasto get, solucioname!!! ", err)
 					}
 
 				}
@@ -720,9 +719,7 @@ func (c *AprobacionPagoController) ObtenerDependenciaOrdenador() {
 		}else{// If jefe_dependencia get
 			fmt.Println("Mirenme, me morí en If jefe_dependencia get, solucioname!!! ", err)
 		}
-
-	c.Data["json"] = pagos_personas_proyecto
 	c.ServeJSON()
 
 }
-*/
+
