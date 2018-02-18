@@ -33,7 +33,7 @@ func (c *GestionResolucionesController) URLMapping() {
 // @router /get_resoluciones_inscritas [get]
 func (c *GestionResolucionesController) GetResolucionesInscritas() {
 	var resolucion_vinculacion []models.ResolucionVinculacion
-  fmt.Println("sadasddsss")
+  fmt.Println(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion")
 	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion", &resolucion_vinculacion); err2 == nil {
 		for x, pos := range resolucion_vinculacion {
 			resolucion_vinculacion[x].FacultadNombre = BuscarNombreFacultad(pos.Facultad)

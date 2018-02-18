@@ -38,7 +38,7 @@ func (c *AprobacionPagoController) ObtenerInfoCoordinador() {
 	var temp_snies map[string]interface{}
 	var info_coordinador models.InformacionCoordinador
 
-	if err := getJsonWSO2(beego.AppConfig.String("ProtocolAdmin")+"://jbpm.udistritaloas.edu.co:8280/services/servicios_homologacion_dependencias/proyecto_curricular_oikos/"+id_oikos, &temp); err == nil && temp != nil {
+	if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/servicios_homologacion_dependencias/proyecto_curricular_oikos/"+id_oikos, &temp); err == nil && temp != nil {
 		json_proyecto_curricular, error_json := json.Marshal(temp)
 
 		if error_json == nil {
@@ -46,7 +46,7 @@ func (c *AprobacionPagoController) ObtenerInfoCoordinador() {
 			json.Unmarshal(json_proyecto_curricular, &temp_homologacion)
 			id_proyecto_snies := temp_homologacion.Homologacion.IDSnies
 
-			if err := getJsonWSO2(beego.AppConfig.String("ProtocolAdmin")+"://jbpm.udistritaloas.edu.co:8280/services/academicaProxy/carrera_snies/"+id_proyecto_snies, &temp_snies); err == nil && temp_snies != nil {
+			if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/academicaProxy/carrera_snies/"+id_proyecto_snies, &temp_snies); err == nil && temp_snies != nil {
 				json_info_coordinador, error_json := json.Marshal(temp_snies)
 
 				if error_json == nil {
@@ -167,7 +167,7 @@ func (c *AprobacionPagoController) ObtenerInfoOrdenador() {
 	var informacion_ordenador models.InformacionOrdenador
 	var ordenadores []models.Ordenador
 
-	if err := getJsonWSO2(beego.AppConfig.String("ProtocolAdmin")+"://jbpm.udistritaloas.edu.co:8280/services/contratoSuscritoProxyService/contrato_elaborado/"+numero_contrato+"/"+vigencia, &temp); err == nil && temp != nil {
+	if err := getJsonWSO2("http://jbpm.udistritaloas.edu.co:8280/services/contratoSuscritoProxyService/contrato_elaborado/"+numero_contrato+"/"+vigencia, &temp); err == nil && temp != nil {
 		json_contrato_elaborado, error_json := json.Marshal(temp)
 
 		if error_json == nil {
