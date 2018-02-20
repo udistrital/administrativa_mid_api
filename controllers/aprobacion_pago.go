@@ -563,7 +563,7 @@ func (c *AprobacionPagoController) GetSolicitudesCoordinador() {
 	var vinculaciones_docente []models.VinculacionDocente
 	var dep models.Dependencia
 
-	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?query=EstadoPagoMensual.CodigoAbreviacion:PRC,Responsable:"+doc_coordinador, &pagos_mensuales); err == nil {
+	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?limit=-1&query=EstadoPagoMensual.CodigoAbreviacion:PRC,Responsable:"+doc_coordinador, &pagos_mensuales); err == nil {
 
 		for x, pago_mensual := range pagos_mensuales {
 
@@ -632,7 +632,7 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenador() {
 	var vinculaciones_docente []models.VinculacionDocente
 	var dep models.Dependencia
 
-	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?query=EstadoPagoMensual.CodigoAbreviacion:AD,Responsable:"+doc_ordenador, &pagos_mensuales); err == nil {
+	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?limit=-1&query=EstadoPagoMensual.CodigoAbreviacion:AD,Responsable:"+doc_ordenador, &pagos_mensuales); err == nil {
 		for x, pago_mensual := range pagos_mensuales {
 
 			if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pago_mensual.Persona, &contratistas); err == nil {
@@ -682,7 +682,6 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenador() {
 
 }
 
-
 // AprobacionPagoController ...
 // @Title ObtenerDependenciaOrdenador
 // @Description create ObtenerDependenciaOrdenador
@@ -697,29 +696,26 @@ func (c *AprobacionPagoController) ObtenerDependenciaOrdenador() {
 	var ordenadores_gasto []models.OrdenadorGasto
 	var jefes_dependencia []models.JefeDependencia
 
+	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/jefe_dependencia/?query=TerceroId:"+doc_ordenador+"&sortby=FechaInicio&order=desc&limit=1", &jefes_dependencia); err == nil {
+		for _, jefe := range jefes_dependencia {
 
-		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/jefe_dependencia/?query=TerceroId:"+doc_ordenador+"&sortby=FechaInicio&order=desc&limit=1", &jefes_dependencia); err == nil {
-				for _,jefe := range jefes_dependencia{
+			if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ordenador_gasto/?query=DependenciaId:"+strconv.Itoa(jefe.DependenciaId), &ordenadores_gasto); err == nil {
 
-					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ordenador_gasto/?query=DependenciaId:"+strconv.Itoa(jefe.DependenciaId), &ordenadores_gasto); err == nil {
+				for _, ordenador := range ordenadores_gasto {
 
-						for _,ordenador := range ordenadores_gasto {
-
-
-							c.Data["json"] = ordenador.DependenciaId
-
-						}
-
-					}else{// If ordenador_gasto get
-						fmt.Println("Mirenme, me morí en If ordenador_gasto get, solucioname!!! ", err)
-					}
+					c.Data["json"] = ordenador.DependenciaId
 
 				}
 
-		}else{// If jefe_dependencia get
-			fmt.Println("Mirenme, me morí en If jefe_dependencia get, solucioname!!! ", err)
+			} else { // If ordenador_gasto get
+				fmt.Println("Mirenme, me morí en If ordenador_gasto get, solucioname!!! ", err)
+			}
+
 		}
+
+	} else { // If jefe_dependencia get
+		fmt.Println("Mirenme, me morí en If jefe_dependencia get, solucioname!!! ", err)
+	}
 	c.ServeJSON()
 
 }
-
