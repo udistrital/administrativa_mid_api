@@ -104,7 +104,7 @@ func CargarReglasBase(dominio string) (reglas string) {
 	//carga de reglas desde el ruler
 	var reglasbase string = ``
 	var v []models.Predicado
-	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://10.20.0.254/ruler/v1/predicado/?query=Dominio.Nombre:"+dominio+"&limit=-1", &v); err == nil {
+	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("Urlruler")+"/"+beego.AppConfig.String("Nsruler")+"/predicado/?query=Dominio.Nombre:"+dominio+"&limit=-1", &v); err == nil {
 
 		reglasbase = reglasbase + FormatoReglas(v) //funcion general para dar formato a reglas cargadas desde el ruler
 		} else {
