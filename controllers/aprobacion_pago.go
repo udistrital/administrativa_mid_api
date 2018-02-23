@@ -332,7 +332,7 @@ func (c *AprobacionPagoController) CertificacionVistoBueno() {
 					for _, contrato_estado := range contratos_estado {
 						//If Estado = 4
 						if contrato_estado.Estado.Id == 4 {
-							if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?query=EstadoPagoMensual.CodigoAbreviacion:PAD,NumeroContrato:"+vinculacion_docente.NumeroContrato.String+",VigenciaContrato:"+strconv.FormatInt(vinculacion_docente.Vigencia.Int64, 10)+",Mes:"+mes+",Ano:"+anio, &pagos_mensuales); err == nil {
+							if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?query=EstadoPagoMensual.CodigoAbreviacion.in:PAD|AD|AP,NumeroContrato:"+vinculacion_docente.NumeroContrato.String+",VigenciaContrato:"+strconv.FormatInt(vinculacion_docente.Vigencia.Int64, 10)+",Mes:"+mes+",Ano:"+anio, &pagos_mensuales); err == nil {
 
 								if pagos_mensuales == nil {
 
@@ -572,17 +572,16 @@ func (c *AprobacionPagoController) GetSolicitudesCoordinador() {
 				for _, contratista := range contratistas {
 
 					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?limit=-1&query=Estado:TRUE,NumeroContrato:"+pagos_mensuales[x].NumeroContrato+",Vigencia:"+strconv.FormatFloat(pagos_mensuales[x].VigenciaContrato, 'f', 0, 64), &vinculaciones_docente); err == nil {
-						
-						for y, _ := range vinculaciones_docente {
-							
-							if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudOikos")+"/"+beego.AppConfig.String("NscrudOikos")+"/dependencia/?query=Id:"+strconv.Itoa(vinculaciones_docente[y].IdProyectoCurricular), &dep); err == nil {
-								
 
-								for z,_ := range dep {
-								pago_personas_proyecto.PagoMensual = &pagos_mensuales[x]
-								pago_personas_proyecto.NombrePersona = contratista.NomProveedor
-								pago_personas_proyecto.Dependencia = &dep[z]
-								pagos_personas_proyecto = append(pagos_personas_proyecto, pago_personas_proyecto)
+						for y, _ := range vinculaciones_docente {
+
+							if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudOikos")+"/"+beego.AppConfig.String("NscrudOikos")+"/dependencia/?query=Id:"+strconv.Itoa(vinculaciones_docente[y].IdProyectoCurricular), &dep); err == nil {
+
+								for z, _ := range dep {
+									pago_personas_proyecto.PagoMensual = &pagos_mensuales[x]
+									pago_personas_proyecto.NombrePersona = contratista.NomProveedor
+									pago_personas_proyecto.Dependencia = &dep[z]
+									pagos_personas_proyecto = append(pagos_personas_proyecto, pago_personas_proyecto)
 								}
 
 							} else { //If dependencia get
