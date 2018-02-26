@@ -488,9 +488,9 @@ func (c *AprobacionPagoController) GetSolicitudesSupervisor() {
 	var pagos_mensuales []models.PagoMensual
 	var contratistas []models.InformacionProveedor
 	var pagos_personas_proyecto []models.PagoPersonaProyecto
-	var pago_personas_proyecto models.PagoPersonaProyecto
+	
 	var vinculaciones_docente []models.VinculacionDocente
-	var dep models.Dependencia
+	//var dep models.Dependencia
 
 	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?limit=-1&query=EstadoPagoMensual.CodigoAbreviacion:PAD,Responsable:"+doc_supervisor, &pagos_mensuales); err == nil {
 
@@ -503,13 +503,14 @@ func (c *AprobacionPagoController) GetSolicitudesSupervisor() {
 					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?limit=-1&query=Estado:TRUE,NumeroContrato:"+pago_mensual.NumeroContrato+",Vigencia:"+strconv.FormatFloat(pago_mensual.VigenciaContrato, 'f', 0, 64), &vinculaciones_docente); err == nil {
 
 						for _, vinculacion := range vinculaciones_docente {
-
+							var dep models.Dependencia
 							if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudOikos")+"/"+beego.AppConfig.String("NscrudOikos")+"/dependencia/"+strconv.Itoa(vinculacion.IdProyectoCurricular), &dep); err == nil {
-
+								//pago_personas_proyecto := models.PagoPersonaProyecto{}
+								var pago_personas_proyecto models.PagoPersonaProyecto
+								
 								pago_personas_proyecto.PagoMensual = &pagos_mensuales[x]
 								pago_personas_proyecto.NombrePersona = contratista.NomProveedor
 								pago_personas_proyecto.Dependencia = &dep
-
 								pagos_personas_proyecto = append(pagos_personas_proyecto, pago_personas_proyecto)
 
 							} else { //If dependencia get
@@ -561,7 +562,6 @@ func (c *AprobacionPagoController) GetSolicitudesCoordinador() {
 	var pagos_personas_proyecto []models.PagoPersonaProyecto
 	var pago_personas_proyecto models.PagoPersonaProyecto
 	var vinculaciones_docente []models.VinculacionDocente
-	var dep []models.Dependencia
 
 	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?limit=-1&query=EstadoPagoMensual.CodigoAbreviacion:PRC,Responsable:"+doc_coordinador, &pagos_mensuales); err == nil {
 
@@ -574,6 +574,7 @@ func (c *AprobacionPagoController) GetSolicitudesCoordinador() {
 					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?limit=-1&query=Estado:TRUE,NumeroContrato:"+pagos_mensuales[x].NumeroContrato+",Vigencia:"+strconv.FormatFloat(pagos_mensuales[x].VigenciaContrato, 'f', 0, 64), &vinculaciones_docente); err == nil {
 
 						for y, _ := range vinculaciones_docente {
+							var dep []models.Dependencia
 
 							if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudOikos")+"/"+beego.AppConfig.String("NscrudOikos")+"/dependencia/?query=Id:"+strconv.Itoa(vinculaciones_docente[y].IdProyectoCurricular), &dep); err == nil {
 
@@ -631,7 +632,6 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenador() {
 	var pagos_personas_proyecto []models.PagoPersonaProyecto
 	var pago_personas_proyecto models.PagoPersonaProyecto
 	var vinculaciones_docente []models.VinculacionDocente
-	var dep models.Dependencia
 
 	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?limit=-1&query=EstadoPagoMensual.CodigoAbreviacion:AD,Responsable:"+doc_ordenador, &pagos_mensuales); err == nil {
 		for x, pago_mensual := range pagos_mensuales {
@@ -643,6 +643,7 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenador() {
 					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?limit=-1&query=Estado:TRUE,NumeroContrato:"+pago_mensual.NumeroContrato+",Vigencia:"+strconv.FormatFloat(pago_mensual.VigenciaContrato, 'f', 0, 64), &vinculaciones_docente); err == nil {
 
 						for _, vinculacion := range vinculaciones_docente {
+							var dep models.Dependencia
 
 							if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudOikos")+"/"+beego.AppConfig.String("NscrudOikos")+"/dependencia/"+strconv.Itoa(vinculacion.IdProyectoCurricular), &dep); err == nil {
 
