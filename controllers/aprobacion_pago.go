@@ -220,9 +220,8 @@ func (c *AprobacionPagoController) ObtenerInfoOrdenador() {
 
 				//fmt.Println(temp)
 			} else { //si no son docentes
-
+				fmt.Println(contrato_elaborado.Contrato.OrdenadorGasto)
 				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/ordenadores/?query=IdOrdenador:"+contrato_elaborado.Contrato.OrdenadorGasto+"&sortby=FechaInicio&order=desc&limit=1", &ordenadores); err == nil {
-
 					for _, ordenador := range ordenadores {
 						informacion_ordenador.NumeroDocumento = ordenador.Documento
 						informacion_ordenador.Cargo = ordenador.RolOrdenador
