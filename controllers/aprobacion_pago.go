@@ -739,7 +739,7 @@ func (c *AprobacionPagoController) AprobarMultiplesSolicitudes() {
 			var pago_mensual *models.PagoMensual
 
 			pago_mensual = pm.PagoMensual
-
+			fmt.Println(pago_mensual)
 			pagos_mensuales = append(pagos_mensuales,pago_mensual)
 		}
 		c.Data["json"] = pagos_mensuales
