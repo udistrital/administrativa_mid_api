@@ -734,12 +734,12 @@ func (c *AprobacionPagoController) AprobarMultiplesSolicitudes() {
 	
 	var pagos_mensuales []*models.PagoMensual
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err != nil {
-
+		var pago_mensual *models.PagoMensual
 		for _, pm := range v {
-			var pago_mensual *models.PagoMensual
+			
 
 			pago_mensual = pm.PagoMensual
-			fmt.Println(pago_mensual)
+			fmt.Println("probando: ")
 			pagos_mensuales = append(pagos_mensuales,pago_mensual)
 		}
 		c.Data["json"] = pagos_mensuales
