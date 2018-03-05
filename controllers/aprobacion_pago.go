@@ -720,3 +720,33 @@ func (c *AprobacionPagoController) ObtenerDependenciaOrdenador() {
 	c.ServeJSON()
 
 }
+
+// AprobacionPagoController ...
+// @Title AprobarMultiplesSolicitudes
+// @Description create AprobarMultiplesSolicitudes
+// @Success 201
+// @Failure 403
+// @router /aprobar_documentos [post]
+func (c *AprobacionPagoController) AprobarMultiplesSolicitudes() {
+
+
+	var v []models.PagoPersonaProyecto
+	
+	var pagos_mensuales []*models.PagoMensual
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err != nil {
+
+		for _, pm := range v {
+			var pago_mensual *models.PagoMensual
+
+			pago_mensual = pm.PagoMensual
+
+			pagos_mensuales = append(pagos_mensuales,pago_mensual)
+		}
+		c.Data["json"] = pagos_mensuales
+
+	}else{
+		fmt.Println(err)
+	}
+
+	c.ServeJSON()
+}

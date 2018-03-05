@@ -11,6 +11,17 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 basePath: /v1
 paths:
+  /aprobacion_pago/aprobar_documentos:
+    post:
+      tags:
+      - aprobacion_pago
+      description: create AprobarMultiplesSolicitudes
+      operationId: AprobacionPagoController.AprobarMultiplesSolicitudes
+      responses:
+        "201":
+          description: ""
+        "403":
+          description: ""
   /aprobacion_pago/certificacion_documentos_aprobados/{dependencia}/{mes}/{anio}:
     get:
       tags:
