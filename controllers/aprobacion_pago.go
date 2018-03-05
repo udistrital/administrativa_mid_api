@@ -731,18 +731,27 @@ func (c *AprobacionPagoController) AprobarMultiplesSolicitudes() {
 
 
 	var v []models.PagoPersonaProyecto
+	var response interface{}
+
 	
 	var pagos_mensuales []*models.PagoMensual
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err != nil {
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		var pago_mensual *models.PagoMensual
 		for _, pm := range v {
 			
 
 			pago_mensual = pm.PagoMensual
-			fmt.Println("probando: ")
+		
 			pagos_mensuales = append(pagos_mensuales,pago_mensual)
 		}
-		c.Data["json"] = pagos_mensuales
+		if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/tr_aprobacion_masiva_documentos", "POST", &response, pagos_mensuales); err == nil {
+			c.Data["json"] = "OK"
+		}else{
+			fmt.Println(err)
+		}
+
+
+		
 
 	}else{
 		fmt.Println(err)
