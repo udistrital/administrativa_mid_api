@@ -22,6 +22,17 @@ paths:
           description: ""
         "403":
           description: ""
+  /aprobacion_pago/aprobar_pagos:
+    post:
+      tags:
+      - aprobacion_pago
+      description: create AprobarMultiplesPagos
+      operationId: AprobacionPagoController.AprobarMultiplesPagos
+      responses:
+        "201":
+          description: ""
+        "403":
+          description: ""
   /aprobacion_pago/certificacion_documentos_aprobados/{dependencia}/{mes}/{anio}:
     get:
       tags:

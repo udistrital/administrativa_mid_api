@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"time"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -88,7 +89,7 @@ func (c *AprobacionPagoController) GetContratosDocente() {
 	var proveedor []models.InformacionProveedor
 	var vinculaciones []models.VinculacionDocente
 	//var contrato []models.ContratoGeneral
-	var contratosEstado []models.ContratoEstado
+	var actasInicio []models.ActaInicio
 	var res models.Resolucion
 	var dep models.Dependencia
 	//If informacion_proveedor get
@@ -104,11 +105,11 @@ func (c *AprobacionPagoController) GetContratosDocente() {
 						//If nulo
 
 						if vinculacion.NumeroContrato.Valid == true {
-							if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_estado/?query=NumeroContrato:"+vinculacion.NumeroContrato.String+",Vigencia:"+strconv.FormatInt(vinculacion.Vigencia.Int64, 10)+"&sortby=FechaRegistro&order=desc&limit=1", &contratosEstado); err == nil {
+							if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/acta_inicio/?query=NumeroContrato:"+vinculacion.NumeroContrato.String+",Vigencia:"+strconv.FormatInt(vinculacion.Vigencia.Int64, 10), &actasInicio); err == nil {
 
 								//If Estado = 4
-								for _, contratoEstado := range contratosEstado {
-									if contratoEstado.Estado.Id == 4 {
+								for _, actaInicio := range actasInicio {
+									if int(actaInicio.FechaInicio.Month())<= int(time.Now().Month()) && actaInicio.FechaInicio.Year()<= time.Now().Year() && int(actaInicio.FechaFin.Month())>= int(time.Now().Month()) && actaInicio.FechaFin.Year()<= time.Now().Year() {
 										cd.NumeroVinculacion = vinculacion.NumeroContrato.String
 										cd.Vigencia = vinculacion.Vigencia.Int64
 										cd.Resolucion = res.NumeroResolucion
@@ -314,23 +315,25 @@ func (c *AprobacionPagoController) CertificacionVistoBueno() {
 	mes := c.GetString(":mes")
 	anio := c.GetString(":anio")
 	var vinculaciones_docente []models.VinculacionDocente
-	var contratos_estado []models.ContratoEstado
 	var pagos_mensuales []models.PagoMensual
-	//var vinculaciones []models.VinculacionDocente
 	var contratistas []models.InformacionProveedor
 	var personas []models.Persona
 	var persona models.Persona
+	var actasInicio []models.ActaInicio
+	var mes_cer,_ = strconv.Atoi(mes)
+	var anio_cer,_ = strconv.Atoi(anio)
 
 	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?limit=-1&query=Estado:TRUE,IdProyectoCurricular:"+dependencia, &vinculaciones_docente); err == nil {
 
 		for _, vinculacion_docente := range vinculaciones_docente {
 			if vinculacion_docente.NumeroContrato.Valid == true {
 
-				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_estado/?query=NumeroContrato:"+vinculacion_docente.NumeroContrato.String+",Vigencia:"+strconv.FormatInt(vinculacion_docente.Vigencia.Int64, 10)+"&sortby=FechaRegistro&order=desc&limit=1", &contratos_estado); err == nil {
+				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/acta_inicio/?query=NumeroContrato:"+vinculacion_docente.NumeroContrato.String+",Vigencia:"+strconv.FormatInt(vinculacion_docente.Vigencia.Int64, 10), &actasInicio); err == nil {
 
-					for _, contrato_estado := range contratos_estado {
+					for _, actaInicio := range actasInicio {
 						//If Estado = 4
-						if contrato_estado.Estado.Id == 4 {
+						if int(actaInicio.FechaInicio.Month())<= mes_cer && actaInicio.FechaInicio.Year()<= anio_cer && int(actaInicio.FechaFin.Month())>=mes_cer && actaInicio.FechaFin.Year()>= anio_cer {
+
 							if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?query=EstadoPagoMensual.CodigoAbreviacion.in:PAD|AD|AP,NumeroContrato:"+vinculacion_docente.NumeroContrato.String+",VigenciaContrato:"+strconv.FormatInt(vinculacion_docente.Vigencia.Int64, 10)+",Mes:"+mes+",Ano:"+anio, &pagos_mensuales); err == nil {
 
 								if pagos_mensuales == nil {
@@ -341,8 +344,8 @@ func (c *AprobacionPagoController) CertificacionVistoBueno() {
 
 											persona.NumDocumento = contratista.NumDocumento
 											persona.Nombre = contratista.NomProveedor
-											persona.NumeroContrato = contrato_estado.NumeroContrato
-											persona.Vigencia = contrato_estado.Vigencia
+											persona.NumeroContrato = actaInicio.NumeroContrato
+											persona.Vigencia = actaInicio.Vigencia
 
 											personas = append(personas, persona)
 
@@ -399,12 +402,14 @@ func (c *AprobacionPagoController) CertificacionDocumentosAprobados() {
 
 	var ordenadores_gasto []models.OrdenadorGasto
 	var contratos_generales []models.ContratoGeneral
-	var contratos_estado []models.ContratoEstado
 	var pagos_mensuales []models.PagoMensual
 	//var cg []models.ContratoGeneral
 	var contratistas []models.InformacionProveedor
 	var personas []models.Persona
 	var persona models.Persona
+	var actasInicio []models.ActaInicio
+	var mes_cer,_ = strconv.Atoi(mes)
+	var anio_cer,_ = strconv.Atoi(anio)
 
 	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ordenador_gasto/?query=DependenciaId:"+dependencia, &ordenadores_gasto); err == nil {
 
@@ -413,11 +418,12 @@ func (c *AprobacionPagoController) CertificacionDocumentosAprobados() {
 			if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_general/?limit=-1&query=OrdenadorGasto:"+strconv.Itoa(ordenador_gasto.Id), &contratos_generales); err == nil {
 
 				for _, contrato_general := range contratos_generales {
-					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_estado/?query=NumeroContrato:"+contrato_general.Id+",Vigencia:"+strconv.Itoa(contrato_general.VigenciaContrato)+"&sortby=FechaRegistro&order=desc&limit=1", &contratos_estado); err == nil {
+					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/acta_inicio/?query=NumeroContrato:"+contrato_general.Id+",Vigencia:"+strconv.Itoa(contrato_general.VigenciaContrato), &actasInicio); err == nil {
 
-						for _, contrato_estado := range contratos_estado {
 
-							if contrato_estado.Estado.Id == 4 {
+						for _, actaInicio := range actasInicio {
+
+							if int(actaInicio.FechaInicio.Month())<= mes_cer && actaInicio.FechaInicio.Year()<= anio_cer && int(actaInicio.FechaFin.Month())>=mes_cer && actaInicio.FechaFin.Year()>= anio_cer {
 								if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?query=EstadoPagoMensual.CodigoAbreviacion:AP,NumeroContrato:"+contrato_general.Id+",VigenciaContrato:"+strconv.Itoa(contrato_general.VigenciaContrato)+",Mes:"+mes+",Ano:"+anio, &pagos_mensuales); err == nil {
 
 									if pagos_mensuales == nil {
@@ -745,6 +751,45 @@ func (c *AprobacionPagoController) AprobarMultiplesSolicitudes() {
 			pagos_mensuales = append(pagos_mensuales,pago_mensual)
 		}
 		if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/tr_aprobacion_masiva_documentos", "POST", &response, pagos_mensuales); err == nil {
+			c.Data["json"] = "OK"
+		}else{
+			fmt.Println(err)
+		}
+
+
+		
+
+	}else{
+		fmt.Println(err)
+	}
+
+	c.ServeJSON()
+}
+
+// AprobacionPagoController ...
+// @Title AprobarMultiplesPagos
+// @Description create AprobarMultiplesPagos
+// @Success 201
+// @Failure 403
+// @router /aprobar_pagos [post]
+func (c *AprobacionPagoController) AprobarMultiplesPagos() {
+
+
+	var v []models.PagoPersonaProyecto
+	var response interface{}
+
+	
+	var pagos_mensuales []*models.PagoMensual
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+		var pago_mensual *models.PagoMensual
+		for _, pm := range v {
+			
+
+			pago_mensual = pm.PagoMensual
+		
+			pagos_mensuales = append(pagos_mensuales,pago_mensual)
+		}
+		if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/tr_aprobacion_masiva_pagos", "POST", &response, pagos_mensuales); err == nil {
 			c.Data["json"] = "OK"
 		}else{
 			fmt.Println(err)

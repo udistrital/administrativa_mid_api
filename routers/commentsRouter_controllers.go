@@ -17,6 +17,14 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
 		beego.ControllerComments{
+			Method: "AprobarMultiplesPagos",
+			Router: `/aprobar_pagos`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
+		beego.ControllerComments{
 			Method: "CertificacionDocumentosAprobados",
 			Router: `/certificacion_documentos_aprobados/:dependencia/:mes/:anio`,
 			AllowHTTPMethods: []string{"get"},
