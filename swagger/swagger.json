@@ -49,6 +49,40 @@
                 }
             }
         },
+        "/aprobacion_pago/aprobar_pagos_contratistas": {
+            "post": {
+                "tags": [
+                    "aprobacion_pago"
+                ],
+                "description": "create AprobarMultiplesPagosContratistas",
+                "operationId": "AprobacionPagoController.AprobarMultiplesPagosContratistas",
+                "responses": {
+                    "201": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/aprobacion_pago/aprobar_soportes_contratistas": {
+            "post": {
+                "tags": [
+                    "aprobacion_pago"
+                ],
+                "description": "create AprobarMultiplesSolicitudesContratistas",
+                "operationId": "AprobacionPagoController.AprobarMultiplesSolicitudesContratistas",
+                "responses": {
+                    "201": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/aprobacion_pago/certificacion_documentos_aprobados/{dependencia}/{mes}/{anio}": {
             "get": {
                 "tags": [
@@ -131,6 +165,31 @@
                     },
                     "403": {
                         "description": ":anio is empty"
+                    }
+                }
+            }
+        },
+        "/aprobacion_pago/contratos_contratista/{numero_documento}": {
+            "get": {
+                "tags": [
+                    "aprobacion_pago"
+                ],
+                "operationId": "AprobacionPagoController.GetContratosContratista",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "numero_documento",
+                        "description": "Número documento",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ":numero_cdp is empty"
                     }
                 }
             }
@@ -358,6 +417,32 @@
                 }
             }
         },
+        "/aprobacion_pago/solicitudes_ordenador_contratistas/{docordenador}": {
+            "get": {
+                "tags": [
+                    "aprobacion_pago"
+                ],
+                "description": "create GetSolicitudesOrdenadorContratistas",
+                "operationId": "AprobacionPagoController.GetSolicitudesOrdenadorContratistas",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "docordenador",
+                        "description": "Número del documento del supervisor",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ":docordenador is empty"
+                    }
+                }
+            }
+        },
         "/aprobacion_pago/solicitudes_supervisor/{docsupervisor}": {
             "get": {
                 "tags": [
@@ -365,6 +450,32 @@
                 ],
                 "description": "create GetSolicitudesSupervisor",
                 "operationId": "AprobacionPagoController.GetSolicitudesSupervisor",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "docsupervisor",
+                        "description": "Número del documento del supervisor",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ":docsupervisor is empty"
+                    }
+                }
+            }
+        },
+        "/aprobacion_pago/solicitudes_supervisor_contratistas/{docsupervisor}": {
+            "get": {
+                "tags": [
+                    "aprobacion_pago"
+                ],
+                "description": "create GetSolicitudesSupervisorContratistas",
+                "operationId": "AprobacionPagoController.GetSolicitudesSupervisorContratistas",
                 "parameters": [
                     {
                         "in": "query",

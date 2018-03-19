@@ -25,6 +25,22 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
 		beego.ControllerComments{
+			Method: "AprobarMultiplesPagosContratistas",
+			Router: `/aprobar_pagos_contratistas`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
+		beego.ControllerComments{
+			Method: "AprobarMultiplesSolicitudesContratistas",
+			Router: `/aprobar_soportes_contratistas`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
+		beego.ControllerComments{
 			Method: "CertificacionDocumentosAprobados",
 			Router: `/certificacion_documentos_aprobados/:dependencia/:mes/:anio`,
 			AllowHTTPMethods: []string{"get"},
@@ -35,6 +51,14 @@ func init() {
 		beego.ControllerComments{
 			Method: "CertificacionVistoBueno",
 			Router: `/certificacion_visto_bueno/:dependencia/:mes/:anio`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
+		beego.ControllerComments{
+			Method: "GetContratosContratista",
+			Router: `/contratos_contratista/:numero_documento`,
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
@@ -97,8 +121,24 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
 		beego.ControllerComments{
+			Method: "GetSolicitudesOrdenadorContratistas",
+			Router: `/solicitudes_ordenador_contratistas/:docordenador`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
+		beego.ControllerComments{
 			Method: "GetSolicitudesSupervisor",
 			Router: `/solicitudes_supervisor/:docsupervisor`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
+		beego.ControllerComments{
+			Method: "GetSolicitudesSupervisorContratistas",
+			Router: `/solicitudes_supervisor_contratistas/:docsupervisor`,
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
