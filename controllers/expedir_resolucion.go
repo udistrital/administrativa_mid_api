@@ -80,6 +80,7 @@ func (c *ExpedirResolucionController) Expedir() {
 					contrato.TipologiaContrato = 46
 					contrato.FechaRegistro = time.Now()
 					contrato.UnidadEjecutora = 1
+					contrato.Supervisor.Id = SupervisorActual(v.IdResolucion.Id)
 					contrato.Condiciones = "Sin condiciones"
 					// If 5 - Informacion_Proveedor
 					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+strconv.Itoa(contrato.Contratista), &proveedor); err == nil {
@@ -250,6 +251,33 @@ func CalcularFechaFin(fecha_inicio time.Time, numero_semanas int) (fecha_fin tim
 	after := f_i.AddDate(0, 0, int(numero_dias))
 	fmt.Println(after)
 	return after
+}
+
+func SupervisorActual(id_resolucion int) (id_supervisor_actual int) {
+	var r models.Resolucion
+	var j []models.JefeDependencia
+	var s []models.SupervisorContrato
+	var fecha = time.Now().Format("2006-01-02")
+	//If Resolucion (GET)
+	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+strconv.Itoa(id_resolucion), &r); err == nil {
+		//If Jefe_dependencia (GET)
+		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/jefe_dependencia/?query=DependenciaId:"+strconv.Itoa(r.IdDependencia)+",FechaFin__gte:"+fecha+",FechaInicio__lte:"+fecha, &j); err == nil {
+			//If Supervisor (GET)
+			if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/supervisor_contrato/?query=Documento:"+strconv.Itoa(j[0].TerceroId)+",FechaFin__gte:"+fecha+",FechaInicio__lte:"+fecha+",CargoId.Cargo__startswith:DECANO|VICE", &s); err == nil {
+				return s[0].Id
+			} else { //If Jefe_dependencia (GET)
+				fmt.Println("He fallado un poquito en If Supervisor (GET) en el método SupervisorActual, solucioname!!! ", err)
+				return 0
+			}
+		} else { //If Jefe_dependencia (GET)
+			fmt.Println("He fallado un poquito en If Jefe_dependencia (GET) en el método SupervisorActual, solucioname!!! ", err)
+			return 0
+		}
+	} else { //If Resolucion (GET)
+		fmt.Println("He fallado un poquito en If Resolucion (GET) en el método SupervisorActual, solucioname!!! ", err)
+		return 0
+	}
+	return 0
 }
 
 // Cancelar ...
@@ -573,7 +601,6 @@ func (c *ExpedirResolucionController) Modificar() {
 			flyway.Rollback()
 			return
 		}
-
 	} else { //If 13 - Unmarshal
 		fmt.Println("He fallado un poquito en If 13 - Unmarshal, solucioname!!! ", err)
 		amazon.Rollback()

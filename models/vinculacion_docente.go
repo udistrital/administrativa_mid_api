@@ -29,7 +29,8 @@ type VinculacionDocente struct {
 	LugarExpedicionCedula string
 	NumeroHorasNuevas     int
 	Periodo               int
-	TipoDocumento 			  string
-	NumeroMeses						string
+	TipoDocumento         string
+	NumeroMeses           string
 	ValorContratoFormato  string
+	DependenciaAcademica  int
 }

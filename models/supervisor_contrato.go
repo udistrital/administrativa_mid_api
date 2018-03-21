@@ -1,5 +1,9 @@
 package models
 
+import (
+	"time"
+)
+
 type SupervisorContrato struct {
 	Id                    int
 	Nombre                string
@@ -10,4 +14,7 @@ type SupervisorContrato struct {
 	Tipo                  int
 	Estado                bool
 	DigitoVerificacion    int
+	FechaInicio           time.Time
+	FechaFin              time.Time
+	CargoId               *CargoSupervisorTemporal
 }

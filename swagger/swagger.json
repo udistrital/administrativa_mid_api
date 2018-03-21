@@ -23,12 +23,8 @@
                 "description": "create AprobarMultiplesSolicitudes",
                 "operationId": "AprobacionPagoController.AprobarMultiplesSolicitudes",
                 "responses": {
-                    "201": {
-                        "description": ""
-                    },
-                    "403": {
-                        "description": ""
-                    }
+                    "201": {},
+                    "403": {}
                 }
             }
         },
@@ -40,12 +36,8 @@
                 "description": "create AprobarMultiplesPagos",
                 "operationId": "AprobacionPagoController.AprobarMultiplesPagos",
                 "responses": {
-                    "201": {
-                        "description": ""
-                    },
-                    "403": {
-                        "description": ""
-                    }
+                    "201": {},
+                    "403": {}
                 }
             }
         },
@@ -57,12 +49,8 @@
                 "description": "create AprobarMultiplesPagosContratistas",
                 "operationId": "AprobacionPagoController.AprobarMultiplesPagosContratistas",
                 "responses": {
-                    "201": {
-                        "description": ""
-                    },
-                    "403": {
-                        "description": ""
-                    }
+                    "201": {},
+                    "403": {}
                 }
             }
         },
@@ -74,12 +62,8 @@
                 "description": "create AprobarMultiplesSolicitudesContratistas",
                 "operationId": "AprobacionPagoController.AprobarMultiplesSolicitudesContratistas",
                 "responses": {
-                    "201": {
-                        "description": ""
-                    },
-                    "403": {
-                        "description": ""
-                    }
+                    "201": {},
+                    "403": {}
                 }
             }
         },
@@ -117,9 +101,7 @@
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": ""
-                    },
+                    "201": {},
                     "403": {
                         "description": ":anio is empty"
                     }
@@ -160,9 +142,7 @@
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": ""
-                    },
+                    "201": {},
                     "403": {
                         "description": ":anio is empty"
                     }
@@ -185,9 +165,7 @@
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": ""
-                    },
+                    "201": {},
                     "403": {
                         "description": ":numero_cdp is empty"
                     }
@@ -211,9 +189,7 @@
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": ""
-                    },
+                    "201": {},
                     "403": {
                         "description": ":docordenador is empty"
                     }
@@ -238,7 +214,6 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -356,9 +331,7 @@
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": ""
-                    },
+                    "201": {},
                     "403": {
                         "description": ":anio is empty"
                     }
@@ -382,9 +355,7 @@
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": ""
-                    },
+                    "201": {},
                     "403": {
                         "description": ":doccoordinador is empty"
                     }
@@ -408,9 +379,7 @@
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": ""
-                    },
+                    "201": {},
                     "403": {
                         "description": ":docordenador is empty"
                     }
@@ -434,9 +403,7 @@
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": ""
-                    },
+                    "201": {},
                     "403": {
                         "description": ":docordenador is empty"
                     }
@@ -460,9 +427,7 @@
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": ""
-                    },
+                    "201": {},
                     "403": {
                         "description": ":docsupervisor is empty"
                     }
@@ -486,9 +451,7 @@
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": ""
-                    },
+                    "201": {},
                     "403": {
                         "description": ":docsupervisor is empty"
                     }
@@ -537,14 +500,11 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
                         "schema": {
                             "$ref": "#/definitions/.Contrato_genral"
                         }
                     },
-                    "403": {
-                        "description": ""
-                    }
+                    "403": {}
                 }
             }
         },
@@ -601,14 +561,11 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
                         "schema": {
                             "$ref": "#/definitions/models.Disponibilidad"
                         }
                     },
-                    "403": {
-                        "description": ""
-                    }
+                    "403": {}
                 }
             }
         },
@@ -804,7 +761,6 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "",
                         "schema": {
                             "$ref": "#/definitions/models.ResolucionCompleta"
                         }
@@ -890,7 +846,6 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "",
                         "schema": {
                             "$ref": "#/definitions/.Docentes_x_Carga"
                         }
@@ -985,7 +940,6 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -1016,7 +970,6 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "",
                         "schema": {
                             "type": "array",
                             "items": {

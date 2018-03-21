@@ -8,6 +8,7 @@ type ObjetoCargaLectiva struct {
 			DocDocente            string `json:"docente_documento"`
 			IDFacultad            string `json:"id_facultad"`
 			IDProyecto            string `json:"id_proyecto"`
+			DependenciaAcademica  int    //`json:"id_proyecto_condor"`
 			IDTipoVinculacion     string `json:"id_tipo_vinculacion"`
 			NombreFacultad        string `json:"facultad_nombre"`
 			NombreProyecto        string `json:"proyecto_nombre"`
