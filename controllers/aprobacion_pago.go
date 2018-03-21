@@ -820,10 +820,10 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 
 	for _, contrato_persona := range contratos_persona.ContratosPersonas.ContratoPersona {
 		var contrato models.InformacionContrato
-		contrato = GetContrato(strconv.Itoa(contrato_persona.NumeroContrato),strconv.Itoa(contrato_persona.Vigencia))
+		contrato = GetContrato(contrato_persona.NumeroContrato,contrato_persona.Vigencia)
 		var informacion_contrato_contratista models.InformacionContratoContratista 
-		informacion_contrato_contratista = GetInformacionContratoContratista(strconv.Itoa(contrato_persona.NumeroContrato), strconv.Itoa(contrato_persona.Vigencia))
-		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+strconv.Itoa(contrato.Contrato.NumeroContrato)+",Vigencia:"+strconv.Itoa(contrato.Contrato.Vigencia), &contratos_disponibilidad); err == nil {
+		informacion_contrato_contratista = GetInformacionContratoContratista(contrato_persona.NumeroContrato, contrato_persona.Vigencia)
+		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
 
 			for _, contrato_disponibilidad := range contratos_disponibilidad {
 				var cdprp models.InformacionCdpRp
@@ -832,15 +832,15 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 				for _, rp := range cdprp.CdpXRp.CdpRp {
 					var contrato_disponibilidad_rp models.ContratoDisponibilidadRp
 
-					contrato_disponibilidad_rp.NumeroContratoSuscrito = strconv.Itoa(contrato_persona.NumeroContrato)
-					contrato_disponibilidad_rp.Vigencia = strconv.Itoa(contrato_persona.Vigencia)
+					contrato_disponibilidad_rp.NumeroContratoSuscrito = contrato_persona.NumeroContrato
+					contrato_disponibilidad_rp.Vigencia = contrato_persona.Vigencia
 					contrato_disponibilidad_rp.NumeroCdp = strconv.Itoa(contrato_disponibilidad.NumeroCdp)
 					contrato_disponibilidad_rp.VigenciaCdp = strconv.Itoa(contrato_disponibilidad.VigenciaCdp)
 					contrato_disponibilidad_rp.NumeroRp = rp.RpNumeroRegistro
 					contrato_disponibilidad_rp.VigenciaRp = rp.RpVigencia
 			
 					contrato_disponibilidad_rp.NombreDependencia = informacion_contrato_contratista.InformacionContratista.Dependencia
-					contrato_disponibilidad_rp.NumDocumentoSupervisor = strconv.Itoa(contrato.Contrato.Supervisor.DocumentoIdentificacion)
+					contrato_disponibilidad_rp.NumDocumentoSupervisor = contrato.Contrato.Supervisor.DocumentoIdentificacion
 
 					contratos_disponibilidad_rp = append(contratos_disponibilidad_rp,contrato_disponibilidad_rp)
 				}
@@ -893,7 +893,7 @@ func (c *AprobacionPagoController) GetSolicitudesSupervisorContratistas() {
 					var contrato models.InformacionContrato
 					contrato = GetContrato(pago_mensual.NumeroContrato,strconv.FormatFloat(pago_mensual.VigenciaContrato, 'f', 0, 64) )
 
-					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+strconv.Itoa(contrato.Contrato.NumeroContrato)+",Vigencia:"+strconv.Itoa(contrato.Contrato.Vigencia), &contratos_disponibilidad); err == nil {
+					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
 
 						for _, contrato_disponibilidad := range contratos_disponibilidad {
 
@@ -976,7 +976,7 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistas() {
 					var contrato models.InformacionContrato
 					contrato = GetContrato(pago_mensual.NumeroContrato,strconv.FormatFloat(pago_mensual.VigenciaContrato, 'f', 0, 64) )
 
-					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+strconv.Itoa(contrato.Contrato.NumeroContrato)+",Vigencia:"+strconv.Itoa(contrato.Contrato.Vigencia), &contratos_disponibilidad); err == nil {
+					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
 
 						for _, contrato_disponibilidad := range contratos_disponibilidad {
 

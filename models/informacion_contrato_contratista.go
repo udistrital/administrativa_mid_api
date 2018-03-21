@@ -4,7 +4,7 @@ package models
 type InformacionContratoContratista struct {
 	InformacionContratista struct {
 		Tiempo struct {
-			Valor int `json:"valor"`
+			Valor string `json:"valor"`
 			Unidad string `json:"unidad"`
 		} `json:"tiempo"`
 		Supervisor struct {
@@ -14,7 +14,7 @@ type InformacionContratoContratista struct {
 		Documento struct {
 			Ciudad string `json:"ciudad"`
 			Tipo string `json:"tipo"`
-			Numero int `json:"numero"`
+			Numero string `json:"numero"`
 		} `json:"documento"`
 		Dependencia string `json:"dependencia"`
 		UnidadEjecutora struct {
@@ -24,13 +24,13 @@ type InformacionContratoContratista struct {
 		Cuenta struct {
 			Banco string `json:"banco"`
 			Tipo string `json:"tipo"`
-			Numero int64 `json:"numero"`
+			Numero string `json:"numero"`
 		} `json:"cuenta"`
-		ValorContrato int64 `json:"valor_contrato"`
+		ValorContrato string `json:"valor_contrato"`
 		Contrato struct {
 			Fecha string `json:"fecha"`
 			Objeto string `json:"objeto"`
-			Numero int `json:"numero"`
+			Numero string `json:"numero"`
 		}
 		NombreCompleto string `json:"nombre_completo"`
 	} `json:"informacion_contratista"`

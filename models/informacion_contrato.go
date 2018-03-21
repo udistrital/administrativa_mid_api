@@ -5,11 +5,11 @@ type InformacionContrato struct {
 	Contrato struct {
 		FechaSuscripcion string `json:"fecha_suscripcion"`
 		Justificacion    string `json:"justificacion"`
-		TipoContrato int `json:"tipo_contrato"`
-		UnidadEjecucion int `json:"unidad_ejecucion"`
-		Vigencia int `json:"vigencia"`
+		TipoContrato string `json:"tipo_contrato"`
+		UnidadEjecucion string `json:"unidad_ejecucion"`
+		Vigencia string `json:"vigencia"`
 		OrdenadorGasto struct {
-			Id int `json:"id"`
+			Id string `json:"id"`
 			RolOrdenador string `json:"rol_ordenador"`
 			Nombre string `json:"nombre"`
 		} `json:"ordenador_gasto"`
@@ -18,19 +18,19 @@ type InformacionContrato struct {
 		FechaRegistro string `json:"fecha_registro"`
 		Observaciones string `json:"observaciones"`
 		ObjetoContrato string `json:"objeto_contrato"`
-		Contratista int `json:"contratista"`
-		NumeroContratoSuscrito int `json:"numero_contrato_suscrito"`
+		Contratista string `json:"contratista"`
+		NumeroContratoSuscrito string `json:"numero_contrato_suscrito"`
 		Supervisor struct {
 			Nombre string `json:"nombre"`
-			Id int `json:"id"`
-			DocumentoIdentificacion int `json:"documento_identificacion"`
+			Id string `json:"id"`
+			DocumentoIdentificacion string `json:"documento_identificacion"`
 			Cargo string `json:"cargo"`
 		} `json:"supervisor"`
-		LugarEjecucion int `json:"lugar_ejecucion"`
+		LugarEjecucion string `json:"lugar_ejecucion"`
 		Actividades string `json:"actividades"`
-		UnidadEjecutora int `json:"unidad_ejecutora"`
-		NumeroContrato int `json:"numero_contrato"`
-		PlazoEjecucion int `json:"plazo_ejecucion"`
-		ValorContrato int64 `json:"valor_contrato"` 
+		UnidadEjecutora string `json:"unidad_ejecutora"`
+		NumeroContrato string `json:"numero_contrato"`
+		PlazoEjecucion string `json:"plazo_ejecucion"`
+		ValorContrato string `json:"valor_contrato"` 
 	} `json:"contrato"`
 }
