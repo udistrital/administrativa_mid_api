@@ -179,8 +179,8 @@ func (c *AprobacionPagoController) ObtenerInfoOrdenador() {
 			//contrato_elaborado = temp_contrato_elaborado
 			//c.Data["json"] = contrato_elaborado
 
-			if contrato_elaborado.Contrato.TipoContrato == 2 || contrato_elaborado.Contrato.TipoContrato == 3 || contrato_elaborado.Contrato.TipoContrato == 18 {
-				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ordenador_gasto/?query=Id:"+strconv.Itoa(contrato_elaborado.Contrato.OrdenadorGasto), &ordenadores_gasto); err == nil {
+			if contrato_elaborado.Contrato.TipoContrato == "2" || contrato_elaborado.Contrato.TipoContrato == "3" || contrato_elaborado.Contrato.TipoContrato == "18" {
+				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ordenador_gasto/?query=Id:"+contrato_elaborado.Contrato.OrdenadorGasto, &ordenadores_gasto); err == nil {
 
 					//c.Data["json"] = ordenador_gasto
 					for _, ordenador_gasto := range ordenadores_gasto {
@@ -222,7 +222,7 @@ func (c *AprobacionPagoController) ObtenerInfoOrdenador() {
 				//fmt.Println(temp)
 			} else { //si no son docentes
 				fmt.Println(contrato_elaborado.Contrato.OrdenadorGasto)
-				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/ordenadores/?query=IdOrdenador:"+strconv.Itoa(contrato_elaborado.Contrato.OrdenadorGasto)+"&sortby=FechaInicio&order=desc&limit=1", &ordenadores); err == nil {
+				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/ordenadores/?query=IdOrdenador:"+contrato_elaborado.Contrato.OrdenadorGasto+"&sortby=FechaInicio&order=desc&limit=1", &ordenadores); err == nil {
 					for _, ordenador := range ordenadores {
 						informacion_ordenador.NumeroDocumento = ordenador.Documento
 						informacion_ordenador.Cargo = ordenador.RolOrdenador

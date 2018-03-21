@@ -3,27 +3,27 @@ package models
 type ContratoElaborado struct {
 	Contrato struct {
 			Justificacion string `json:"justificacion"`
-			TipoContrato int `json:"tipo_contrato"`
-			UnidadEjecucion   int `json:"unidad_ejecucion"`
-			Vigencia int `json:"vigencia"`
+			TipoContrato string `json:"tipo_contrato"`
+			UnidadEjecucion   string `json:"unidad_ejecucion"`
+			Vigencia string `json:"vigencia"`
 			DescripcionFormaPago string `json:"descripcion_forma_pago"`
 			FechaRegistro string `json:"fecha_registro"`
 			Observaciones string `json:"observaciones"`
 			ObjetoContrato string `json:"objeto_contrato"`
-			Contratista int `json:"contratista"`
+			Contratista string `json:"contratista"`
 			Supervisor struct {
-				Id int `json:"id"`
+				Id string `json:"id"`
 				Nombre string `json:"nombre"`
-				DocumentoIdentificacion int `json:"documento_identificacion"`
+				DocumentoIdentificacion string `json:"documento_identificacion"`
 				Cargo string `json:"cargo"`
 			} `json:"supervisor"`
-			LugarEjecucion int `json:"lugar_ejecucion"`
+			LugarEjecucion string `json:"lugar_ejecucion"`
 			Actividades string `json:"actividades"`
-			UnidadEjecutora int `json:"unidad_ejecutora"`
-			NumeroContrato int `json:"numero_contrato"`
-			PlazoEjecucion int `json:"plazo_ejecucion"`
-			ValorContrato int64 `json:"valor_contrato"`
-			OrdenadorGasto int `json:"ordenador_gasto"`
+			UnidadEjecutora string `json:"unidad_ejecutora"`
+			NumeroContrato string `json:"numero_contrato"`
+			PlazoEjecucion string `json:"plazo_ejecucion"`
+			ValorContrato string `json:"valor_contrato"`
+			OrdenadorGasto string `json:"ordenador_gasto"`
 	} `json:"contrato"`
 }
 
