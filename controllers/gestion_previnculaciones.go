@@ -18,7 +18,6 @@ type GestionPrevinculacionesController struct {
 
 // URLMapping ...
 func (c *GestionPrevinculacionesController) URLMapping() {
-	//c.Mapping("CalcularSalarioContratacion", c.CalcularSalarioContratacion)
 	c.Mapping("InsertarPrevinculaciones", c.InsertarPrevinculaciones)
 	c.Mapping("CalcularTotalDeSalarios", c.Calcular_total_de_salarios)
 	c.Mapping("ListarDocentesCargaHoraria", c.ListarDocentesCargaHoraria)
@@ -135,10 +134,6 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 	for x, pos := range docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
 
 		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].CategoriaNombre, docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDCategoria = Buscar_Categoria_Docente(vigencia, periodo, pos.DocDocente)
-		if docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].CategoriaNombre == "" && docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDCategoria == "" && x != len(docentes_x_carga_horaria.CargasLectivas.CargaLectiva) {
-
-			//docentes_x_carga_horaria.CargasLectivas.CargaLectiva = append(docentes_x_carga_horaria.CargasLectivas.CargaLectiva[:x], docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x+1:]...)
-		}
 	}
 
 	//RETORNAR CON ID DE TIPO DE VINCULACION DE NUEVO MODELO
@@ -171,15 +166,12 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 }
 
 func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDocente) (docentes_a_insertar []models.VinculacionDocente) {
-	//id_resolucion := 141
 	nivel_academico := docentes_a_vincular[0].NivelAcademico
 	vigencia := strconv.Itoa(int(docentes_a_vincular[0].Vigencia.Int64))
 	var a string
 	var categoria string
 
 	for x, docente := range docentes_a_vincular {
-		//docentes_a_vincular[x].NombreCompleto = docente.PrimerNombre + " " + docente.SegundoNombre + " " + docente.PrimerApellido + " " + docente.SegundoApellido
-		//docentes_a_vincular[x].IdPersona = BuscarIdProveedor(docente.DocumentoIdentidad);
 
 		if EsDocentePlanta(docente.IdPersona) && strings.ToLower(nivel_academico) == "posgrado" {
 			categoria = docente.Categoria + "ud"
@@ -384,10 +376,7 @@ func ListarDocentesHorasLectivas(vigencia, periodo, tipo_vinculacion, facultad, 
 				var temp_docentes models.ObjetoCargaLectiva
 				json.Unmarshal(jsonDocentes, &temp_docentes)
 				docentes_x_carga.CargasLectivas.CargaLectiva = append(docentes_x_carga.CargasLectivas.CargaLectiva, temp_docentes.CargasLectivas.CargaLectiva...)
-				//c.Ctx.Output.SetStatus(201)
-				//c.Data["json"] = docentes_a_listar.CargasLectivas.CargaLectiva
 			} else {
-				// c.Data["json"] = error_json.Error()
 			}
 		} else {
 			fmt.Println("Soy el err", err)
@@ -415,7 +404,6 @@ func Buscar_Categoria_Docente(vigencia, periodo, documento_ident string) (catego
 
 		} else {
 			fmt.Println(error_json.Error())
-			// c.Data["json"] = error_json.Error()
 		}
 	} else {
 		fmt.Println(err)
@@ -443,7 +431,6 @@ func HomologarProyectoCurricular(proyecto_old string) (proyecto string) {
 
 		} else {
 			fmt.Println(error_json.Error())
-			// c.Data["json"] = error_json.Error()
 		}
 	} else {
 		fmt.Println(err)
@@ -479,7 +466,6 @@ func HomologarFacultad(tipo, facultad string) (facultad_old string) {
 
 		} else {
 			fmt.Println(error_json.Error())
-			// c.Data["json"] = error_json.Error()
 		}
 	} else {
 		fmt.Println(err)

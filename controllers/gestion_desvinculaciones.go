@@ -53,7 +53,6 @@ func (c *GestionDesvinculacionesController) ListarDocentesDesvinculados() {
 	c.Ctx.Output.SetStatus(201)
 	c.Data["json"] = v
 	c.ServeJSON()
-	//fmt.Println(v)
 
 }
 
@@ -133,7 +132,7 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 					Dedicacion:           v.DocentesDesvincular[0].Dedicacion,
 					NivelAcademico:       v.DocentesDesvincular[0].NivelAcademico,
 					Disponibilidad:       v.DisponibilidadNueva,
-					Vigencia:							v.DocentesDesvincular[0].Vigencia,               
+					Vigencia:             v.DocentesDesvincular[0].Vigencia,
 				}
 
 				//CREAR NUEVA Vinculacion

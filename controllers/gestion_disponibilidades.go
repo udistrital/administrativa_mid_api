@@ -3,10 +3,8 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	//"strconv"
-	//"strings"
+
 	"github.com/astaxie/beego"
-	//. "github.com/mndrix/golog"
 	"github.com/udistrital/administrativa_mid_api/models"
 )
 
@@ -17,7 +15,6 @@ type GestionDisponibilidadController struct {
 
 // URLMapping ...
 func (c *GestionDisponibilidadController) URLMapping() {
-	//c.Mapping("CalcularSalarioContratacion", c.CalcularSalarioContratacion)
 	c.Mapping("ListarApropiaciones", c.ListarApropiaciones)
 
 }

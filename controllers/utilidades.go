@@ -4,14 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"net/http"
-	"time"
-	"strings"
 	"math/big"
+	"net/http"
+	"reflect"
+	"strings"
+	"time"
+
 	"github.com/astaxie/beego"
 	"github.com/udistrital/administrativa_mid_api/models"
-	"reflect"
-
 )
 
 func sendJson(url string, trequest string, target interface{}, datajson interface{}) error {
@@ -22,7 +22,6 @@ func sendJson(url string, trequest string, target interface{}, datajson interfac
 	client := &http.Client{}
 	req, err := http.NewRequest(trequest, url, b)
 	r, err := client.Do(req)
-	//r, err := http.Post(url, "application/json; charset=utf-8", b)
 	if err != nil {
 		beego.Error("error", err)
 		return err
@@ -42,16 +41,12 @@ func getJson(url string, target interface{}) error {
 	return json.NewDecoder(r.Body).Decode(target)
 }
 
-
 func getJsonWSO2(urlp string, target interface{}) error {
 	b := new(bytes.Buffer)
-	//proxyUrl, err := url.Parse(beego.AppConfig.String("ProtocolAdmin")+"://10.20.4.15:3128")
-	//http.DefaultTransport = &http.Transport{Proxy: http.ProxyURL(proxyUrl)}
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", urlp, b)
 	req.Header.Set("Accept", "application/json")
 	r, err := client.Do(req)
-	//r, err := http.Post(url, "application/json; charset=utf-8", b)
 	if err != nil {
 		beego.Error("error", err)
 		return err
@@ -79,12 +74,7 @@ func diff(a, b time.Time) (year, month, day int) {
 	day = int(d2 - d1)
 
 	// Normalize negative values
-	/*if day < 0{
-				day = 0
-			}
-			if month < 0 {
-	        month = 0
-	    }*/
+
 	if day < 0 {
 		// days in month:
 		t := time.Date(y1, M1, 32, 0, 0, 0, 0, time.UTC)
@@ -107,7 +97,7 @@ func CargarReglasBase(dominio string) (reglas string) {
 	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("Urlruler")+"/"+beego.AppConfig.String("Nsruler")+"/predicado/?query=Dominio.Nombre:"+dominio+"&limit=-1", &v); err == nil {
 
 		reglasbase = reglasbase + FormatoReglas(v) //funcion general para dar formato a reglas cargadas desde el ruler
-		} else {
+	} else {
 		fmt.Println("err: ", err)
 	}
 
@@ -129,12 +119,10 @@ func FormatoReglas(v []models.Predicado) (reglas string) {
 	return
 }
 
-
-func FormatMoney(value interface{}, Precision int ) string {
+func FormatMoney(value interface{}, Precision int) string {
 	formattedNumber := FormatNumber(value, Precision, ",", ".")
-  return FormatMoneyString(formattedNumber, Precision)
+	return FormatMoneyString(formattedNumber, Precision)
 }
-
 
 func FormatMoneyString(formattedNumber string, Precision int) string {
 	var format string
@@ -143,16 +131,7 @@ func FormatMoneyString(formattedNumber string, Precision int) string {
 	if Precision > 0 {
 		zero += "." + strings.Repeat("0", Precision)
 	}
-	/*
-	if formattedNumber[0] == '-' {
-		format = accounting.FormatNegative
-		formattedNumber = formattedNumber[1:]
-	} else if formattedNumber == zero {
-		format = accounting.FormatZero
-	} else {
-		format = accounting.Format
-	}
-	*/
+
 	format = "%s%v"
 	result := strings.Replace(format, "%s", "$", -1)
 	result = strings.Replace(result, "%v", formattedNumber, -1)
@@ -168,7 +147,7 @@ func FormatNumber(value interface{}, precision int, thousand string, decimal str
 		x = fmt.Sprintf("%d", v.Int())
 		if precision > 0 {
 			x += "." + strings.Repeat("0", precision)
-	}
+		}
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		x = fmt.Sprintf("%d", v.Uint())
 		if precision > 0 {

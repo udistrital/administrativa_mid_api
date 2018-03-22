@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/astaxie/beego"
-	//. "github.com/mndrix/golog"
 	. "github.com/udistrital/golog"
 )
 

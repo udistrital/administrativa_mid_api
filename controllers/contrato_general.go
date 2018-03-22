@@ -121,7 +121,6 @@ func (c *Contrato_generalController) ListaContratoContratoSuscrito() {
 	}
 	vigenciaStr := c.Ctx.Input.Param(":vigencia")
 	_, err1 := strconv.Atoi(vigenciaStr)
-	//UnidadEjecutora, err2 := c.GetInt("UnidadEjecutora")
 	if err1 == nil { //&& err2 == nil {
 		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_general?limit="+strconv.FormatInt(limit, 10)+"&offset="+strconv.FormatInt(offset, 10)+"&query=VigenciaContrato:"+vigenciaStr+",ContratoSuscrito.Vigencia:"+vigenciaStr+query, &infoContrato); err == nil {
 			if infoContrato != nil {

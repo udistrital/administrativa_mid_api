@@ -43,7 +43,4 @@ type ContratoGeneral struct {
 	LugarEjecucion               *LugarEjecucion
 	UnidadEjecucion              *Parametros
 	UnidadEjecutora              int
-	//RegistroPresupuestal       int
-	//NumeroCdp                	 int
-	//NumeroSolicitudNecesidad   int
 }
