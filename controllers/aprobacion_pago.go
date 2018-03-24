@@ -919,16 +919,16 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistas() {
 
 	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?limit=-1&query=EstadoPagoMensual.CodigoAbreviacion:AS,Responsable:"+doc_ordenador, &pagos_mensuales); err == nil {
 
-		for _, pago_mensual := range pagos_mensuales {
+		for v, _ := range pagos_mensuales {
 
-			if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pago_mensual.Persona, &contratistas); err == nil {
+			if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pagos_mensuales[v].Persona, &contratistas); err == nil {
 
 				for _, contratista := range contratistas {
 
 					var informacion_contrato_contratista models.InformacionContratoContratista
-					informacion_contrato_contratista = GetInformacionContratoContratista(pago_mensual.NumeroContrato, strconv.FormatFloat(pago_mensual.VigenciaContrato, 'f', 0, 64))
+					informacion_contrato_contratista = GetInformacionContratoContratista(pagos_mensuales[v].NumeroContrato, strconv.FormatFloat(pagos_mensuales[v].VigenciaContrato, 'f', 0, 64))
 					var contrato models.InformacionContrato
-					contrato = GetContrato(pago_mensual.NumeroContrato, strconv.FormatFloat(pago_mensual.VigenciaContrato, 'f', 0, 64))
+					contrato = GetContrato(pagos_mensuales[v].NumeroContrato, strconv.FormatFloat(pagos_mensuales[v].VigenciaContrato, 'f', 0, 64))
 
 					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
 
@@ -940,7 +940,7 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistas() {
 							for _, rp := range cdprp.CdpXRp.CdpRp {
 								var pago_contratista_cdp_rp models.PagoContratistaCdpRp
 
-								pago_contratista_cdp_rp.PagoMensual = &pago_mensual
+								pago_contratista_cdp_rp.PagoMensual = &pagos_mensuales[v]
 								pago_contratista_cdp_rp.NombreDependencia = informacion_contrato_contratista.InformacionContratista.Dependencia
 								pago_contratista_cdp_rp.NombrePersona = contratista.NomProveedor
 								pago_contratista_cdp_rp.NumeroCdp = strconv.Itoa(contrato_disponibilidad.NumeroCdp)
