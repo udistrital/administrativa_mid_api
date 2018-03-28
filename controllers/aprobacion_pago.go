@@ -40,7 +40,7 @@ func (c *AprobacionPagoController) ObtenerInfoCoordinador() {
 	var temp_snies map[string]interface{}
 	var info_coordinador models.InformacionCoordinador
 
-	if err := getJsonWSO2(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudHomologacion")+"/"+"proyecto_curricular_oikos/"+id_oikos, &temp); err == nil && temp != nil {
+	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudHomologacion")+"/"+"proyecto_curricular_oikos/"+id_oikos, &temp); err == nil && temp != nil {
 		json_proyecto_curricular, error_json := json.Marshal(temp)
 
 		if error_json == nil {
@@ -48,7 +48,7 @@ func (c *AprobacionPagoController) ObtenerInfoCoordinador() {
 			json.Unmarshal(json_proyecto_curricular, &temp_homologacion)
 			id_proyecto_snies := temp_homologacion.Homologacion.IDSnies
 
-			if err := getJsonWSO2(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAcademica")+"/"+"carrera_snies/"+id_proyecto_snies, &temp_snies); err == nil && temp_snies != nil {
+			if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAcademica")+"/"+"carrera_snies/"+id_proyecto_snies, &temp_snies); err == nil && temp_snies != nil {
 				json_info_coordinador, error_json := json.Marshal(temp_snies)
 
 				if error_json == nil {
@@ -164,7 +164,7 @@ func (c *AprobacionPagoController) ObtenerInfoOrdenador() {
 	var informacion_ordenador models.InformacionOrdenador
 	var ordenadores []models.Ordenador
 
-	if err := getJsonWSO2(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contrato_elaborado/"+numero_contrato+"/"+vigencia, &temp); err == nil && temp != nil {
+	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contrato_elaborado/"+numero_contrato+"/"+vigencia, &temp); err == nil && temp != nil {
 		json_contrato_elaborado, error_json := json.Marshal(temp)
 
 		if error_json == nil {
@@ -1048,7 +1048,7 @@ func GetRP(numero_cdp string, vigencia_cdp string) (rp models.InformacionCdpRp) 
 	var temp map[string]interface{}
 	var temp_cdp_rp models.InformacionCdpRp
 
-	if err := getJsonWSO2(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudFinanciera")+"/"+"cdprp/"+numero_cdp+"/"+vigencia_cdp+"/01", &temp); err == nil {
+	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudFinanciera")+"/"+"cdprp/"+numero_cdp+"/"+vigencia_cdp+"/01", &temp); err == nil {
 		json_cdp_rp, error_json := json.Marshal(temp)
 
 		if error_json == nil {
@@ -1072,7 +1072,7 @@ func GetContratosPersona(num_documento string) (contratos_persona models.Informa
 	var temp map[string]interface{}
 	var contratos models.InformacionContratosPersona
 
-	if err := getJsonWSO2(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contratos_persona/"+num_documento, &temp); err == nil {
+	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contratos_persona/"+num_documento, &temp); err == nil {
 		json_contratos, error_json := json.Marshal(temp)
 
 		if error_json == nil {
@@ -1097,7 +1097,7 @@ func GetContrato(num_contrato_suscrito string, vigencia string) (informacion_con
 
 	var temp map[string]interface{}
 
-	if err := getJsonWSO2(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contrato/"+num_contrato_suscrito+"/"+vigencia, &temp); err == nil {
+	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contrato/"+num_contrato_suscrito+"/"+vigencia, &temp); err == nil {
 		json_contrato, error_json := json.Marshal(temp)
 
 		if error_json == nil {
@@ -1121,7 +1121,7 @@ func GetInformacionContratoContratista(num_contrato_suscrito string, vigencia st
 
 	var temp map[string]interface{}
 
-	if err := getJsonWSO2(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"informacion_contrato_contratista/"+num_contrato_suscrito+"/"+vigencia, &temp); err == nil {
+	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"informacion_contrato_contratista/"+num_contrato_suscrito+"/"+vigencia, &temp); err == nil {
 		json_contrato, error_json := json.Marshal(temp)
 
 		if error_json == nil {
