@@ -788,26 +788,29 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 	contratos_persona := GetContratosPersona(numero_documento)
 
 	if contratos_persona.ContratosPersonas.ContratoPersona == nil {// Si no tiene contrato
-		//fmt.Println("bbbbbb", contratos_persona)
 		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+numero_documento,&informacion_proveedores); err == nil {
 			
 			for _,persona := range informacion_proveedores {
+				
 				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/novedad_postcontractual/?query=Contratista:"+ strconv.Itoa(persona.Id)+"&sortby=FechaInicio&order=desc&limit=1", &novedades_postcontractuales); err == nil {
 
 					for _, novedad := range novedades_postcontractuales {
-
 						var contrato models.InformacionContrato
 						contrato = GetContrato(novedad.NumeroContrato, strconv.Itoa(novedad.Vigencia))
 
 						var informacion_contrato_contratista models.InformacionContratoContratista
 		informacion_contrato_contratista = GetInformacionContratoContratista(novedad.NumeroContrato, strconv.Itoa(novedad.Vigencia))
-		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+novedad.NumeroContrato+",Vigencia:"+strconv.Itoa(novedad.Vigencia), &contratos_disponibilidad); err == nil {
+		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
+
 
 			for _, contrato_disponibilidad := range contratos_disponibilidad {
+
+
 				var cdprp models.InformacionCdpRp
 				cdprp = GetRP(strconv.Itoa(contrato_disponibilidad.NumeroCdp), strconv.Itoa(contrato_disponibilidad.VigenciaCdp))
 
 				for _, rp := range cdprp.CdpXRp.CdpRp {
+					
 					var contrato_disponibilidad_rp models.ContratoDisponibilidadRp
 
 					contrato_disponibilidad_rp.NumeroContratoSuscrito = novedad.NumeroContrato
@@ -857,7 +860,6 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 	
 		for _, novedad := range novedades_postcontractuales {
 			if novedad.TipoNovedad == 219 {// si es una cesión
-			fmt.Println(novedad.NumeroContrato)
 			}else{// si no es una cesión
 				var cdprp models.InformacionCdpRp
 				cdprp = GetRP(strconv.Itoa(novedad.NumeroCdp),strconv.Itoa(novedad.VigenciaCdp))
