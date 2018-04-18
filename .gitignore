@@ -1,2 +1,7 @@
 administrativa_mid_api
 lastupdate.tmp
+report.xml
+coverage.xml
+sonar-project.properties
+.scannerwork/.sonar_lock
+.scannerwork/report-task.txt
