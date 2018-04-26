@@ -392,8 +392,11 @@ func (c *AprobacionPagoController) CertificacionDocumentosAprobados() {
 	var personas []models.Persona
 	var persona models.Persona
 	var actasInicio []models.ActaInicio
+	var vinculaciones_docente []models.VinculacionDocente
+
 	var mes_cer, _ = strconv.Atoi(mes)
 	var anio_cer, _ = strconv.Atoi(anio)
+	
 
 	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ordenador_gasto/?query=DependenciaId:"+dependencia, &ordenadores_gasto); err == nil {
 
@@ -402,6 +405,12 @@ func (c *AprobacionPagoController) CertificacionDocumentosAprobados() {
 			if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_general/?limit=-1&query=OrdenadorGasto:"+strconv.Itoa(ordenador_gasto.Id), &contratos_generales); err == nil {
 
 				for _, contrato_general := range contratos_generales {
+
+					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?limit=-1&query=Estado:TRUE,NumeroContrato:"+contrato_general.Id+",Vigencia:"+strconv.Itoa(contrato_general.VigenciaContrato), &vinculaciones_docente); err == nil {
+
+						for _, vinculacion_docente := range vinculaciones_docente {
+							if vinculacion_docente.NumeroContrato.Valid == true {
+								
 					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/acta_inicio/?query=NumeroContrato:"+contrato_general.Id+",Vigencia:"+strconv.Itoa(contrato_general.VigenciaContrato), &actasInicio); err == nil {
 
 						for _, actaInicio := range actasInicio {
@@ -442,7 +451,12 @@ func (c *AprobacionPagoController) CertificacionDocumentosAprobados() {
 
 						fmt.Println("Mirenme, me morí en If contrato_estado get, solucioname!!! ", err)
 					}
+				}
+				}
+					}else { //If vinculacion_docente get
 
+						fmt.Println("Mirenme, me morí en If vinculacion_docente get, solucioname!!! ", err)
+					}
 				}
 
 			} else { //If contrato_general get
