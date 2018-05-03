@@ -62,7 +62,7 @@ func (c *GestionResolucionesController) GetResolucionesAprobadas() {
 	var limit = c.GetString("limit")
 	var offset = c.GetString("offset")
 
-	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion/Aprobada?"+"query="+query+"?offset="+offset+"&limit="+limit, &resolucion_vinculacion_aprobada); err2 == nil {
+	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion/Aprobada?"+"query="+query+"&offset="+offset+"&limit="+limit, &resolucion_vinculacion_aprobada); err2 == nil {
 		for x, pos := range resolucion_vinculacion_aprobada {
 			resolucion_vinculacion_aprobada[x].FacultadNombre = BuscarNombreFacultad(pos.Facultad)
 
