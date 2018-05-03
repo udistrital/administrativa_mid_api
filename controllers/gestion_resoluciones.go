@@ -49,14 +49,20 @@ func (c *GestionResolucionesController) GetResolucionesInscritas() {
 // GestionResolucionesController ...
 // @Title getResolucionesAprobadas
 // @Description create  getResolucionesAprobadas
-// @Param vigencia query string false "año a consultar"
+// @Param limit query string false "Limit the size of result set. Must be an integer"
+// @Param offset query string false "Start position of result set. Must be an integer"
+// @Param query query string false "Filter. e.g. col1:v1,col2:v2 ..."
 // @Success 201 {object} []models.ResolucionVinculacion
 // @Failure 403 body is empty
 // @router /get_resoluciones_aprobadas [get]
 func (c *GestionResolucionesController) GetResolucionesAprobadas() {
 	var resolucion_vinculacion_aprobada []models.ResolucionVinculacion
 
-	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion/Aprobada", &resolucion_vinculacion_aprobada); err2 == nil {
+	var query = c.GetString("query")
+	var limit = c.GetString("limit")
+	var offset = c.GetString("offset")
+
+	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion/Aprobada?"+"query="+query+"?offset="+offset+"&limit="+limit, &resolucion_vinculacion_aprobada); err2 == nil {
 		for x, pos := range resolucion_vinculacion_aprobada {
 			resolucion_vinculacion_aprobada[x].FacultadNombre = BuscarNombreFacultad(pos.Facultad)
 
