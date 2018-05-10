@@ -30,7 +30,6 @@ func (c *GestionResolucionesController) URLMapping() {
 // @router /get_resoluciones_inscritas [get]
 func (c *GestionResolucionesController) GetResolucionesInscritas() {
 	var resolucion_vinculacion []models.ResolucionVinculacion
-	fmt.Println(beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudAdmin") + "/" + beego.AppConfig.String("NscrudAdmin") + "/resolucion_vinculacion")
 	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion", &resolucion_vinculacion); err2 == nil {
 		for x, pos := range resolucion_vinculacion {
 			resolucion_vinculacion[x].FacultadNombre = BuscarNombreFacultad(pos.Facultad)
@@ -124,16 +123,26 @@ func (c *GestionResolucionesController) InsertarResolucionCompleta() {
 }
 
 func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre int) {
+	resolucion.NomDependencia = BuscarNombreFacultad(resolucion.Resolucion.IdDependencia)
 	var temp = resolucion.Resolucion
 	var respuesta models.Resolucion
 	var id_creada int
 	var cont bool
 	var respuesta_modificacion_res models.ModificacionResolucion
+	var resVieja models.Resolucion
 
 	temp.Vigencia, _, _ = time.Now().Date()
 	temp.FechaRegistro = time.Now()
 	temp.Estado = true
-	temp.Titulo = "Por la cual se vinculan docentes para el Primer Periodo Académico de 2018 en la modalidad de Docentes de HORA CÁTEDRA (Vinculación Especial) para la " + resolucion.NomDependencia + " en " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ".”"
+	if temp.IdTipoResolucion.Id == 1 {
+		temp.Titulo = "Por la cual se vinculan docentes para el Primer Periodo Académico de 2018 en la modalidad de Docentes de HORA CÁTEDRA (Vinculación Especial) para la " + resolucion.NomDependencia + " en " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ".”"
+	} else if temp.IdTipoResolucion.Id == 2 {
+		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+strconv.Itoa(resolucion.ResolucionVieja), &resVieja); err == nil {
+			temp.Titulo = "Por la cual se Modifica la resolución " + resVieja.NumeroResolucion + " de " + cambiarString(resVieja.FechaExpedicion.Month().String()) + " del " + strconv.Itoa(resVieja.FechaExpedicion.Year()) + " en cuanto al tiempo de vinculación y valores a Reversar para el " + cambiarString(strconv.Itoa(temp.Periodo)) + " periodo académico de " + strconv.Itoa(temp.Vigencia) + " en la modalidad de docentes de " + cambiarString(resolucion.ResolucionVinculacionDocente.Dedicacion) + " (Vinculación Especial) para la " + resolucion.NomDependencia + " en " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ".”"
+		} else {
+			fmt.Println("Error al consultar resolución vieja", err)
+		}
+	}
 	temp.PreambuloResolucion = "El decano de la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas en uso de sus facultades legales y estatuarias y"
 	if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion", "POST", &respuesta, &temp); err == nil {
 		id_creada = respuesta.Id
@@ -144,7 +153,6 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 	}
 
 	if temp.IdTipoResolucion.Id != 1 {
-		fmt.Println(resolucion.ResolucionVieja)
 		objeto_modificacion_res := models.ModificacionResolucion{
 			ResolucionAnterior: resolucion.ResolucionVieja,
 			ResolucionNueva:    id_creada,
@@ -254,4 +262,70 @@ func BuscarNombreFacultad(id_facultad int) (nombre_facultad string) {
 		nom = "N/A"
 	}
 	return nom
+}
+
+func cambiarString(original string) (cambiado string) {
+	switch {
+	//Periodos
+	case original == "1":
+		cambiado = "Primer"
+
+	case original == "2":
+		cambiado = "Segundo"
+
+	case original == "3":
+		cambiado = "Tercer"
+
+		// Meses
+	case original == "January":
+		cambiado = "Enero"
+
+	case original == "February":
+		cambiado = "Febrero"
+
+	case original == "March":
+		cambiado = "Marzo"
+
+	case original == "April":
+		cambiado = "Abril"
+
+	case original == "May":
+		cambiado = "Mayo"
+
+	case original == "June":
+		cambiado = "Junio"
+
+	case original == "July":
+		cambiado = "Julio"
+
+	case original == "August":
+		cambiado = "Agosto"
+
+	case original == "September":
+		cambiado = "Septiembre"
+
+	case original == "October":
+		cambiado = "Octubre"
+
+	case original == "November":
+		cambiado = "Noviembre"
+
+	case original == "December":
+		cambiado = "Diciembre"
+
+		//Dedicación
+	case original == "HCH":
+		cambiado = "Hora Cátedra Honorarios"
+
+	case original == "HCP":
+		cambiado = "Hora Cátedra Salarios"
+
+	case original == "TCO-MTO":
+		cambiado = "Tiempo Completo Ocasional - Medio Tiempo Ocasional"
+
+	default:
+		cambiado = original
+	}
+
+	return cambiado
 }

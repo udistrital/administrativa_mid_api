@@ -32,8 +32,6 @@ func (c *GestionDesvinculacionesController) URLMapping() {
 func (c *GestionDesvinculacionesController) ListarDocentesDesvinculados() {
 	fmt.Println("docentes desvinculados")
 	id_resolucion := c.GetString("id_resolucion")
-	fmt.Println("resolucion a consultar")
-	fmt.Println(id_resolucion)
 	query := "?limit=-1&query=IdResolucion.Id:" + id_resolucion + ",Estado:false"
 	var v []models.VinculacionDocente
 
@@ -137,11 +135,8 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 
 				//CREAR NUEVA Vinculacion
 				vinculacion_nueva, respuesta = InsertarDesvinculaciones(temp_vinculacion)
-				fmt.Println("vinculacion nueva", vinculacion_nueva)
 
 				if respuesta == "OK" {
-					//
-					fmt.Println("Id para modificacion,res", v.IdModificacionResolucion)
 
 					//INSERCION  TABLA  DE TRAZA MODIFICACION VINCULACION
 					for _, pos := range v.DocentesDesvincular {
@@ -335,7 +330,6 @@ func (c *GestionDesvinculacionesController) ListarDocentesCancelados() {
 	// if 3 - modificacion_resolucion
 	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=resolucionNueva:"+id_resolucion, &modRes); err == nil {
 		// if 2 - modificacion_vinculacion
-		fmt.Println("Primer if", modRes[0])
 		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/?limit=-1&query=modificacion_resolucion:"+strconv.Itoa(modRes[0].Id), &modVin); err == nil {
 			//for vinculaciones
 			for _, vinculacion := range modVin {
