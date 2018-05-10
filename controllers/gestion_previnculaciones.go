@@ -213,8 +213,8 @@ func CargarPuntoSalarial() (p models.PuntoSalarial) {
 
 	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/punto_salarial/?sortby=Vigencia&order=desc&limit=1", &v); err == nil {
 	} else {
+		fmt.Println("He fallado en punto_salarial (get) función CargarPuntoSalarial, solucioname!!!", err)
 	}
-
 	return v[0]
 }
 
@@ -223,6 +223,7 @@ func CargarSalarioMinimo() (p models.SalarioMinimo) {
 
 	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/salario_minimo/?sortby=Vigencia&order=desc&limit=1", &v); err == nil {
 	} else {
+		fmt.Println("He fallado en salario_minimo (get) función CargarSalarioMinimo, solucioname!!!", err)
 	}
 
 	return v[0]
@@ -299,26 +300,52 @@ func Calcular_total_de_salario(v []models.VinculacionDocente) (total float64) {
 func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 	id_resolucion := c.GetString("id_resolucion")
 	var v []models.VinculacionDocente
+	var res models.Resolucion
+	var modres []models.ModificacionResolucion
 
-	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_vinculaciones_agrupadas/"+id_resolucion, &v); err2 == nil {
-
-		for x, pos := range v {
-
-			documento_identidad, _ := strconv.Atoi(pos.IdPersona)
-			v[x].NombreCompleto = BuscarNombreProveedor(documento_identidad)
-			v[x].NumeroDisponibilidad = BuscarNumeroDisponibilidad(pos.Disponibilidad)
-			v[x].Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id)
-			v[x].LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona)
-			v[x].TipoDocumento = BuscarTipoDocumento(pos.IdPersona)
-			v[x].NumeroHorasSemanales, v[x].ValorContrato = Calcular_totales_vinculacion_pdf(pos.IdPersona, id_resolucion)
-			v[x].NumeroMeses = strconv.FormatFloat(float64(pos.NumeroSemanas)/4, 'f', 2, 64) + " meses"
-			v[x].ValorContratoFormato = FormatMoney(int(v[x].ValorContrato), 2)
+	//If resoluciones (GET)
+	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+id_resolucion, &res); err == nil {
+		if res.IdTipoResolucion.Id == 1 {
+			if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_vinculaciones_agrupadas/"+id_resolucion, &v); err == nil {
+				for x, pos := range v {
+					documento_identidad, _ := strconv.Atoi(pos.IdPersona)
+					v[x].NombreCompleto = BuscarNombreProveedor(documento_identidad)
+					v[x].NumeroDisponibilidad = BuscarNumeroDisponibilidad(pos.Disponibilidad)
+					v[x].Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id)
+					v[x].LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona)
+					v[x].TipoDocumento = BuscarTipoDocumento(pos.IdPersona)
+					v[x].NumeroHorasSemanales, v[x].ValorContrato = Calcular_totales_vinculacion_pdf(pos.IdPersona, id_resolucion)
+					v[x].NumeroMeses = strconv.FormatFloat(float64(pos.NumeroSemanas)/4, 'f', 2, 64) + " meses"
+					v[x].ValorContratoFormato = FormatMoney(int(v[x].ValorContrato), 2)
+				}
+			} else {
+				fmt.Println("Error de consulta en vinculacion", err)
+			}
+		} else if res.IdTipoResolucion.Id == 2 {
+			if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_vinculaciones_agrupadas_canceladas/"+id_resolucion, &v); err == nil {
+				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+id_resolucion, &modres); err == nil {
+					for x, pos := range v {
+						documento_identidad, _ := strconv.Atoi(pos.IdPersona)
+						v[x].NombreCompleto = BuscarNombreProveedor(documento_identidad)
+						v[x].NumeroDisponibilidad = BuscarNumeroDisponibilidad(pos.Disponibilidad)
+						v[x].Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id)
+						v[x].LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona)
+						v[x].TipoDocumento = BuscarTipoDocumento(pos.IdPersona)
+						v[x].NumeroHorasSemanales, v[x].ValorContrato = Calcular_totales_vinculacion_pdf(pos.IdPersona, strconv.Itoa(modres[0].ResolucionAnterior))
+						v[x].NumeroMeses = strconv.FormatFloat(float64(pos.NumeroSemanas)/4, 'f', 2, 64) + " meses"
+						v[x].ValorContratoFormato = FormatMoney(int(v[x].ValorContrato), 2)
+					}
+				} else {
+					fmt.Println("Error de consulta en vinculacion", err)
+				}
+			} else {
+				fmt.Println("Error de consulta en vinculacion", err)
+			}
 		}
 
-	} else {
-		fmt.Println("Error de consulta en vinculacion", err2)
+	} else { //If resoluciones (GET)
+		fmt.Println("He fallado un poquito en If resoluciones (GET) previnculados all, solucioname!!! ", err)
 	}
-
 	c.Ctx.Output.SetStatus(201)
 	c.Data["json"] = v
 	c.ServeJSON()
@@ -338,20 +365,58 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 	id_resolucion := c.GetString("id_resolucion")
 	query := "?limit=-1&query=IdResolucion.Id:" + id_resolucion + ",Estado:true"
 	var v []models.VinculacionDocente
+	var res models.Resolucion
+	var modres []models.ModificacionResolucion
+	var modvin []models.ModificacionVinculacion
 
-	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &v); err2 == nil {
-		for x, pos := range v {
-			documento_identidad, _ := strconv.Atoi(pos.IdPersona)
-			v[x].NombreCompleto = BuscarNombreProveedor(documento_identidad)
-			v[x].NumeroDisponibilidad = BuscarNumeroDisponibilidad(pos.Disponibilidad)
-			v[x].Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id)
-			v[x].LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona)
-			v[x].TipoDocumento = BuscarTipoDocumento(pos.IdPersona)
-			v[x].ValorContratoFormato = FormatMoney(int(v[x].ValorContrato), 2)
+	//If resoluciones (GET)
+	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+id_resolucion, &res); err == nil {
+		if res.IdTipoResolucion.Id == 1 {
+			if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &v); err == nil {
+				for x, pos := range v {
+					documento_identidad, _ := strconv.Atoi(pos.IdPersona)
+					v[x].NombreCompleto = BuscarNombreProveedor(documento_identidad)
+					v[x].NumeroDisponibilidad = BuscarNumeroDisponibilidad(pos.Disponibilidad)
+					v[x].Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id)
+					v[x].LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona)
+					v[x].TipoDocumento = BuscarTipoDocumento(pos.IdPersona)
+					v[x].ValorContratoFormato = FormatMoney(int(v[x].ValorContrato), 2)
+				}
+
+			} else {
+				fmt.Println("He fallado un poco en vinculacion_docente (get) vinculación, solucioname!!!", err)
+			}
+		} else if res.IdTipoResolucion.Id == 2 {
+			if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+id_resolucion, &modres); err == nil {
+				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/?query=ModificacionResolucion:"+strconv.Itoa(modres[0].Id), &modvin); err == nil {
+					arreglo := make([]string, len(modvin))
+					for x, pos := range modvin {
+						arreglo[x] = strconv.Itoa(pos.VinculacionDocenteCancelada.Id)
+					}
+					identificadoresvinc := strings.Join(arreglo, "|")
+					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?query=Estado:False,Id__in:"+identificadoresvinc+"&limit=-1", &v); err == nil {
+						for x, pos := range v {
+							documento_identidad, _ := strconv.Atoi(pos.IdPersona)
+							v[x].NombreCompleto = BuscarNombreProveedor(documento_identidad)
+							v[x].NumeroDisponibilidad = BuscarNumeroDisponibilidad(pos.Disponibilidad)
+							v[x].Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id)
+							v[x].LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona)
+							v[x].TipoDocumento = BuscarTipoDocumento(pos.IdPersona)
+							v[x].ValorContratoFormato = FormatMoney(int(v[x].ValorContrato), 2)
+						}
+					} else {
+						fmt.Println("He fallado un poco en vinculacion_docente cancelación (get), solucioname!!!", err)
+					}
+				} else {
+					fmt.Println("He fallado un poco en modificacion_vinculacion (get), solucioname!!!", err)
+				}
+			} else {
+				fmt.Println("He fallado un poco en modificacion_resolucion (get), solucioname!!!", err)
+			}
 		}
 
-	} else {
-		fmt.Println("Error de consulta en vinculacion", err2)
+	} else { //If resoluciones (GET)
+		fmt.Println("He fallado un poquito en If resoluciones (GET) previnculados, solucioname!!! ", err)
 	}
 
 	c.Ctx.Output.SetStatus(201)
@@ -622,7 +687,7 @@ func BuscarNumeroDisponibilidad(IdCDP int) (numero_disp int) {
 
 	var temp []models.Disponibilidad
 	var numero_disponibilidad int
-	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad?limit=-1&query=DisponibilidadApropiacion.Id:"+strconv.Itoa(IdCDP), &temp); err2 == nil {
+	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad?limit=-1&query=DisponibilidadApropiacion.Id:"+strconv.Itoa(IdCDP), &temp); err == nil {
 		if temp != nil {
 			numero_disponibilidad = int(temp[0].NumeroDisponibilidad)
 
@@ -631,7 +696,7 @@ func BuscarNumeroDisponibilidad(IdCDP int) (numero_disp int) {
 		}
 
 	} else {
-		fmt.Println("error en json", err2)
+		fmt.Println("Error en disponibilidad (get) función BuscarNumeroDisponibilidad:", err)
 	}
 	return numero_disponibilidad
 
