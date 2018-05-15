@@ -45,7 +45,7 @@ func (c *GestionDesvinculacionesController) ListarDocentesDesvinculados() {
 		}
 
 	} else {
-		fmt.Println("Error de cosulta en vinculacion", err2)
+		fmt.Println("Error de consulta en vinculacion", err2)
 	}
 
 	c.Ctx.Output.SetStatus(201)
@@ -63,7 +63,7 @@ func (c *GestionDesvinculacionesController) ListarDocentesDesvinculados() {
 func (c *GestionDesvinculacionesController) ActualizarVinculaciones() {
 
 	var v models.Objeto_Desvinculacion
-	var respuesta string
+	var respuesta interface{}
 
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		fmt.Println("para poner en false", v)
@@ -80,7 +80,7 @@ func (c *GestionDesvinculacionesController) ActualizarVinculaciones() {
 
 		for _, pos := range v.DocentesDesvincular {
 			temp := models.ModificacionVinculacion{ModificacionResolucion: &models.ModificacionResolucion{Id: v.IdModificacionResolucion}, VinculacionDocenteCancelada: &models.VinculacionDocente{Id: pos.Id}}
-			if err2 := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/", "POST", &respuesta, temp); err2 == nil {
+			if err2 := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/", "POST", respuesta, temp); err2 == nil {
 				fmt.Println("respuesta", respuesta)
 			} else {
 				fmt.Println("error en json de modificacion vinculacion", err2)
@@ -341,15 +341,15 @@ func (c *GestionDesvinculacionesController) ListarDocentesCancelados() {
 					cv.Dedicacion = BuscarNombreDedicacion(vinculacion.VinculacionDocenteCancelada.IdDedicacion.Id)
 					cv.LugarExpedicionCedula = BuscarLugarExpedicion(vinculacion.VinculacionDocenteCancelada.IdPersona)
 				} else { // if 1 - vinculacion_docente
-					fmt.Println("Error de cosulta en vinculacion, solucioname!!!, if 1 - vinculacion_docente: ", err)
+					fmt.Println("Error de consulta en vinculacion, solucioname!!!, if 1 - vinculacion_docente: ", err)
 				}
 				v = append(v, cv)
 			} //fin for vinculaciones
 		} else { // if 2 - modificacion_vinculacion
-			fmt.Println("Error de cosulta en modificacion_vinculacion, solucioname!!!, if 2 - modificacion_vinculacion: ", err)
+			fmt.Println("Error de consulta en modificacion_vinculacion, solucioname!!!, if 2 - modificacion_vinculacion: ", err)
 		}
 	} else { // if 3 - modificacion_resolucion
-		fmt.Println("Error de cosulta en modificacion_resolucion, solucioname!!!, if 3 - modificacion_resolucion: ", err)
+		fmt.Println("Error de consulta en modificacion_resolucion, solucioname!!!, if 3 - modificacion_resolucion: ", err)
 	}
 	c.Ctx.Output.SetStatus(201)
 	c.Data["json"] = v
