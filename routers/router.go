@@ -10,12 +10,12 @@ package routers
 import (
 	"github.com/astaxie/beego"
 	"github.com/udistrital/administrativa_mid_api/controllers"
-	"github.com/udistrital/auditoria"
+//	"github.com/udistrital/auditoria"
 )
 
 func init() {
 
-	auditoria.InitMiddleware()
+	//auditoria.InitMiddleware()
 	ns := beego.NewNamespace("/v1",
 
 		beego.NSNamespace("/gestion_previnculacion",
