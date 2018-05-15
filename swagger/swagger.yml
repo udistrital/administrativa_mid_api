@@ -9,7 +9,7 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-basePath: /administrativa_mid_api/v1
+basePath: /v1
 paths:
   /aprobacion_pago/aprobar_documentos:
     post:
@@ -18,10 +18,8 @@ paths:
       description: create AprobarMultiplesSolicitudes
       operationId: AprobacionPagoController.AprobarMultiplesSolicitudes
       responses:
-        "201":
-          description: ""
-        "403":
-          description: ""
+        "201": {}
+        "403": {}
   /aprobacion_pago/aprobar_pagos:
     post:
       tags:
@@ -29,10 +27,8 @@ paths:
       description: create AprobarMultiplesPagos
       operationId: AprobacionPagoController.AprobarMultiplesPagos
       responses:
-        "201":
-          description: ""
-        "403":
-          description: ""
+        "201": {}
+        "403": {}
   /aprobacion_pago/aprobar_pagos_contratistas:
     post:
       tags:
@@ -40,10 +36,8 @@ paths:
       description: create AprobarMultiplesPagosContratistas
       operationId: AprobacionPagoController.AprobarMultiplesPagosContratistas
       responses:
-        "201":
-          description: ""
-        "403":
-          description: ""
+        "201": {}
+        "403": {}
   /aprobacion_pago/aprobar_soportes_contratistas:
     post:
       tags:
@@ -51,10 +45,8 @@ paths:
       description: create AprobarMultiplesSolicitudesContratistas
       operationId: AprobacionPagoController.AprobarMultiplesSolicitudesContratistas
       responses:
-        "201":
-          description: ""
-        "403":
-          description: ""
+        "201": {}
+        "403": {}
   /aprobacion_pago/certificacion_documentos_aprobados/{dependencia}/{mes}/{anio}:
     get:
       tags:
@@ -81,8 +73,7 @@ paths:
         type: integer
         format: int64
       responses:
-        "201":
-          description: ""
+        "201": {}
         "403":
           description: :anio is empty
   /aprobacion_pago/certificacion_visto_bueno/{dependencia}/{mes}/{anio}:
@@ -111,8 +102,7 @@ paths:
         type: integer
         format: int64
       responses:
-        "201":
-          description: ""
+        "201": {}
         "403":
           description: :anio is empty
   /aprobacion_pago/contratos_contratista/{numero_documento}:
@@ -127,8 +117,7 @@ paths:
         required: true
         type: string
       responses:
-        "201":
-          description: ""
+        "201": {}
         "403":
           description: :numero_cdp is empty
   /aprobacion_pago/dependencia_ordenador/{docordenador}:
@@ -144,8 +133,7 @@ paths:
         required: true
         type: string
       responses:
-        "201":
-          description: ""
+        "201": {}
         "403":
           description: :docordenador is empty
   /aprobacion_pago/get_contratos_docente/{numDocumento}:
@@ -162,7 +150,6 @@ paths:
         type: string
       responses:
         "201":
-          description: ""
           schema:
             type: array
             items:
@@ -243,8 +230,7 @@ paths:
         type: integer
         format: int64
       responses:
-        "201":
-          description: ""
+        "201": {}
         "403":
           description: :anio is empty
   /aprobacion_pago/solicitudes_coordinador/{doccoordinador}:
@@ -260,8 +246,7 @@ paths:
         required: true
         type: string
       responses:
-        "201":
-          description: ""
+        "201": {}
         "403":
           description: :doccoordinador is empty
   /aprobacion_pago/solicitudes_ordenador/{docordenador}:
@@ -277,8 +262,7 @@ paths:
         required: true
         type: string
       responses:
-        "201":
-          description: ""
+        "201": {}
         "403":
           description: :docordenador is empty
   /aprobacion_pago/solicitudes_ordenador_contratistas/{docordenador}:
@@ -294,8 +278,7 @@ paths:
         required: true
         type: string
       responses:
-        "201":
-          description: ""
+        "201": {}
         "403":
           description: :docordenador is empty
   /aprobacion_pago/solicitudes_supervisor/{docsupervisor}:
@@ -311,8 +294,7 @@ paths:
         required: true
         type: string
       responses:
-        "201":
-          description: ""
+        "201": {}
         "403":
           description: :docsupervisor is empty
   /aprobacion_pago/solicitudes_supervisor_contratistas/{docsupervisor}:
@@ -328,8 +310,7 @@ paths:
         required: true
         type: string
       responses:
-        "201":
-          description: ""
+        "201": {}
         "403":
           description: :docsupervisor is empty
   /consultar_disponibilidades/listar_apropiaciones:
@@ -362,11 +343,9 @@ paths:
         type: string
       responses:
         "200":
-          description: ""
           schema:
             $ref: '#/definitions/.Contrato_genral'
-        "403":
-          description: ""
+        "403": {}
   /contrato_general/ListaContratoContratoSuscrito/{vigencia}:
     get:
       tags:
@@ -404,11 +383,9 @@ paths:
         type: string
       responses:
         "200":
-          description: ""
           schema:
             $ref: '#/definitions/models.Disponibilidad'
-        "403":
-          description: ""
+        "403": {}
   /expedir_resolucion/cancelar:
     post:
       tags:
@@ -518,6 +495,26 @@ paths:
           description: '{int} models.VinculacionDocente'
         "403":
           description: body is empty
+  /gestion_desvinculaciones/vinculaciones_agrupadas_canceladas/{id_resolucion}:
+    get:
+      tags:
+      - gestion_desvinculaciones
+      description: Get de vinculaciones agrupadas canceladas para el PDF
+      operationId: GestionDesvinculacionesController.GetVinculacionesAgrupadasCanceladas
+      parameters:
+      - in: path
+        name: id_resolucion
+        description: resolucion a consultar
+        required: true
+        type: string
+      responses:
+        "201":
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/models.VinculacionDocente'
+        "403":
+          description: :id_resolucion is empty
   /gestion_documento_resolucion/get_contenido_resolucion:
     get:
       tags:
@@ -535,7 +532,6 @@ paths:
         type: string
       responses:
         "201":
-          description: ""
           schema:
             $ref: '#/definitions/models.ResolucionCompleta'
         "403":
@@ -591,7 +587,6 @@ paths:
         type: string
       responses:
         "201":
-          description: ""
           schema:
             $ref: '#/definitions/.Docentes_x_Carga'
         "403":
@@ -660,7 +655,6 @@ paths:
         type: string
       responses:
         "201":
-          description: ""
           schema:
             type: array
             items:
@@ -680,7 +674,6 @@ paths:
         type: string
       responses:
         "201":
-          description: ""
           schema:
             type: array
             items:
@@ -727,6 +720,10 @@ definitions:
     type: object
   .Docentes_x_Carga:
     type: object
+  .NullInt64:
+    type: object
+  .NullString:
+    type: object
   models.Articulo:
     title: Articulo
     type: object
@@ -742,6 +739,17 @@ definitions:
         items:
           $ref: '#/definitions/models.Paragrafo'
       Texto:
+        type: string
+  models.Dedicacion:
+    title: Dedicacion
+    type: object
+    properties:
+      Descripcion:
+        type: string
+      Id:
+        type: integer
+        format: int64
+      NombreDedicacion:
         type: string
   models.Disponibilidad:
     title: Disponibilidad
@@ -856,6 +864,77 @@ definitions:
         format: int64
       NivelAcademico:
         type: string
+  models.VinculacionDocente:
+    title: VinculacionDocente
+    type: object
+    properties:
+      Categoria:
+        type: string
+      Dedicacion:
+        type: string
+      DependenciaAcademica:
+        type: integer
+        format: int64
+      Disponibilidad:
+        type: integer
+        format: int64
+      Estado:
+        type: boolean
+      FechaRegistro:
+        type: string
+        format: string
+      Id:
+        type: integer
+        format: int64
+      IdDedicacion:
+        $ref: '#/definitions/models.Dedicacion'
+      IdPersona:
+        type: string
+      IdProyectoCurricular:
+        type: integer
+        format: int64
+      IdPuntoSalarial:
+        type: integer
+        format: int64
+      IdResolucion:
+        $ref: '#/definitions/models.ResolucionVinculacionDocente'
+      IdSalarioMinimo:
+        type: integer
+        format: int64
+      LugarExpedicionCedula:
+        type: string
+      NivelAcademico:
+        type: string
+      NombreCompleto:
+        type: string
+      NumeroContrato:
+        $ref: '#/definitions/sql.NullString'
+      NumeroDisponibilidad:
+        type: integer
+        format: int64
+      NumeroHorasNuevas:
+        type: integer
+        format: int64
+      NumeroHorasSemanales:
+        type: integer
+        format: int64
+      NumeroMeses:
+        type: string
+      NumeroSemanas:
+        type: integer
+        format: int64
+      Periodo:
+        type: integer
+        format: int64
+      TipoDocumento:
+        type: string
+      ValorContrato:
+        type: number
+        format: double
+      ValorContratoFormato:
+        type: string
+      Vigencia:
+        $ref: '#/definitions/sql.NullInt64'
 tags:
 - name: gestion_previnculacion
   description: |
