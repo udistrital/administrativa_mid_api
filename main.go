@@ -33,7 +33,11 @@ func main() {
 		beego.BConfig.WebConfig.DirectoryIndex = true
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	}
-	
+
+	// Custom JSON error pages
+	beego.ErrorHandler("403", forgivenJsonPage)
+	beego.ErrorHandler("404", notFoundJsonPage)
+
 	apistatus.Init()
 	beego.Run()
 }

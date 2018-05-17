@@ -30,17 +30,21 @@ func (c *GestionResolucionesController) URLMapping() {
 // @router /get_resoluciones_inscritas [get]
 func (c *GestionResolucionesController) GetResolucionesInscritas() {
 	var resolucion_vinculacion []models.ResolucionVinculacion
-	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion", &resolucion_vinculacion); err2 == nil {
+
+	query := c.GetString("query")
+	limit, _ := c.GetInt("limit")
+	offset, _ := c.GetInt("offset")
+
+	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion"+"?query="+query+"&offset="+strconv.Itoa(offset)+"&limit="+strconv.Itoa(limit), &resolucion_vinculacion); err == nil {
 		for x, pos := range resolucion_vinculacion {
 			resolucion_vinculacion[x].FacultadNombre = BuscarNombreFacultad(pos.Facultad)
-
 		}
 
 		c.Data["json"] = resolucion_vinculacion
 
 	} else {
-		c.Data["json"] = "error"
-		fmt.Println("Error de consulta en resolucion_vinculacion", err2)
+		beego.Error("Error de consulta en resolucion_vinculacion", err)
+		c.Abort("403")
 	}
 	c.ServeJSON()
 }
@@ -48,8 +52,8 @@ func (c *GestionResolucionesController) GetResolucionesInscritas() {
 // GestionResolucionesController ...
 // @Title getResolucionesAprobadas
 // @Description create  getResolucionesAprobadas
-// @Param limit query string false "Limit the size of result set. Must be an integer"
-// @Param offset query string false "Start position of result set. Must be an integer"
+// @Param limit query int false "Limit the size of result set. Must be an integer"
+// @Param offset query int false "Start position of result set. Must be an integer"
 // @Param query query string false "Filter. e.g. col1:v1,col2:v2 ..."
 // @Success 201 {object} []models.ResolucionVinculacion
 // @Failure 403 body is empty
@@ -57,11 +61,11 @@ func (c *GestionResolucionesController) GetResolucionesInscritas() {
 func (c *GestionResolucionesController) GetResolucionesAprobadas() {
 	var resolucion_vinculacion_aprobada []models.ResolucionVinculacion
 
-	var query = c.GetString("query")
-	var limit = c.GetString("limit")
-	var offset = c.GetString("offset")
+	query := c.GetString("query")
+	limit, _ := c.GetInt("limit")
+	offset, _ := c.GetInt("offset")
 
-	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion/Aprobada?"+"query="+query+"&offset="+offset+"&limit="+limit, &resolucion_vinculacion_aprobada); err2 == nil {
+	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion/Aprobada"+"?query="+query+"&offset="+strconv.Itoa(offset)+"&limit="+strconv.Itoa(limit), &resolucion_vinculacion_aprobada); err == nil {
 		for x, pos := range resolucion_vinculacion_aprobada {
 			resolucion_vinculacion_aprobada[x].FacultadNombre = BuscarNombreFacultad(pos.Facultad)
 
@@ -70,8 +74,8 @@ func (c *GestionResolucionesController) GetResolucionesAprobadas() {
 		c.Data["json"] = resolucion_vinculacion_aprobada
 
 	} else {
-		c.Data["json"] = "error"
-		fmt.Println("Error de consulta en resolucion_vinculacion_aprobada", err2)
+		beego.Error("Error de consulta en resolucion_vinculacion_aprobada", err)
+		c.Abort("403")
 	}
 	c.ServeJSON()
 }
