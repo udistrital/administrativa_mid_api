@@ -6,6 +6,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/plugins/cors"
+	"github.com/astaxie/beego/logs"
 	_ "github.com/lib/pq"
 	"github.com/udistrital/utils_oas/apiStatusLib"
 )
@@ -34,9 +35,14 @@ func main() {
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	}
 
+
 	// Custom JSON error pages
 	beego.ErrorHandler("403", forgivenJsonPage)
 	beego.ErrorHandler("404", notFoundJsonPage)
+
+	
+	logs.SetLogger(logs.AdapterFile, `{"filename":"/var/log/beego/administrativa_mid_api.log"}`)
+
 
 	apistatus.Init()
 	beego.Run()

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"time"
+	//"net/http"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/administrativa_mid_api/models"
@@ -391,8 +392,11 @@ func (c *AprobacionPagoController) CertificacionDocumentosAprobados() {
 	var personas []models.Persona
 	var persona models.Persona
 	var actasInicio []models.ActaInicio
+	var vinculaciones_docente []models.VinculacionDocente
+
 	var mes_cer, _ = strconv.Atoi(mes)
 	var anio_cer, _ = strconv.Atoi(anio)
+	
 
 	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ordenador_gasto/?query=DependenciaId:"+dependencia, &ordenadores_gasto); err == nil {
 
@@ -401,6 +405,12 @@ func (c *AprobacionPagoController) CertificacionDocumentosAprobados() {
 			if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_general/?limit=-1&query=OrdenadorGasto:"+strconv.Itoa(ordenador_gasto.Id), &contratos_generales); err == nil {
 
 				for _, contrato_general := range contratos_generales {
+
+					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?limit=-1&query=Estado:TRUE,NumeroContrato:"+contrato_general.Id+",Vigencia:"+strconv.Itoa(contrato_general.VigenciaContrato), &vinculaciones_docente); err == nil {
+
+						for _, vinculacion_docente := range vinculaciones_docente {
+							if vinculacion_docente.NumeroContrato.Valid == true {
+								
 					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/acta_inicio/?query=NumeroContrato:"+contrato_general.Id+",Vigencia:"+strconv.Itoa(contrato_general.VigenciaContrato), &actasInicio); err == nil {
 
 						for _, actaInicio := range actasInicio {
@@ -441,7 +451,12 @@ func (c *AprobacionPagoController) CertificacionDocumentosAprobados() {
 
 						fmt.Println("Mirenme, me morí en If contrato_estado get, solucioname!!! ", err)
 					}
+				}
+				}
+					}else { //If vinculacion_docente get
 
+						fmt.Println("Mirenme, me morí en If vinculacion_docente get, solucioname!!! ", err)
+					}
 				}
 
 			} else { //If contrato_general get
@@ -782,14 +797,116 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 	numero_documento := c.GetString(":numero_documento")
 	var contratos_disponibilidad []models.ContratoDisponibilidad
 	var contratos_disponibilidad_rp []models.ContratoDisponibilidadRp
-
+	var novedades_postcontractuales []models.NovedadPostcontractual
+	var informacion_proveedores []models.InformacionProveedor
 	contratos_persona := GetContratosPersona(numero_documento)
 
+	if contratos_persona.ContratosPersonas.ContratoPersona == nil {// Si no tiene contrato
+		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+numero_documento,&informacion_proveedores); err == nil {
+			
+			for _,persona := range informacion_proveedores {
+				
+				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/novedad_postcontractual/?query=Contratista:"+ strconv.Itoa(persona.Id)+"&sortby=FechaInicio&order=desc&limit=1", &novedades_postcontractuales); err == nil {
+
+					for _, novedad := range novedades_postcontractuales {
+						var contrato models.InformacionContrato
+						contrato = GetContrato(novedad.NumeroContrato, strconv.Itoa(novedad.Vigencia))
+
+						var informacion_contrato_contratista models.InformacionContratoContratista
+		informacion_contrato_contratista = GetInformacionContratoContratista(novedad.NumeroContrato, strconv.Itoa(novedad.Vigencia))
+		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
+
+
+			for _, contrato_disponibilidad := range contratos_disponibilidad {
+
+
+				var cdprp models.InformacionCdpRp
+				cdprp = GetRP(strconv.Itoa(contrato_disponibilidad.NumeroCdp), strconv.Itoa(contrato_disponibilidad.VigenciaCdp))
+
+				for _, rp := range cdprp.CdpXRp.CdpRp {
+					
+					var contrato_disponibilidad_rp models.ContratoDisponibilidadRp
+
+					contrato_disponibilidad_rp.NumeroContratoSuscrito = novedad.NumeroContrato
+					contrato_disponibilidad_rp.Vigencia = strconv.Itoa(novedad.Vigencia)
+					contrato_disponibilidad_rp.NumeroCdp = strconv.Itoa(contrato_disponibilidad.NumeroCdp)
+					contrato_disponibilidad_rp.VigenciaCdp = strconv.Itoa(contrato_disponibilidad.VigenciaCdp)
+					contrato_disponibilidad_rp.NumeroRp = rp.RpNumeroRegistro
+					contrato_disponibilidad_rp.VigenciaRp = rp.RpVigencia
+
+					contrato_disponibilidad_rp.NombreDependencia = informacion_contrato_contratista.InformacionContratista.Dependencia
+					contrato_disponibilidad_rp.NumDocumentoSupervisor = contrato.Contrato.Supervisor.DocumentoIdentificacion
+
+					contratos_disponibilidad_rp = append(contratos_disponibilidad_rp, contrato_disponibilidad_rp)
+				}
+
+			}
+
+		} else { // If contrato_disponibilidad get
+			fmt.Println("Mirenme, me morí en If contrato_disponibilidad get, solucioname!!! ", err)
+		
+		}
+					}
+
+				}else{ // If novedad_postcontractual get
+					fmt.Println("Mirenme, me morí en If novedad_postcontractual get, solucioname!!! ", err.Error())
+				}	
+			}
+
+		}else{// If informacion_proveedor get
+			fmt.Println("Mirenme, me morí en If informacion_proveedor get, solucioname!!! ", err.Error())
+		}
+
+	}else{// si tiene contrato
 	for _, contrato_persona := range contratos_persona.ContratosPersonas.ContratoPersona {
 		var contrato models.InformacionContrato
 		contrato = GetContrato(contrato_persona.NumeroContrato, contrato_persona.Vigencia)
+
+		//var novedad_postcontractual models.NovedadPostcontractual
+		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/novedad_postcontractual/?query=NumeroContrato:"+contrato_persona.NumeroContrato+",Vigencia:"+contrato_persona.Vigencia+"&sortby=FechaInicio&order=desc&limit=1",&novedades_postcontractuales); err == nil {
+		//var	prueba []models.NovedadPostcontractual
+
+		//	json.NewDecoder(r.Body).Decode(prueba)
 		var informacion_contrato_contratista models.InformacionContratoContratista
 		informacion_contrato_contratista = GetInformacionContratoContratista(contrato_persona.NumeroContrato, contrato_persona.Vigencia)
+
+		if novedades_postcontractuales != nil { // Si tiene novedades
+	
+		for _, novedad := range novedades_postcontractuales {
+			if novedad.TipoNovedad == 219 {// si es una cesión
+			}else{// si no es una cesión
+				var cdprp models.InformacionCdpRp
+				cdprp = GetRP(strconv.Itoa(novedad.NumeroCdp),strconv.Itoa(novedad.VigenciaCdp))
+
+				for _, rp := range cdprp.CdpXRp.CdpRp {
+				var contrato_disponibilidad_rp models.ContratoDisponibilidadRp
+
+				contrato_disponibilidad_rp.NumeroContratoSuscrito = novedad.NumeroContrato
+				contrato_disponibilidad_rp.Vigencia = strconv.Itoa(novedad.Vigencia)
+				contrato_disponibilidad_rp.NumeroCdp = strconv.Itoa(novedad.NumeroCdp)
+				contrato_disponibilidad_rp.VigenciaCdp = strconv.Itoa(novedad.VigenciaCdp)
+				contrato_disponibilidad_rp.NumeroRp = rp.RpNumeroRegistro
+				contrato_disponibilidad_rp.VigenciaRp = rp.RpVigencia
+
+				contrato_disponibilidad_rp.NombreDependencia = informacion_contrato_contratista.InformacionContratista.Dependencia
+				contrato_disponibilidad_rp.NumDocumentoSupervisor = contrato.Contrato.Supervisor.DocumentoIdentificacion
+
+				contratos_disponibilidad_rp = append(contratos_disponibilidad_rp, contrato_disponibilidad_rp)
+				}
+
+
+
+			}
+
+		}
+
+		}else{// si no tiene novedades
+	
+	
+
+		
+
+		
 		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
 
 			for _, contrato_disponibilidad := range contratos_disponibilidad {
@@ -816,9 +933,19 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 
 		} else { // If contrato_disponibilidad get
 			fmt.Println("Mirenme, me morí en If contrato_disponibilidad get, solucioname!!! ", err)
+		
+		}
+	
+
+	
+	}
+		} else { // If novedad_postcontractual get
+			fmt.Println("Mirenme, me morí en If novedad_postcontractual get, solucioname!!! ", err.Error())
 		}
 
 	}
+
+}
 
 	c.Data["json"] = contratos_disponibilidad_rp
 
