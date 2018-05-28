@@ -122,7 +122,7 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 				temp_vinculacion[0] = models.VinculacionDocente{
 					IdPersona:            v.DocentesDesvincular[0].IdPersona,
 					NumeroHorasSemanales: v.DocentesDesvincular[0].NumeroHorasNuevas,
-					NumeroSemanas:        v.DocentesDesvincular[0].NumeroSemanas,
+					NumeroSemanas:        v.DocentesDesvincular[0].NumeroSemanasNuevas,
 					IdResolucion:         &models.ResolucionVinculacionDocente{Id: v.IdNuevaResolucion},
 					IdDedicacion:         v.DocentesDesvincular[0].IdDedicacion,
 					IdProyectoCurricular: v.DocentesDesvincular[0].IdProyectoCurricular,
