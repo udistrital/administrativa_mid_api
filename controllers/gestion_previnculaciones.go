@@ -431,6 +431,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 	var res models.Resolucion
 	var modres []models.ModificacionResolucion
 	var modvin []models.ModificacionVinculacion
+
 	err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+strconv.Itoa(id_resolucion), &res)
 	if err != nil {
 		beego.Error(err)
@@ -439,6 +440,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 	switch res.IdTipoResolucion.Id {
 	case 1:
 		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &v)
+
 		if err != nil {
 			beego.Error(err)
 			c.Abort("400")
@@ -462,6 +464,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 		}
 		identificadoresvinc := strings.Join(arreglo, "|")
 		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?query=Estado:False,Id__in:"+identificadoresvinc+"&limit=-1", &v)
+
 		if err != nil {
 			beego.Error(err)
 			c.Abort("400")
@@ -480,8 +483,11 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 
 		v[x] = pos
 	}
-
+	if v == nil {
+		v = []models.VinculacionDocente{}
+	}
 	c.Ctx.Output.SetStatus(201)
+
 	c.Data["json"] = v
 	c.ServeJSON()
 
