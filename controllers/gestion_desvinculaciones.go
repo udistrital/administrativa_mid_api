@@ -112,60 +112,64 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 	var vinculacion_nueva int
 	var temp_vinculacion [1]models.VinculacionDocente
 
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
-
-		//CAMBIAR ESTADO DE VINCULACIÓN DOCNETE
-		for _, pos := range v.DocentesDesvincular {
-			if err2 := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.Id), "PUT", &respuesta, pos); err2 == nil {
-				fmt.Println("respuesta", respuesta)
-
-				temp_vinculacion[0] = models.VinculacionDocente{
-					IdPersona:            v.DocentesDesvincular[0].IdPersona,
-					NumeroHorasSemanales: v.DocentesDesvincular[0].NumeroHorasNuevas,
-					NumeroSemanas:        v.DocentesDesvincular[0].NumeroSemanasNuevas,
-					IdResolucion:         &models.ResolucionVinculacionDocente{Id: v.IdNuevaResolucion},
-					IdDedicacion:         v.DocentesDesvincular[0].IdDedicacion,
-					IdProyectoCurricular: v.DocentesDesvincular[0].IdProyectoCurricular,
-					Categoria:            v.DocentesDesvincular[0].Categoria,
-					Dedicacion:           v.DocentesDesvincular[0].Dedicacion,
-					NivelAcademico:       v.DocentesDesvincular[0].NivelAcademico,
-					Disponibilidad:       v.DisponibilidadNueva,
-					Vigencia:             v.DocentesDesvincular[0].Vigencia,
-				}
-
-				//CREAR NUEVA Vinculacion
-				vinculacion_nueva, respuesta = InsertarDesvinculaciones(temp_vinculacion)
-
-				if respuesta == "OK" {
-
-					//INSERCION  TABLA  DE TRAZA MODIFICACION VINCULACION
-					for _, pos := range v.DocentesDesvincular {
-						temp := models.ModificacionVinculacion{ModificacionResolucion: &models.ModificacionResolucion{Id: v.IdModificacionResolucion}, VinculacionDocenteCancelada: &models.VinculacionDocente{Id: pos.Id}, VinculacionDocenteRegistrada: &models.VinculacionDocente{Id: vinculacion_nueva}, Horas: pos.NumeroHorasNuevas}
-						if err2 := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/", "POST", &respuesta_mod_vin, temp); err2 == nil {
-							fmt.Println("respuesta modificacion vin", respuesta_mod_vin)
-							respuesta = "OK"
-						} else {
-							fmt.Println("error en actualizacion de modificacion vinculacion de modificacion vinculacion", err2)
-							respuesta = "error"
-						}
-					}
-
-				} else {
-					fmt.Println("error al realizar vinculacion nueva")
-				}
-
-			} else {
-				fmt.Println("error al cambiar estado en vinculación docente al adicionar horas", err2)
-				respuesta = "error"
-			}
-		}
-
-		c.Data["json"] = respuesta
-	} else {
-		fmt.Println("ERROR")
-		fmt.Println(err)
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &v)
+	if err != nil {
+		beego.Error(err)
 		c.Data["json"] = "Error al leer json para desvincular"
 	}
+
+	//CAMBIAR ESTADO DE VINCULACIÓN DOCNETE
+	for _, pos := range v.DocentesDesvincular {
+		err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.Id), "PUT", &respuesta, pos)
+		//TODO: unificar errores
+		if err != nil {
+			err = fmt.Errorf("error al cambiar estado en vinculación docente al adicionar horas %s", err)
+			beego.Error(err)
+			c.Abort("403")
+		}
+		fmt.Println("respuesta", respuesta)
+
+		temp_vinculacion[0] = models.VinculacionDocente{
+			IdPersona:            v.DocentesDesvincular[0].IdPersona,
+			NumeroHorasSemanales: v.DocentesDesvincular[0].NumeroHorasNuevas,
+			NumeroSemanas:        v.DocentesDesvincular[0].NumeroSemanasNuevas,
+			IdResolucion:         &models.ResolucionVinculacionDocente{Id: v.IdNuevaResolucion},
+			IdDedicacion:         v.DocentesDesvincular[0].IdDedicacion,
+			IdProyectoCurricular: v.DocentesDesvincular[0].IdProyectoCurricular,
+			Categoria:            v.DocentesDesvincular[0].Categoria,
+			Dedicacion:           v.DocentesDesvincular[0].Dedicacion,
+			NivelAcademico:       v.DocentesDesvincular[0].NivelAcademico,
+			Disponibilidad:       v.DisponibilidadNueva,
+			Vigencia:             v.DocentesDesvincular[0].Vigencia,
+		}
+
+		//CREAR NUEVA Vinculacion
+		vinculacion_nueva, respuesta, err = InsertarDesvinculaciones(temp_vinculacion)
+		if err != nil {
+			beego.Error(err)
+			c.Abort("400")
+		}
+
+		if respuesta == "OK" {
+
+			//INSERCION  TABLA  DE TRAZA MODIFICACION VINCULACION
+			for _, pos := range v.DocentesDesvincular {
+				temp := models.ModificacionVinculacion{ModificacionResolucion: &models.ModificacionResolucion{Id: v.IdModificacionResolucion}, VinculacionDocenteCancelada: &models.VinculacionDocente{Id: pos.Id}, VinculacionDocenteRegistrada: &models.VinculacionDocente{Id: vinculacion_nueva}, Horas: pos.NumeroHorasNuevas}
+				if err2 := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/", "POST", &respuesta_mod_vin, temp); err2 == nil {
+					fmt.Println("respuesta modificacion vin", respuesta_mod_vin)
+					respuesta = "OK"
+				} else {
+					fmt.Println("error en actualizacion de modificacion vinculacion de modificacion vinculacion", err2)
+					respuesta = "error"
+				}
+			}
+
+		} else {
+			fmt.Println("error al realizar vinculacion nueva")
+		}
+	}
+
+	c.Data["json"] = respuesta
 
 	c.ServeJSON()
 
@@ -287,7 +291,7 @@ func (c *GestionDesvinculacionesController) AnularAdicionDocente() {
 	c.ServeJSON()
 }
 
-func InsertarDesvinculaciones(v [1]models.VinculacionDocente) (id int, cont string) {
+func InsertarDesvinculaciones(v [1]models.VinculacionDocente) (id int, cont string, err error) {
 
 	var id_respuesta int
 	var control_respuesta string
@@ -296,7 +300,11 @@ func InsertarDesvinculaciones(v [1]models.VinculacionDocente) (id int, cont stri
 	fmt.Println("error al hacer lo del json:", err)
 	if err := json.Unmarshal(json_ejemplo, &d); err == nil {
 		fmt.Println("docentes a contratar", d)
-		d = CalcularSalarioPrecontratacion(d)
+		//TODO: unificar cont con error
+		d, err = CalcularSalarioPrecontratacion(d)
+		if err != nil {
+			return id, cont, err
+		}
 
 	} else {
 		fmt.Println("ERROR")
@@ -311,7 +319,7 @@ func InsertarDesvinculaciones(v [1]models.VinculacionDocente) (id int, cont stri
 		id_respuesta = 0
 		control_respuesta = "error"
 	}
-	return id_respuesta, control_respuesta
+	return id_respuesta, control_respuesta, err
 }
 
 // GestionCanceladosController ...
