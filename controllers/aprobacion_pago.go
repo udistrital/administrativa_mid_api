@@ -104,9 +104,11 @@ func (c *AprobacionPagoController) GetContratosDocente() {
 
 						if vinculacion.NumeroContrato.Valid == true {
 							if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/acta_inicio/?query=NumeroContrato:"+vinculacion.NumeroContrato.String+",Vigencia:"+strconv.FormatInt(vinculacion.Vigencia.Int64, 10), &actasInicio); err == nil {
-
+	
 								//If Estado = 4
 								for _, actaInicio := range actasInicio {
+									actaInicio.FechaInicio = actaInicio.FechaInicio.UTC()
+									actaInicio.FechaFin = actaInicio.FechaFin.UTC()
 									if int(actaInicio.FechaInicio.Month()) <= int(time.Now().Month()) && actaInicio.FechaInicio.Year() <= time.Now().Year() && int(actaInicio.FechaFin.Month()) >= int(time.Now().Month()) && actaInicio.FechaFin.Year() <= time.Now().Year() {
 										cd.NumeroVinculacion = vinculacion.NumeroContrato.String
 										cd.Vigencia = vinculacion.Vigencia.Int64
