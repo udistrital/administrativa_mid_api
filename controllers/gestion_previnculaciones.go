@@ -19,7 +19,7 @@ type GestionPrevinculacionesController struct {
 // URLMapping ...
 func (c *GestionPrevinculacionesController) URLMapping() {
 	c.Mapping("InsertarPrevinculaciones", c.InsertarPrevinculaciones)
-	c.Mapping("CalcularTotalDeSalarios", c.Calcular_total_de_salarios)
+	c.Mapping("CalcularTotalDeSalarios", c.CalcularTotalSalarios)
 	c.Mapping("ListarDocentesCargaHoraria", c.ListarDocentesCargaHoraria)
 }
 
@@ -44,7 +44,7 @@ func (c *GestionPrevinculacionesController) Calcular_total_de_salarios_seleccion
 		beego.Error(err)
 		c.Abort("400")
 	}
-	total = int(Calcular_total_de_salario(v))
+	total = int(CalcularTotalSalario(v))
 	c.Data["json"] = total
 
 	c.ServeJSON()
@@ -56,10 +56,10 @@ func (c *GestionPrevinculacionesController) Calcular_total_de_salarios_seleccion
 // @Success 201 {int} models.VinculacionDocente
 // @Failure 403 body is empty
 // @router /Precontratacion/calcular_valor_contratos [post]
-func (c *GestionPrevinculacionesController) Calcular_total_de_salarios() {
+func (c *GestionPrevinculacionesController) CalcularTotalSalarios() {
 
 	var v []models.VinculacionDocente
-	var totales_disponibilidad int
+	var totalesDisponibilidad int
 	var total int
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 	if err != nil {
@@ -71,17 +71,17 @@ func (c *GestionPrevinculacionesController) Calcular_total_de_salarios() {
 		beego.Error(err)
 		c.Abort("400")
 	}
-	totales_de_salario := Calcular_total_de_salario(v)
+	totalesSalario := CalcularTotalSalario(v)
 	vigencia := strconv.Itoa(int(v[0].Vigencia.Int64))
 	periodo := strconv.Itoa(v[0].Periodo)
 	disponibilidad := strconv.Itoa(v[0].Disponibilidad)
 
-	err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_valores_totales_x_disponibilidad/"+vigencia+"/"+periodo+"/"+disponibilidad+"", &totales_disponibilidad)
+	err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_valores_totales_x_disponibilidad/"+vigencia+"/"+periodo+"/"+disponibilidad+"", &totalesDisponibilidad)
 	if err != nil {
 		beego.Error("ERROR al calcular total de contratos", err)
 		c.Abort("403")
 	}
-	total = int(totales_de_salario) + totales_disponibilidad
+	total = int(totalesSalario) + totalesDisponibilidad
 	c.Data["json"] = total
 
 	c.ServeJSON()
@@ -96,7 +96,7 @@ func (c *GestionPrevinculacionesController) Calcular_total_de_salarios() {
 func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 
 	var v []models.VinculacionDocente
-	var id_respuesta int
+	var idRespuesta int
 
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 	if err != nil {
@@ -109,8 +109,8 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 		c.Abort("403")
 	}
 
-	err = sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &id_respuesta, &v)
-	c.Data["json"] = id_respuesta
+	err = sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &idRespuesta, &v)
+	c.Data["json"] = idRespuesta
 	if err != nil {
 		beego.Error("Error al insertar docentes", err)
 		c.Abort("403")
@@ -134,68 +134,77 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 
 	vigencia := c.GetString("vigencia")
 	periodo := c.GetString("periodo")
-	tipo_vinculacion := c.GetString("tipo_vinculacion")
+	tipoVinculacion := c.GetString("tipo_vinculacion")
 	facultad := c.GetString("facultad")
-	nivel_academico := c.GetString("nivel_academico")
-	docentes_x_carga_horaria, err := ListarDocentesHorasLectivas(vigencia, periodo, tipo_vinculacion, facultad, nivel_academico)
+	nivelAcademico := c.GetString("nivel_academico")
+	docentesXcargaHoraria, err := ListarDocentesHorasLectivas(vigencia, periodo, tipoVinculacion, facultad, nivelAcademico)
+	beego.Debug(docentesXcargaHoraria)
+
 	if err != nil {
 		beego.Error(err)
 		c.Abort("403")
 	}
 	//BUSCAR CATEGORÍA DE CADA DOCENTE
-	for x, pos := range docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
+	for x, pos := range docentesXcargaHoraria.CargasLectivas.CargaLectiva {
 
-		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].CategoriaNombre, docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDCategoria = Buscar_Categoria_Docente(vigencia, periodo, pos.DocDocente)
+		docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].CategoriaNombre, docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].IDCategoria = Buscar_Categoria_Docente(vigencia, periodo, pos.DocDocente)
 	}
 
 	//RETORNAR CON ID DE TIPO DE VINCULACION DE NUEVO MODELO
-	for x, pos := range docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
-		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDTipoVinculacion, docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].NombreTipoVinculacion = HomologarDedicacion_ID("old", pos.IDTipoVinculacion)
-		if docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDTipoVinculacion == "3" {
-			docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].HorasLectivas = "20"
-			docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].NombreTipoVinculacion = "MTO"
+	for x, pos := range docentesXcargaHoraria.CargasLectivas.CargaLectiva {
+		docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].IDTipoVinculacion, docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].NombreTipoVinculacion = HomologarDedicacion_ID("old", pos.IDTipoVinculacion)
+		if docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].IDTipoVinculacion == "3" {
+			docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].HorasLectivas = "20"
+			docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].NombreTipoVinculacion = "MTO"
 		}
-		if docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDTipoVinculacion == "4" {
-			docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].HorasLectivas = "40"
-			docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].NombreTipoVinculacion = "TCO"
+		if docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].IDTipoVinculacion == "4" {
+			docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].HorasLectivas = "40"
+			docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].NombreTipoVinculacion = "TCO"
 		}
 	}
 
 	//RETORNAR FACULTTADES CON ID DE OIKOS, HOMOLOGACION
-	for x, pos := range docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
-		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDFacultad = HomologarFacultad("old", pos.IDFacultad)
+	for x, pos := range docentesXcargaHoraria.CargasLectivas.CargaLectiva {
+		docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].IDFacultad = HomologarFacultad("old", pos.IDFacultad)
 	}
 	//RETORNAR PROYECTOS CURRICUALRES HOMOLOGADOS!!
-	for x, pos := range docentes_x_carga_horaria.CargasLectivas.CargaLectiva {
-		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].IDProyecto = HomologarProyectoCurricular(pos.IDProyecto)
-		docentes_x_carga_horaria.CargasLectivas.CargaLectiva[x].DependenciaAcademica, _ = strconv.Atoi(pos.IDProyecto)
+	for x, pos := range docentesXcargaHoraria.CargasLectivas.CargaLectiva {
+		docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].IDProyecto = HomologarProyectoCurricular(pos.IDProyecto)
+		docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].DependenciaAcademica, _ = strconv.Atoi(pos.IDProyecto)
 	}
 
 	c.Ctx.Output.SetStatus(201)
-	c.Data["json"] = docentes_x_carga_horaria.CargasLectivas.CargaLectiva
+	c.Data["json"] = docentesXcargaHoraria.CargasLectivas.CargaLectiva
 	c.ServeJSON()
 
 }
 
 func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDocente) (docentes_a_insertar []models.VinculacionDocente, err error) {
-	nivel_academico := docentes_a_vincular[0].NivelAcademico
+	nivelAcademico := docentes_a_vincular[0].NivelAcademico
 	vigencia := strconv.Itoa(int(docentes_a_vincular[0].Vigencia.Int64))
 	var a string
 	var categoria string
 
 	for x, docente := range docentes_a_vincular {
-
-		if EsDocentePlanta(docente.IdPersona) && strings.ToLower(nivel_academico) == "posgrado" {
+		p, err := EsDocentePlanta(docente.IdPersona)
+		if err != nil {
+			return docentes_a_insertar, err
+		}
+		if p && strings.ToLower(nivelAcademico) == "posgrado" {
 			categoria = docente.Categoria + "ud"
 		} else {
 			categoria = docente.Categoria
 		}
 
 		var predicados string
-		if strings.ToLower(nivel_academico) == "posgrado" {
-			predicados = "valor_salario_minimo(" + strconv.Itoa(CargarSalarioMinimo().Valor) + "," + vigencia + ")." + "\n"
+		if strings.ToLower(nivelAcademico) == "posgrado" {
+			salarioMinimo, err := CargarSalarioMinimo()
+			if err != nil {
+				return docentes_a_insertar, err
+			}
+			predicados = "valor_salario_minimo(" + strconv.Itoa(salarioMinimo.Valor) + "," + vigencia + ")." + "\n"
 			docente.NumeroSemanas = 1
-		} else if strings.ToLower(nivel_academico) == "pregrado" {
+		} else if strings.ToLower(nivelAcademico) == "pregrado" {
 			a, err := CargarPuntoSalarial()
 			if err != nil {
 				return docentes_a_insertar, err
@@ -210,7 +219,7 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 		reglasbase = reglasbase + predicados
 		m := NewMachine().Consult(reglasbase)
 
-		contratos := m.ProveAll("valor_contrato(" + strings.ToLower(nivel_academico) + "," + docente.IdPersona + "," + vigencia + ",X).")
+		contratos := m.ProveAll("valor_contrato(" + strings.ToLower(nivelAcademico) + "," + docente.IdPersona + "," + vigencia + ",X).")
 		for _, solution := range contratos {
 			a = fmt.Sprintf("%s", solution.ByName_("X"))
 		}
@@ -237,67 +246,61 @@ func CargarPuntoSalarial() (p models.PuntoSalarial, err error) {
 	return v[0], err
 }
 
-func CargarSalarioMinimo() (p models.SalarioMinimo) {
+func CargarSalarioMinimo() (p models.SalarioMinimo, err error) {
 	var v []models.SalarioMinimo
 
-	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/salario_minimo/?sortby=Vigencia&order=desc&limit=1", &v); err == nil {
-	} else {
-		fmt.Println("He fallado en salario_minimo (get) función CargarSalarioMinimo, solucioname!!!", err)
+	err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/salario_minimo/?sortby=Vigencia&order=desc&limit=1", &v)
+	if err != nil {
+		err = fmt.Errorf("He fallado en salario_minimo (get) función CargarSalarioMinimo, %s", err)
 	}
 
-	return v[0]
+	return v[0], err
 }
 
-func EsDocentePlanta(idPersona string) (docentePlanta bool) {
+func EsDocentePlanta(idPersona string) (docentePlanta bool, err error) {
 	var temp map[string]interface{}
-	var es_de_planta bool
+	var esDePlanta bool
 
-	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAcademica")+"/"+"consultar_datos_docente/"+idPersona, &temp); err == nil && temp != nil {
-		jsonDocentes, error_json := json.Marshal(temp)
-
-		if error_json == nil {
-			var temp_docentes models.ObjetoDocentePlanta
-			json.Unmarshal(jsonDocentes, &temp_docentes)
-
-			if temp_docentes.DocenteCollection.Docente[0].Planta == "true" {
-				es_de_planta = true
-			} else {
-				es_de_planta = false
-			}
-
-		} else {
-			es_de_planta = false
-			fmt.Println("errorcito")
-
-		}
-	} else {
-		es_de_planta = false
-		fmt.Println(err)
-
+	err = getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAcademica")+"/"+"consultar_datos_docente/"+idPersona, &temp)
+	if err != nil {
+		esDePlanta = false
+		return false, err
+	}
+	jsonDocentes, err := json.Marshal(temp)
+	if err != nil {
+		return false, err
 	}
 
-	return es_de_planta
+	var tempDocentes models.ObjetoDocentePlanta
+	json.Unmarshal(jsonDocentes, &tempDocentes)
+
+	if tempDocentes.DocenteCollection.Docente[0].Planta == "true" {
+		esDePlanta = true
+	} else {
+		esDePlanta = false
+	}
+
+	return esDePlanta, nil
 }
 
 func BuscarIdProveedor(DocumentoIdentidad int) (id_proveedor_docente int) {
 
-	var id_proveedor int
+	var Idproveedor int
 	queryInformacionProveedor := "?query=NumDocumento:" + strconv.Itoa(DocumentoIdentidad)
-	var informacion_proveedor []models.InformacionProveedor
-	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/"+queryInformacionProveedor, &informacion_proveedor); err2 == nil {
-		if informacion_proveedor != nil {
-			id_proveedor = informacion_proveedor[0].Id
+	var informacionProveedor []models.InformacionProveedor
+	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/"+queryInformacionProveedor, &informacionProveedor); err2 == nil {
+		if informacionProveedor != nil {
+			Idproveedor = informacionProveedor[0].Id
 		} else {
-			id_proveedor = 0
+			Idproveedor = 0
 		}
 
 	}
 
-	return id_proveedor
-
+	return Idproveedor
 }
 
-func Calcular_total_de_salario(v []models.VinculacionDocente) (total float64) {
+func CalcularTotalSalario(v []models.VinculacionDocente) (total float64) {
 
 	var sumatoria float64
 	for _, docente := range v {
@@ -306,6 +309,14 @@ func Calcular_total_de_salario(v []models.VinculacionDocente) (total float64) {
 
 	return sumatoria
 }
+
+// tipos de vinculación
+const (
+	tipoVinculacion = iota + 1
+	tipoCancelacion
+	tipoAdicion
+	tipoReduccion
+)
 
 //ESTA FUNCIÓN LISTA LOS DOCENTES PREVINCULADOS EN TRUE O FALSE
 
@@ -317,34 +328,34 @@ func Calcular_total_de_salario(v []models.VinculacionDocente) (total float64) {
 // @Failure 403 body is empty
 // @router /docentes_previnculados_all [get]
 func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
-	id_resolucion := c.GetString("id_resolucion")
-	var v []models.VinculacionDocente = []models.VinculacionDocente{}
+	idResolucion := c.GetString("id_resolucion")
+	var v = []models.VinculacionDocente{}
 	var res models.Resolucion
 	var modres []models.ModificacionResolucion
 	var modvin []models.ModificacionVinculacion
 	var vinc models.VinculacionDocente
 
 	//If resoluciones (GET)
-	err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+id_resolucion, &res)
+	err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+idResolucion, &res)
 	if err != nil {
 		beego.Error(err)
 		c.Abort("400")
 	}
 	var llenarVinculacion = func(v *models.VinculacionDocente) {
-		documento_identidad, _ := strconv.Atoi(v.IdPersona)
+		documentoIdentidad, _ := strconv.Atoi(v.IdPersona)
 
-		v.NombreCompleto = BuscarNombreProveedor(documento_identidad)
+		v.NombreCompleto = BuscarNombreProveedor(documentoIdentidad)
 		v.NumeroDisponibilidad = BuscarNumeroDisponibilidad(v.Disponibilidad)
 		v.Dedicacion = BuscarNombreDedicacion(v.IdDedicacion.Id)
 		v.LugarExpedicionCedula = BuscarLugarExpedicion(v.IdPersona)
 		v.TipoDocumento = BuscarTipoDocumento(v.IdPersona)
-		v.NumeroHorasSemanales, v.ValorContrato = Calcular_totales_vinculacion_pdf(v.IdPersona, id_resolucion)
+		v.NumeroHorasSemanales, v.ValorContrato = Calcular_totales_vinculacion_pdf(v.IdPersona, idResolucion)
 		v.NumeroMeses = strconv.FormatFloat(float64(v.NumeroSemanas)/4, 'f', 2, 64) + " meses"
 		v.ValorContratoFormato = FormatMoney(int(v.ValorContrato), 2)
 	}
 	switch res.IdTipoResolucion.Id {
-	case 1:
-		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_vinculaciones_agrupadas/"+id_resolucion, &v)
+	case tipoVinculacion:
+		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_vinculaciones_agrupadas/"+idResolucion, &v)
 		if err != nil {
 			beego.Error(err)
 			c.Abort("400")
@@ -355,8 +366,8 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 			v[x] = pos
 		}
 
-	case 2:
-		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+id_resolucion, &modres)
+	case tipoCancelacion:
+		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+idResolucion, &modres)
 		if err != nil {
 			beego.Error(err)
 			c.Abort("400")
@@ -379,8 +390,8 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 			llenarVinculacion(&vinc)
 			v[x] = vinc
 		}
-	case 3:
-		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+id_resolucion, &modres)
+	default:
+		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+idResolucion, &modres)
 		if err != nil {
 			beego.Error(err)
 			c.Abort("400")
@@ -402,7 +413,6 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 			llenarVinculacion(&vinc)
 			v[x] = vinc
 		}
-
 	}
 	c.Ctx.Output.SetStatus(201)
 	c.Data["json"] = v
@@ -420,25 +430,26 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 // @Failure 403 body is empty
 // @router /docentes_previnculados [get]
 func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
-	id_resolucion, err := c.GetInt("id_resolucion")
+	idResolucion, err := c.GetInt("id_resolucion")
 	if err != nil {
 		beego.Error(err)
 		c.Abort("403")
 	}
 
-	query := "?limit=-1&query=IdResolucion.Id:" + strconv.Itoa(id_resolucion) + ",Estado:true"
-	var v []models.VinculacionDocente = []models.VinculacionDocente{}
+	query := "?limit=-1&query=IdResolucion.Id:" + strconv.Itoa(idResolucion) + ",Estado:true"
+	var v = []models.VinculacionDocente{}
 	var res models.Resolucion
 	var modres []models.ModificacionResolucion
 	var modvin []models.ModificacionVinculacion
 
-	err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+strconv.Itoa(id_resolucion), &res)
+	err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+strconv.Itoa(idResolucion), &res)
 	if err != nil {
 		beego.Error(err)
 		c.Abort("400")
 	}
+	beego.Debug(res.IdTipoResolucion)
 	switch res.IdTipoResolucion.Id {
-	case 1:
+	case tipoVinculacion:
 		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &v)
 
 		if err != nil {
@@ -446,8 +457,8 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 			c.Abort("400")
 		}
 
-	case 2:
-		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+strconv.Itoa(id_resolucion), &modres)
+	case tipoCancelacion:
+		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+strconv.Itoa(idResolucion), &modres)
 		if err != nil {
 			beego.Error(err)
 			c.Abort("400")
@@ -469,12 +480,42 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 			beego.Error(err)
 			c.Abort("400")
 		}
-	default:
+	default: //los otros tipos
+		err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+strconv.Itoa(idResolucion), &modres)
+		if err != nil {
+			beego.Error(err)
+			c.Abort("400")
+		}
+		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/?query=ModificacionResolucion:"+strconv.Itoa(modres[0].Id), &modvin)
+		if err != nil {
+			beego.Error(err)
+			c.Abort("400")
+		}
+		arreglo := make([]string, len(modvin))
+		for x, pos := range modvin {
+			arreglo[x] = strconv.Itoa(pos.VinculacionDocenteRegistrada.Id)
+		}
+		identificadoresvinc := strings.Join(arreglo, "|")
+		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?query=Estado:True,Id__in:"+identificadoresvinc+"&limit=-1", &v)
+		if err != nil {
+			beego.Error(err)
+			c.Abort("400")
+		}
+		for x, pos := range v {
+			documentoIdentidad, _ := strconv.Atoi(pos.IdPersona)
+			v[x].NombreCompleto = BuscarNombreProveedor(documentoIdentidad)
+			v[x].NumeroDisponibilidad = BuscarNumeroDisponibilidad(pos.Disponibilidad)
+			v[x].Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id)
+			v[x].LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona)
+			v[x].TipoDocumento = BuscarTipoDocumento(pos.IdPersona)
+			v[x].ValorContratoFormato = FormatMoney(int(v[x].ValorContrato), 2)
+		}
+
 	}
 	for x, pos := range v {
-		documento_identidad, _ := strconv.Atoi(pos.IdPersona)
+		documentoIdentidad, _ := strconv.Atoi(pos.IdPersona)
 
-		pos.NombreCompleto = BuscarNombreProveedor(documento_identidad)
+		pos.NombreCompleto = BuscarNombreProveedor(documentoIdentidad)
 		pos.NumeroDisponibilidad = BuscarNumeroDisponibilidad(pos.Disponibilidad)
 		pos.Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id)
 		pos.LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona)
@@ -495,48 +536,48 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 
 func ListarDocentesHorasLectivas(vigencia, periodo, tipo_vinculacion, facultad, nivel_academico string) (docentes_a_listar models.ObjetoCargaLectiva, err error) {
 
-	tipo_vinculacion_old := HomologarDedicacion_nombre(tipo_vinculacion)
-	facultad_old := HomologarFacultad("new", facultad)
+	tipoVinculacionOld := HomologarDedicacion_nombre(tipo_vinculacion)
+	facultadOld := HomologarFacultad("new", facultad)
 
 	var temp map[string]interface{}
-	var docentes_x_carga models.ObjetoCargaLectiva
+	var docentesXCarga models.ObjetoCargaLectiva
 
-	for _, pos := range tipo_vinculacion_old {
-		err = getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAcademica")+"/"+"carga_lectiva/"+vigencia+"/"+periodo+"/"+pos+"/"+facultad_old+"/"+nivel_academico, &temp)
+	for _, pos := range tipoVinculacionOld {
+		t := "http://" + beego.AppConfig.String("UrlcrudWSO2") + "/" + beego.AppConfig.String("NscrudAcademica") + "/" + "carga_lectiva/" + vigencia + "/" + periodo + "/" + pos + "/" + facultadOld + "/" + nivel_academico
+		beego.Info(t)
+		err = getJsonWSO2(t, &temp)
+		beego.Info(temp)
 		if err != nil {
-			return docentes_x_carga, err
+			return docentesXCarga, err
 		}
-		if temp == nil {
-			return docentes_x_carga, fmt.Errorf("Lista vacia")
+		jsonDocentes, err := json.Marshal(temp)
+		if err != nil {
+			return docentesXCarga, err
 		}
 
-		jsonDocentes, error_json := json.Marshal(temp)
+		var tempDocentes models.ObjetoCargaLectiva
+		json.Unmarshal(jsonDocentes, &tempDocentes)
+		docentesXCarga.CargasLectivas.CargaLectiva = append(docentesXCarga.CargasLectivas.CargaLectiva, tempDocentes.CargasLectivas.CargaLectiva...)
 
-		if error_json == nil {
-			var temp_docentes models.ObjetoCargaLectiva
-			json.Unmarshal(jsonDocentes, &temp_docentes)
-			docentes_x_carga.CargasLectivas.CargaLectiva = append(docentes_x_carga.CargasLectivas.CargaLectiva, temp_docentes.CargasLectivas.CargaLectiva...)
-		} else {
-		}
 	}
 
-	return docentes_x_carga, nil
+	return docentesXCarga, nil
 
 }
 
 func Buscar_Categoria_Docente(vigencia, periodo, documento_ident string) (categoria_nombre, categoria_id_old string) {
 	var temp map[string]interface{}
-	var nombre_categoria string
-	var id_categoria_old string
+	var nombreCategoria string
+	var idCategoriaOld string
 
 	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudUrano")+"/"+"categoria_docente/"+vigencia+"/"+periodo+"/"+documento_ident, &temp); err == nil && temp != nil {
 		jsonDocentes, error_json := json.Marshal(temp)
 
 		if error_json == nil {
-			var temp_docentes models.ObjetoCategoriaDocente
-			json.Unmarshal(jsonDocentes, &temp_docentes)
-			nombre_categoria = temp_docentes.CategoriaDocente.Categoria
-			id_categoria_old = temp_docentes.CategoriaDocente.IDCategoria
+			var tempDocentes models.ObjetoCategoriaDocente
+			json.Unmarshal(jsonDocentes, &tempDocentes)
+			nombreCategoria = tempDocentes.CategoriaDocente.Categoria
+			idCategoriaOld = tempDocentes.CategoriaDocente.IDCategoria
 
 		} else {
 			fmt.Println(error_json.Error())
@@ -546,7 +587,7 @@ func Buscar_Categoria_Docente(vigencia, periodo, documento_ident string) (catego
 
 	}
 
-	return nombre_categoria, id_categoria_old
+	return nombreCategoria, idCategoriaOld
 }
 
 func HomologacionTotal() {
