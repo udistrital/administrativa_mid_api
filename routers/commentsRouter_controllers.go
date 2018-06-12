@@ -41,10 +41,16 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
 		beego.ControllerComments{
-
 			Method: "CertificacionCumplidosContratistas",
 			Router: `/certificacion_cumplidos_contratistas/:dependencia/:mes/:anio`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
 
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
+		beego.ControllerComments{
+			Method: "CertificacionDocumentosAprobados",
+			Router: `/certificacion_documentos_aprobados/:dependencia/:mes/:anio`,
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
@@ -59,77 +65,54 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
 		beego.ControllerComments{
-
-			Method: "CertificacionVistoBueno",
-			Router: `/certificacion_visto_bueno/:dependencia/:mes/:anio`,
-
-			AllowHTTPMethods: []string{"get"},
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
-		beego.ControllerComments{
-
 			Method: "GetContratosContratista",
 			Router: `/contratos_contratista/:numero_documento`,
-
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
 		beego.ControllerComments{
-
 			Method: "ObtenerDependenciaOrdenador",
 			Router: `/dependencia_ordenador/:docordenador`,
-
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
 		beego.ControllerComments{
-
 			Method: "GetContratosDocente",
 			Router: `/get_contratos_docente/:numDocumento`,
-
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
 		beego.ControllerComments{
-
 			Method: "ObtenerInfoCoordinador",
 			Router: `/informacion_coordinador/:id_dependencia_oikos`,
-
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
 		beego.ControllerComments{
-
 			Method: "ObtenerInfoOrdenador",
 			Router: `/informacion_ordenador/:numero_contrato/:vigencia`,
-
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
 		beego.ControllerComments{
-
 			Method: "PagoAprobado",
 			Router: `/pago_aprobado/:numero_contrato/:vigencia/:mes/:anio`,
-
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
 		beego.ControllerComments{
-
 			Method: "GetSolicitudesCoordinador",
 			Router: `/solicitudes_coordinador/:doccoordinador`,
 			AllowHTTPMethods: []string{"get"},
@@ -138,7 +121,6 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
 		beego.ControllerComments{
-
 			Method: "GetSolicitudesOrdenador",
 			Router: `/solicitudes_ordenador/:docordenador`,
 			AllowHTTPMethods: []string{"get"},
@@ -211,14 +193,19 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:ExpedirResolucionController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:ExpedirResolucionController"],
 		beego.ControllerComments{
-
-			Method: "ValidarDatosExpedicion",
-			Router: `/validar_datos_expedicion`,
-
+			Method: "ExpedirModificacion",
+			Router: `/expedirModificacion`,
 			AllowHTTPMethods: []string{"post"},
 			MethodParams: param.Make(),
 			Params: nil})
 
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:ExpedirResolucionController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:ExpedirResolucionController"],
+		beego.ControllerComments{
+			Method: "ValidarDatosExpedicion",
+			Router: `/validar_datos_expedicion`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
+			Params: nil})
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"],
 		beego.ControllerComments{
@@ -232,12 +219,6 @@ func init() {
 		beego.ControllerComments{
 			Method: "AdicionarHoras",
 			Router: `/adicionar_horas`,
-
-	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:ExpedirResolucionController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:ExpedirResolucionController"],
-		beego.ControllerComments{
-			Method: "ValidarDatosExpedicion",
-			Router: `/validar_datos_expedicion`,
-
 			AllowHTTPMethods: []string{"post"},
 			MethodParams: param.Make(),
 			Params: nil})
@@ -260,36 +241,8 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"],
 		beego.ControllerComments{
-
 			Method: "ListarDocentesCancelados",
 			Router: `/docentes_cancelados`,
-			AllowHTTPMethods: []string{"get"},
-
-			Method: "AnularAdicionDocente",
-			Router: `/anular_adicion`,
-			AllowHTTPMethods: []string{"post"},
-
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"],
-		beego.ControllerComments{
-
-			Method: "ListarDocentesDesvinculados",
-			Router: `/docentes_desvinculados`,
-			AllowHTTPMethods: []string{"get"},
-
-			Method: "AnularDesvinculacionDocente",
-			Router: `/anular_desvinculacion`,
-			AllowHTTPMethods: []string{"post"},
-
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"],
-		beego.ControllerComments{
-			Method: "GetVinculacionesAgrupadasCanceladas",
-			Router: `/vinculaciones_agrupadas_canceladas/:id_resolucion`,
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
