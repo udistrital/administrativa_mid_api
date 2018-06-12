@@ -298,82 +298,70 @@ func SupervisorActual(id_resolucion int) (id_supervisor_actual int) {
 // @router /validar_datos_expedicion [post]
 func (c *ExpedirResolucionController) ValidarDatosExpedicion() {
 	var m models.ExpedicionResolucion
-	//If Unmarshal
-	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &m); err == nil {
-		v := m.Vinculaciones
-		// for vinculaciones
-		for _, vinculacion := range *v {
-			v := vinculacion.VinculacionDocente
-			idvinculaciondocente := strconv.Itoa(v.Id)
-			//if Vinculacion_docente (GET)
-			if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+idvinculaciondocente, &v); err == nil {
-				contrato := vinculacion.ContratoGeneral
-				var proveedor []models.InformacionProveedor
-				//If informacion_proveedor
-				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+strconv.Itoa(contrato.Contratista), &proveedor); err == nil {
-					//If proveedor nulo
-					if proveedor != nil {
-						var dispoap []models.DisponibilidadApropiacion
-						// If Get disponibildad_apropiacion
-						if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad_apropiacion/?query=Id:"+strconv.Itoa(v.Disponibilidad), &dispoap); err == nil {
-							//If disponibilidad nula
-							if dispoap != nil {
-								var proycur []models.Dependencia
-								// If Get Dependencia
-								if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudOikos")+"/"+beego.AppConfig.String("NscrudOikos")+"/dependencia/?query=Id:"+strconv.Itoa(v.IdProyectoCurricular), &proycur); err == nil {
-									//If dependencia nula
-									if proycur != nil {
-										c.Ctx.Output.SetStatus(201)
-										c.Data["json"] = v
-									} else { //If dependencia nula
-										fmt.Println("dependencia nula")
-										c.Ctx.Output.SetStatus(233)
-										c.Ctx.Output.Body([]byte("Dependencia incorrectamente homologada asociada al docente identificado con número de documento " + strconv.Itoa(contrato.Contratista) + " en Ágora"))
-										return
-									}
-								} else { // If Get Dependencia
-									fmt.Println("dependencia error ", err.Error())
-									c.Ctx.Output.SetStatus(233)
-									c.Ctx.Output.Body([]byte("Dependencia incorrectamente homologada asociada al docente identificado con número de documento " + strconv.Itoa(contrato.Contratista) + " en Ágora"))
-									return
-								}
-							} else { //If disponibilidad nula
-								fmt.Println("disponibilidad nula")
-								c.Ctx.Output.SetStatus(233)
-								c.Ctx.Output.Body([]byte("Disponibilidad no válida asociada al docente identificado con número de documento " + strconv.Itoa(contrato.Contratista) + " en Ágora"))
-								return
-							}
-						} else { // If Get disponibildad_apropiacion
-							fmt.Println("disponibilidad_apropiacion error ", err.Error())
-							c.Ctx.Output.SetStatus(233)
-							c.Ctx.Output.Body([]byte("Disponibilidad no válida asociada al docente identificado con número de documento " + strconv.Itoa(contrato.Contratista) + " en Ágora"))
-							return
-						}
-					} else { //If proveedor nulo
-						fmt.Println("proveedor nulo")
-						c.Ctx.Output.SetStatus(233)
-						c.Ctx.Output.Body([]byte("No existe el docente con número de documento " + strconv.Itoa(contrato.Contratista) + " en Ágora"))
-						return
-					}
-				} else { //If informacion_proveedor
-					fmt.Println("informacion_proveedor error")
-					c.Ctx.Output.SetStatus(233)
-					c.Ctx.Output.Body([]byte("Docente no válido en Ágora, se encuentra identificado con el documento número " + strconv.Itoa(contrato.Contratista) + " : " + err.Error()))
-					return
-				}
-			} else { //if Vinculacion_docente (GET)
-				fmt.Println("informacion_proveedor error")
-				c.Ctx.Output.SetStatus(233)
-				c.Ctx.Output.Body([]byte("Previnculación no válida : " + err.Error()))
-				return
-			}
-		} //for vinculaciones
-	} else { //If Unmarshal
-		fmt.Println("Unmarshal error")
-		c.Ctx.Output.SetStatus(233)
-		c.Ctx.Output.Body([]byte("La resolución no es válida: " + err.Error()))
-		return
+
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &m)
+	if err != nil {
+		beego.Error(err)
+		c.Abort("400")
 	}
+
+	v := m.Vinculaciones
+	beego.Info(v)
+
+	for _, vinculacion := range *v {
+		v := vinculacion.VinculacionDocente
+		idvinculaciondocente := strconv.Itoa(v.Id)
+
+		err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+idvinculaciondocente, &v)
+		if err != nil {
+			beego.Error("Previnculación no valida", err)
+			c.Abort("233")
+		}
+
+		contrato := vinculacion.ContratoGeneral
+		var proveedor []models.InformacionProveedor
+
+		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+strconv.Itoa(contrato.Contratista), &proveedor)
+		if err != nil {
+			beego.Error("Docente no válido en Ágora, se encuentra identificado con el documento número ", strconv.Itoa(contrato.Contratista), err)
+			c.Abort("233")
+		}
+
+		if proveedor == nil {
+			beego.Error("No existe el docente con número de documento "+strconv.Itoa(contrato.Contratista)+" en Ágora", err)
+			c.Abort("233")
+		}
+
+		var dispoap []models.DisponibilidadApropiacion
+
+		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad_apropiacion/?query=Id:"+strconv.Itoa(v.Disponibilidad), &dispoap)
+		if err != nil {
+			beego.Error("Disponibilidad no válida asociada al docente identificado con número de documento "+strconv.Itoa(contrato.Contratista)+" en Ágora", err)
+			c.Abort("233")
+		}
+
+		if dispoap == nil {
+			beego.Error("Disponibilidad no válida asociada al docente identificado con número de documento " + strconv.Itoa(contrato.Contratista) + " en Ágora")
+			c.Abort("233")
+		}
+
+		var proycur []models.Dependencia
+
+		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudOikos")+"/"+beego.AppConfig.String("NscrudOikos")+"/dependencia/?query=Id:"+strconv.Itoa(v.IdProyectoCurricular), &proycur)
+		if err != nil {
+			beego.Error("Dependencia incorrectamente homologada asociada al docente identificado con número de documento "+strconv.Itoa(contrato.Contratista)+" en Ágora", err)
+			c.Abort("233")
+		}
+
+		if proycur == nil {
+			beego.Error("Dependencia incorrectamente homologada asociada al docente identificado con número de documento " + strconv.Itoa(contrato.Contratista) + " en Ágora")
+			c.Abort("233")
+		}
+		beego.Info(proycur)
+
+	}
+	c.Ctx.Output.SetStatus(201)
+	c.Data["json"] = v
 	c.ServeJSON()
 }
 
@@ -505,7 +493,6 @@ func (c *ExpedirResolucionController) Cancelar() {
 	c.ServeJSON()
 }
 
-
 // ExpedirModificacion ...
 // @Title ExpedirModificacion
 // @Description create ExpedirModificacion
@@ -584,7 +571,7 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 										aini.Vigencia = actaInicioAnterior[0].Vigencia
 										aini.Descripcion = actaInicioAnterior[0].Descripcion
 										aini.FechaInicio = actaInicioAnterior[0].FechaInicio
-										aini.FechaFin =  acta.FechaInicio.AddDate(0, -1, 0)
+										aini.FechaFin = acta.FechaInicio.AddDate(0, -1, 0)
 										//If put acta_inicio cancelando
 										if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/acta_inicio", "PUT", &response, &aini); err == nil {
 											var contratoCancelado models.ContratoCancelado
@@ -692,7 +679,7 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 													flyway.Rollback()
 													return
 												}
-											} else {// if contrato_cancelado (post)
+											} else { // if contrato_cancelado (post)
 												fmt.Println("He fallado un poquito en if contrato_cancelado (post), solucioname!!!", err)
 												amazon.Rollback()
 												flyway.Rollback()
@@ -711,11 +698,11 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 										return
 									}
 								} else { //If modificacion_vinculacion
-										fmt.Println("He fallado un poquito en If modificacion_vinculacion, solucioname!!!", err)
-										amazon.Rollback()
-										flyway.Rollback()
-										return
-									}
+									fmt.Println("He fallado un poquito en If modificacion_vinculacion, solucioname!!!", err)
+									amazon.Rollback()
+									flyway.Rollback()
+									return
+								}
 							} else { //If insert contrato_general
 								fmt.Println("He fallado un poquito en insert contrato_general, solucioname!!!", err)
 								amazon.Rollback()

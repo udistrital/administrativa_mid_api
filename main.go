@@ -39,6 +39,7 @@ func main() {
 	beego.ErrorHandler("400", BadRequestJsonPage)
 	beego.ErrorHandler("403", forgivenJsonPage)
 	beego.ErrorHandler("404", notFoundJsonPage)
+	beego.ErrorHandler("233", notValidJsonPage)
 
 	logs.SetLogger(logs.AdapterFile, `{"filename":"/var/log/beego/administrativa_mid_api.log"}`)
 
