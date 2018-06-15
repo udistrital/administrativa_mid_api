@@ -28,7 +28,11 @@ func (c *ValidarContratoController) ValidarContrato() {
 	dedicacion := c.Ctx.Input.Param(":dedicacion")
 	numHorasStr := c.Ctx.Input.Param(":numHoras")
 
-	reglasbase := CargarReglasBase("CDVE")
+	reglasbase, err := CargarReglasBase("CDVE")
+	if err != nil {
+		beego.Error(err)
+		c.Abort("400")
+	}
 	m := NewMachine().Consult(reglasbase)
 
 	var a string

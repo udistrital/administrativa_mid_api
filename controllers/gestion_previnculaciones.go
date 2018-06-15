@@ -247,7 +247,10 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 		predicados = predicados + "categoria(" + docente.IdPersona + "," + strings.ToLower(categoria) + ", " + vigencia + ")." + "\n"
 		predicados = predicados + "vinculacion(" + docente.IdPersona + "," + strings.ToLower(docente.Dedicacion) + ", " + vigencia + ")." + "\n"
 		predicados = predicados + "horas(" + docente.IdPersona + "," + strconv.Itoa(docente.NumeroHorasSemanales*docente.NumeroSemanas) + ", " + vigencia + ")." + "\n"
-		reglasbase := CargarReglasBase("CDVE")
+		reglasbase, err := CargarReglasBase("CDVE")
+		if err != nil {
+			return docentes_a_insertar, err
+		}
 		reglasbase = reglasbase + predicados
 		m := NewMachine().Consult(reglasbase)
 
