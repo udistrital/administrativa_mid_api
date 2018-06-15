@@ -137,44 +137,76 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 	tipoVinculacion := c.GetString("tipo_vinculacion")
 	facultad := c.GetString("facultad")
 	nivelAcademico := c.GetString("nivel_academico")
-	docentesXcargaHoraria, err := ListarDocentesHorasLectivas(vigencia, periodo, tipoVinculacion, facultad, nivelAcademico)
-	beego.Debug(docentesXcargaHoraria)
 
+	docentesXcargaHoraria, err := ListarDocentesHorasLectivas(vigencia, periodo, tipoVinculacion, facultad, nivelAcademico)
 	if err != nil {
 		beego.Error(err)
 		c.Abort("403")
 	}
-	//BUSCAR CATEGORÍA DE CADA DOCENTE
-	for x, pos := range docentesXcargaHoraria.CargasLectivas.CargaLectiva {
+	newDocentesXcargaHoraria := models.ObjetoCargaLectiva{}
 
-		docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].CategoriaNombre, docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].IDCategoria = Buscar_Categoria_Docente(vigencia, periodo, pos.DocDocente)
+	//BUSCAR CATEGORÍA DE CADA DOCENTE
+	for _, pos := range docentesXcargaHoraria.CargasLectivas.CargaLectiva {
+		catDocente := models.ObjetoCategoriaDocente{}
+		emptyCatDocente := models.ObjetoCategoriaDocente{}
+		q := beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudWSO2") + "/" + beego.AppConfig.String("NscrudUrano") + "/categoria_docente/" + vigencia + "/" + periodo + "/" + pos.DocDocente
+		err = getXml(q, &catDocente.CategoriaDocente)
+		if err != nil {
+			beego.Error(err)
+			c.Abort("403")
+		}
+
+		pos.CategoriaNombre, pos.IDCategoria, err = Buscar_Categoria_Docente(vigencia, periodo, pos.DocDocente)
+		if err != nil {
+			beego.Error(err)
+			c.Abort("403")
+		}
+		if catDocente.CategoriaDocente != emptyCatDocente.CategoriaDocente {
+			newDocentesXcargaHoraria.CargasLectivas.CargaLectiva = append(newDocentesXcargaHoraria.CargasLectivas.CargaLectiva, pos)
+		}
 	}
 
 	//RETORNAR CON ID DE TIPO DE VINCULACION DE NUEVO MODELO
-	for x, pos := range docentesXcargaHoraria.CargasLectivas.CargaLectiva {
-		docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].IDTipoVinculacion, docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].NombreTipoVinculacion = HomologarDedicacion_ID("old", pos.IDTipoVinculacion)
-		if docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].IDTipoVinculacion == "3" {
-			docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].HorasLectivas = "20"
-			docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].NombreTipoVinculacion = "MTO"
+	for x, pos := range newDocentesXcargaHoraria.CargasLectivas.CargaLectiva {
+		pos.IDTipoVinculacion, pos.NombreTipoVinculacion = HomologarDedicacion_ID("old", pos.IDTipoVinculacion)
+		if pos.IDTipoVinculacion == "3" {
+			pos.HorasLectivas = "20"
+			pos.NombreTipoVinculacion = "MTO"
 		}
-		if docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].IDTipoVinculacion == "4" {
-			docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].HorasLectivas = "40"
-			docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].NombreTipoVinculacion = "TCO"
+		if pos.IDTipoVinculacion == "4" {
+			pos.HorasLectivas = "40"
+			pos.NombreTipoVinculacion = "TCO"
 		}
+		newDocentesXcargaHoraria.CargasLectivas.CargaLectiva[x] = pos
 	}
 
 	//RETORNAR FACULTTADES CON ID DE OIKOS, HOMOLOGACION
-	for x, pos := range docentesXcargaHoraria.CargasLectivas.CargaLectiva {
-		docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].IDFacultad = HomologarFacultad("old", pos.IDFacultad)
+	for x, pos := range newDocentesXcargaHoraria.CargasLectivas.CargaLectiva {
+		pos.IDFacultad, err = HomologarFacultad("old", pos.IDFacultad)
+		if err != nil {
+			beego.Error(err)
+			c.Abort("403")
+		}
+		newDocentesXcargaHoraria.CargasLectivas.CargaLectiva[x] = pos
 	}
 	//RETORNAR PROYECTOS CURRICUALRES HOMOLOGADOS!!
-	for x, pos := range docentesXcargaHoraria.CargasLectivas.CargaLectiva {
-		docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].IDProyecto = HomologarProyectoCurricular(pos.IDProyecto)
-		docentesXcargaHoraria.CargasLectivas.CargaLectiva[x].DependenciaAcademica, _ = strconv.Atoi(pos.IDProyecto)
+	for x, pos := range newDocentesXcargaHoraria.CargasLectivas.CargaLectiva {
+		pos.IDProyecto, err = HomologarProyectoCurricular(pos.IDProyecto)
+		if err != nil {
+			beego.Error(err)
+			c.Abort("403")
+		}
+		pos.DependenciaAcademica, err = strconv.Atoi(pos.IDProyecto)
+		if err != nil {
+			beego.Error(err)
+			c.Abort("403")
+		}
+		newDocentesXcargaHoraria.CargasLectivas.CargaLectiva[x] = pos
+
 	}
 
 	c.Ctx.Output.SetStatus(201)
-	c.Data["json"] = docentesXcargaHoraria.CargasLectivas.CargaLectiva
+	c.Data["json"] = newDocentesXcargaHoraria.CargasLectivas.CargaLectiva
 	c.ServeJSON()
 
 }
@@ -537,16 +569,18 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 func ListarDocentesHorasLectivas(vigencia, periodo, tipo_vinculacion, facultad, nivel_academico string) (docentes_a_listar models.ObjetoCargaLectiva, err error) {
 
 	tipoVinculacionOld := HomologarDedicacion_nombre(tipo_vinculacion)
-	facultadOld := HomologarFacultad("new", facultad)
+	facultadOld, err := HomologarFacultad("new", facultad)
+	if err != nil {
+		return docentes_a_listar, err
+	}
 
 	var temp map[string]interface{}
 	var docentesXCarga models.ObjetoCargaLectiva
 
 	for _, pos := range tipoVinculacionOld {
 		t := "http://" + beego.AppConfig.String("UrlcrudWSO2") + "/" + beego.AppConfig.String("NscrudAcademica") + "/" + "carga_lectiva/" + vigencia + "/" + periodo + "/" + pos + "/" + facultadOld + "/" + nivel_academico
-		beego.Info(t)
+
 		err = getJsonWSO2(t, &temp)
-		beego.Info(temp)
 		if err != nil {
 			return docentesXCarga, err
 		}
@@ -565,59 +599,60 @@ func ListarDocentesHorasLectivas(vigencia, periodo, tipo_vinculacion, facultad, 
 
 }
 
-func Buscar_Categoria_Docente(vigencia, periodo, documento_ident string) (categoria_nombre, categoria_id_old string) {
+func Buscar_Categoria_Docente(vigencia, periodo, documento_ident string) (categoria_nombre, categoria_id_old string, err error) {
 	var temp map[string]interface{}
 	var nombreCategoria string
 	var idCategoriaOld string
 
-	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudUrano")+"/"+"categoria_docente/"+vigencia+"/"+periodo+"/"+documento_ident, &temp); err == nil && temp != nil {
-		jsonDocentes, error_json := json.Marshal(temp)
+	err = getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudUrano")+"/"+"categoria_docente/"+vigencia+"/"+periodo+"/"+documento_ident, &temp)
+	if err != nil {
+		return categoria_nombre, categoria_id_old, err
+	}
+	if temp != nil {
 
-		if error_json == nil {
-			var tempDocentes models.ObjetoCategoriaDocente
-			json.Unmarshal(jsonDocentes, &tempDocentes)
-			nombreCategoria = tempDocentes.CategoriaDocente.Categoria
-			idCategoriaOld = tempDocentes.CategoriaDocente.IDCategoria
+		jsonDocentes, err := json.Marshal(temp)
 
-		} else {
-			fmt.Println(error_json.Error())
+		if err != nil {
+			return categoria_nombre, categoria_id_old, err
 		}
-	} else {
-		fmt.Println(err)
+		var tempDocentes models.ObjetoCategoriaDocente
+		json.Unmarshal(jsonDocentes, &tempDocentes)
+		nombreCategoria = tempDocentes.CategoriaDocente.Categoria
+		idCategoriaOld = tempDocentes.CategoriaDocente.IDCategoria
 
 	}
-
-	return nombreCategoria, idCategoriaOld
+	return nombreCategoria, idCategoriaOld, nil
 }
 
 func HomologacionTotal() {
 
 }
 
-func HomologarProyectoCurricular(proyecto_old string) (proyecto string) {
+func HomologarProyectoCurricular(proyecto_old string) (proyecto string, err error) {
 	var id_proyecto string
 	var temp map[string]interface{}
 
-	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudHomologacion")+"/"+"proyecto_curricular_cod_proyecto/"+proyecto_old, &temp); err == nil && temp != nil {
-		json_proyecto_curricular, error_json := json.Marshal(temp)
-
-		if error_json == nil {
-			var temp_proy models.ObjetoProyectoCurricular
-			json.Unmarshal(json_proyecto_curricular, &temp_proy)
-			id_proyecto = temp_proy.Homologacion.IDOikos
-
-		} else {
-			fmt.Println(error_json.Error())
-		}
-	} else {
-		fmt.Println(err)
-
+	err = getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudHomologacion")+"/"+"proyecto_curricular_cod_proyecto/"+proyecto_old, &temp)
+	if err != nil {
+		return proyecto, err
 	}
 
-	return id_proyecto
+	json_proyecto_curricular, err := json.Marshal(temp)
+
+	if err != nil {
+		return proyecto, err
+	}
+	var temp_proy models.ObjetoProyectoCurricular
+	err = json.Unmarshal(json_proyecto_curricular, &temp_proy)
+	if err != nil {
+		return proyecto, err
+	}
+	id_proyecto = temp_proy.Homologacion.IDOikos
+
+	return id_proyecto, nil
 }
 
-func HomologarFacultad(tipo, facultad string) (facultad_old string) {
+func HomologarFacultad(tipo, facultad string) (facultad_old string, err error) {
 	var id_facultad string
 	var temp map[string]interface{}
 	var string_consulta_servicio string
@@ -628,28 +663,31 @@ func HomologarFacultad(tipo, facultad string) (facultad_old string) {
 		string_consulta_servicio = "facultad_oikos_gedep"
 	}
 
-	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudHomologacion")+"/"+string_consulta_servicio+"/"+facultad, &temp); err == nil && temp != nil {
-		json_facultad, error_json := json.Marshal(temp)
+	err = getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudHomologacion")+"/"+string_consulta_servicio+"/"+facultad, &temp)
+	if err != nil {
+		return facultad_old, err
+	}
+	if temp != nil {
+		json_facultad, err := json.Marshal(temp)
 
-		if error_json == nil {
-			var temp_proy models.ObjetoFacultad
-			json.Unmarshal(json_facultad, &temp_proy)
-
-			if tipo == "new" {
-				id_facultad = temp_proy.Homologacion.IdGeDep
-			} else {
-				id_facultad = temp_proy.Homologacion.IdOikos
-			}
-
-		} else {
-			fmt.Println(error_json.Error())
+		if err != nil {
+			return facultad_old, err
 		}
-	} else {
-		fmt.Println(err)
 
+		var temp_proy models.ObjetoFacultad
+		json.Unmarshal(json_facultad, &temp_proy)
+
+		if tipo == "new" {
+			id_facultad = temp_proy.Homologacion.IdGeDep
+		} else {
+			id_facultad = temp_proy.Homologacion.IdOikos
+		}
+
+	} else {
+		return id_facultad, fmt.Errorf("No hay datos de respuesta de las APIs")
 	}
 
-	return id_facultad
+	return id_facultad, nil
 
 }
 
@@ -722,7 +760,7 @@ func HomologarDedicacion_ID(tipo, dedicacion string) (vinculacion_old, nombre_vi
 	byt := []byte(homologacion_dedicacion)
 	var arreglo_homologacion []models.HomologacionDedicacion
 	if err := json.Unmarshal(byt, &arreglo_homologacion); err != nil {
-		panic(err)
+		panic(err) //nunca esperado
 	}
 
 	for _, pos := range arreglo_homologacion {
