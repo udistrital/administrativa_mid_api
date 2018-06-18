@@ -145,10 +145,12 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 	temp.FechaRegistro = time.Now()
 	temp.Estado = true
 	if temp.IdTipoResolucion.Id == 1 {
-		temp.Titulo = "Por la cual se vinculan docentes para el Primer Periodo Académico de 2018 en la modalidad de Docentes de HORA CÁTEDRA (Vinculación Especial) para la " + resolucion.NomDependencia + " en " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ".”"
-	} else if temp.IdTipoResolucion.Id == 2 {
+		temp.Titulo = "“Por la cual se vinculan docentes para el Primer Periodo Académico de 2018 en la modalidad de Docentes de HORA CÁTEDRA (Vinculación Especial) para la " + resolucion.NomDependencia + " en " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ".”"
+	}
+
+	if temp.IdTipoResolucion.Id != 1 {
 		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+strconv.Itoa(resolucion.ResolucionVieja), &resVieja); err == nil {
-			temp.Titulo = "Por la cual se Modifica la resolución " + resVieja.NumeroResolucion + " de " + cambiarString(resVieja.FechaExpedicion.Month().String()) + " del " + strconv.Itoa(resVieja.FechaExpedicion.Year()) + " en cuanto al tiempo de vinculación y valores a Reversar para el " + cambiarString(strconv.Itoa(temp.Periodo)) + " periodo académico de " + strconv.Itoa(temp.Vigencia) + " en la modalidad de docentes de " + cambiarString(resolucion.ResolucionVinculacionDocente.Dedicacion) + " (Vinculación Especial) para la " + resolucion.NomDependencia + " en " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ".”"
+			temp.Titulo = "“Por la cual se Modifica la resolución " + resVieja.NumeroResolucion + " de " + cambiarString(resVieja.FechaExpedicion.Month().String()) + " del " + strconv.Itoa(resVieja.FechaExpedicion.Year()) + " en cuanto al tiempo de vinculación y valores a Reversar para el " + cambiarString(strconv.Itoa(temp.Periodo)) + " periodo académico de " + strconv.Itoa(temp.Vigencia) + " en la modalidad de docentes de " + cambiarString(resolucion.ResolucionVinculacionDocente.Dedicacion) + " (Vinculación Especial) para la " + resolucion.NomDependencia + " en " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ".”"
 		} else {
 			fmt.Println("Error al consultar resolución vieja", err)
 		}
