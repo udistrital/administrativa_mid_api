@@ -41,8 +41,10 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
 		beego.ControllerComments{
+
 			Method: "CertificacionDocumentosAprobados",
 			Router: `/certificacion_documentos_aprobados/:dependencia/:mes/:anio`,
+
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
@@ -57,62 +59,81 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
 		beego.ControllerComments{
+
 			Method: "GetContratosContratista",
 			Router: `/contratos_contratista/:numero_documento`,
+
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
 		beego.ControllerComments{
+
 			Method: "ObtenerDependenciaOrdenador",
 			Router: `/dependencia_ordenador/:docordenador`,
+
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
 		beego.ControllerComments{
+
 			Method: "GetContratosDocente",
 			Router: `/get_contratos_docente/:numDocumento`,
+
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
 		beego.ControllerComments{
+
 			Method: "ObtenerInfoCoordinador",
 			Router: `/informacion_coordinador/:id_dependencia_oikos`,
+
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
 		beego.ControllerComments{
+
 			Method: "ObtenerInfoOrdenador",
 			Router: `/informacion_ordenador/:numero_contrato/:vigencia`,
+
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
 		beego.ControllerComments{
+
 			Method: "PagoAprobado",
 			Router: `/pago_aprobado/:numero_contrato/:vigencia/:mes/:anio`,
+
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
 		beego.ControllerComments{
+
 			Method: "GetSolicitudesCoordinador",
 			Router: `/solicitudes_coordinador/:doccoordinador`,
+
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
 		beego.ControllerComments{
+
+
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:AprobacionPagoController"],
+		beego.ControllerComments{
+
 			Method: "GetSolicitudesOrdenador",
 			Router: `/solicitudes_ordenador/:docordenador`,
 			AllowHTTPMethods: []string{"get"},
@@ -185,6 +206,16 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:ExpedirResolucionController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:ExpedirResolucionController"],
 		beego.ControllerComments{
+
+			Method: "ValidarDatosExpedicion",
+			Router: `/validar_datos_expedicion`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:ExpedirResolucionController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:ExpedirResolucionController"],
+		beego.ControllerComments{
+
 			Method: "ValidarDatosExpedicion",
 			Router: `/validar_datos_expedicion`,
 			AllowHTTPMethods: []string{"post"},
@@ -193,6 +224,7 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"],
 		beego.ControllerComments{
+
 			Method: "ActualizarVinculaciones",
 			Router: `/actualizar_vinculaciones`,
 			AllowHTTPMethods: []string{"post"},
@@ -239,6 +271,15 @@ func init() {
 			MethodParams: param.Make(),
 			Params: nil})
 
+
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"],
+		beego.ControllerComments{
+			Method: "GetVinculacionesAgrupadasCanceladas",
+			Router: `/vinculaciones_agrupadas_canceladas/:id_resolucion`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDisponibilidadController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDisponibilidadController"],
 		beego.ControllerComments{
 			Method: "ListarApropiaciones",
@@ -257,7 +298,8 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"],
 		beego.ControllerComments{
-			Method: "Calcular_total_de_salarios",
+
+			Method: "CalcularTotalSalarios",
 			Router: `/Precontratacion/calcular_valor_contratos`,
 			AllowHTTPMethods: []string{"post"},
 			MethodParams: param.Make(),
@@ -276,13 +318,18 @@ func init() {
 			Method: "ListarDocentesCargaHoraria",
 			Router: `/Precontratacion/docentes_x_carga_horaria`,
 			AllowHTTPMethods: []string{"get"},
+
+			Method: "Calcular_total_de_salarios",
+			Router: `/Precontratacion/calcular_valor_contratos`,
+			AllowHTTPMethods: []string{"post"},
+
 			MethodParams: param.Make(),
 			Params: nil})
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"],
 		beego.ControllerComments{
-			Method: "InsertarPrevinculaciones",
-			Router: `/Precontratacion/insertar_previnculaciones`,
+			Method: "Calcular_total_de_salarios_seleccionados",
+			Router: `/Precontratacion/calcular_valor_contratos_seleccionados`,
 			AllowHTTPMethods: []string{"post"},
 			MethodParams: param.Make(),
 			Params: nil})
@@ -297,6 +344,22 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"],
 		beego.ControllerComments{
+			Method: "InsertarPrevinculaciones",
+			Router: `/Precontratacion/insertar_previnculaciones`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionResolucionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionResolucionesController"],
+		beego.ControllerComments{
+			Method: "GetResolucionesAprobadas",
+			Router: `/get_resoluciones_aprobadas`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"],
+		beego.ControllerComments{
 			Method: "ListarDocentesPrevinculadosAll",
 			Router: `/docentes_previnculados_all`,
 			AllowHTTPMethods: []string{"get"},
@@ -305,6 +368,7 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionResolucionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionResolucionesController"],
 		beego.ControllerComments{
+
 			Method: "GetResolucionesAprobadas",
 			Router: `/get_resoluciones_aprobadas`,
 			AllowHTTPMethods: []string{"get"},
@@ -321,6 +385,7 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionResolucionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionResolucionesController"],
 		beego.ControllerComments{
+
 			Method: "InsertarResolucionCompleta",
 			Router: `/insertar_resolucion_completa`,
 			AllowHTTPMethods: []string{"post"},

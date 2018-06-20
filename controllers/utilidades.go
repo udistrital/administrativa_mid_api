@@ -3,6 +3,7 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"math/big"
 	"net/http"
@@ -39,6 +40,16 @@ func getJson(url string, target interface{}) error {
 	defer r.Body.Close()
 
 	return json.NewDecoder(r.Body).Decode(target)
+}
+
+func getXml(url string, target interface{}) error {
+	r, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer r.Body.Close()
+
+	return xml.NewDecoder(r.Body).Decode(target)
 }
 
 func getJsonWSO2(urlp string, target interface{}) error {
@@ -90,19 +101,18 @@ func diff(a, b time.Time) (year, month, day int) {
 }
 
 //CargarReglasBase general
-func CargarReglasBase(dominio string) (reglas string) {
+func CargarReglasBase(dominio string) (reglas string, err error) {
 	//carga de reglas desde el ruler
 	var reglasbase string = ``
 	var v []models.Predicado
-	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("Urlruler")+"/"+beego.AppConfig.String("Nsruler")+"/predicado/?query=Dominio.Nombre:"+dominio+"&limit=-1", &v); err == nil {
-
-		reglasbase = reglasbase + FormatoReglas(v) //funcion general para dar formato a reglas cargadas desde el ruler
-	} else {
-		fmt.Println("err: ", err)
+	err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("Urlruler")+"/"+beego.AppConfig.String("Nsruler")+"/predicado/?query=Dominio.Nombre:"+dominio+"&limit=-1", &v)
+	if err != nil {
+		return
 	}
+	reglasbase = reglasbase + FormatoReglas(v) //funcion general para dar formato a reglas cargadas desde el ruler
 
 	//-----------------------------
-	return reglasbase
+	return reglasbase, nil
 }
 
 func FormatoReglas(v []models.Predicado) (reglas string) {
