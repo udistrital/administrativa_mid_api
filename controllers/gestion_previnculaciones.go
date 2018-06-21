@@ -149,7 +149,8 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 	for _, pos := range docentesXcargaHoraria.CargasLectivas.CargaLectiva {
 		catDocente := models.ObjetoCategoriaDocente{}
 		emptyCatDocente := models.ObjetoCategoriaDocente{}
-		q := beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudWSO2") + "/" + beego.AppConfig.String("NscrudUrano") + "/categoria_docente/" + vigencia + "/" + periodo + "/" + pos.DocDocente
+	        //TODO: quitar el hardconding para WSO2 cuando ya soporte https:
+		q := "http://" + beego.AppConfig.String("UrlcrudWSO2") + "/" + beego.AppConfig.String("NscrudUrano") + "/categoria_docente/" + vigencia + "/" + periodo + "/" + pos.DocDocente
 		err = getXml(q, &catDocente.CategoriaDocente)
 		if err != nil {
 			beego.Error(err)
@@ -606,7 +607,8 @@ func Buscar_Categoria_Docente(vigencia, periodo, documento_ident string) (catego
 	var temp map[string]interface{}
 	var nombreCategoria string
 	var idCategoriaOld string
-
+        
+	//TODO: quitar el hardconding para WSO2 cuando ya soporte https:
 	err = getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudUrano")+"/"+"categoria_docente/"+vigencia+"/"+periodo+"/"+documento_ident, &temp)
 	if err != nil {
 		return categoria_nombre, categoria_id_old, err
