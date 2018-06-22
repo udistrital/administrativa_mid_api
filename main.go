@@ -6,7 +6,6 @@ import (
 	_ "github.com/udistrital/administrativa_mid_api/routers"
 
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/plugins/cors"
 	"github.com/astaxie/beego/logs"
