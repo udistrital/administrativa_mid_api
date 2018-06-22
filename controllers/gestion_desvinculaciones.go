@@ -32,7 +32,7 @@ func (c *GestionDesvinculacionesController) URLMapping() {
 func (c *GestionDesvinculacionesController) ListarDocentesDesvinculados() {
 	fmt.Println("docentes desvinculados")
 	id_resolucion := c.GetString("id_resolucion")
-	query := "?limit=-1&query=IdResolucion.Id:" + id_resolucion + ",Estado:false"
+	query := "?limit=-1&query=IdResolucion.Id:" + id_resolucion
 	v := []models.VinculacionDocente{}
 
 	err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &v)
@@ -63,6 +63,7 @@ func (c *GestionDesvinculacionesController) ListarDocentesDesvinculados() {
 // @Success 201 {string}
 // @Failure 403 body is empty
 // @router /actualizar_vinculaciones [post]
+// Usado anteriormente para vincular docentes a cancelaciones, cambia por ActualizarVinculacionesCancelacion
 func (c *GestionDesvinculacionesController) ActualizarVinculaciones() {
 
 	var v models.Objeto_Desvinculacion
@@ -93,6 +94,81 @@ func (c *GestionDesvinculacionesController) ActualizarVinculaciones() {
 			beego.Error("error en json de modificacion vinculacion", err)
 		}
 		beego.Debug("respuesta", respuesta)
+	}
+
+	c.Data["json"] = respuesta
+
+	c.ServeJSON()
+
+}
+
+// ActualizarVinculacionesCancelacion ...
+// @Title ActualizarVinculacionesCancelacion
+// @Description create ActualizarVinculacionesCancelacion
+// @Success 201 {string}
+// @Failure 403 body is empty
+// @router /actualizar_vinculaciones_cancelacion [post]
+func (c *GestionDesvinculacionesController) ActualizarVinculacionesCancelacion() {
+
+	var v models.Objeto_Desvinculacion
+	var respuesta interface{}
+	var respuesta_mod_vin models.ModificacionVinculacion
+	// var respuesta string
+	var vinculacion_nueva int
+	var temp_vinculacion [1]models.VinculacionDocente
+
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &v)
+	if err != nil {
+		beego.Error(err)
+		c.Abort("400")
+	}
+	beego.Debug("para poner en false", v)
+
+	for _, pos := range v.DocentesDesvincular {
+		err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.Id), "PUT", &respuesta, pos)
+		if err != nil {
+			beego.Error("error en json", err)
+			c.Abort("403")
+		}
+
+		//Verificar objeto para crear nuevas resoluciones
+		temp_vinculacion[0] = models.VinculacionDocente{
+			IdPersona:            pos.IdPersona,
+			NumeroHorasSemanales: pos.NumeroHorasSemanales,
+			NumeroSemanas:        pos.NumeroSemanasNuevas,
+			IdResolucion:         &models.ResolucionVinculacionDocente{Id: v.IdNuevaResolucion},
+			IdDedicacion:         pos.IdDedicacion,
+			IdProyectoCurricular: pos.IdProyectoCurricular,
+			Categoria:            pos.Categoria,
+			Dedicacion:           pos.Dedicacion,
+			NivelAcademico:       pos.NivelAcademico,
+			Disponibilidad:       pos.Disponibilidad,
+			Vigencia:             pos.Vigencia,
+		}
+
+		//CREAR NUEVA Vinculacion
+		vinculacion_nueva, err = InsertarDesvinculaciones(temp_vinculacion)
+		if err != nil {
+			beego.Error("error al realizar vinculacion nueva", err)
+			c.Abort("400")
+		}
+
+		//INSERCION  TABLA  DE TRAZA MODIFICACION VINCULACION
+		temp := models.ModificacionVinculacion{
+			ModificacionResolucion:       &models.ModificacionResolucion{Id: v.IdModificacionResolucion},
+			VinculacionDocenteCancelada:  &models.VinculacionDocente{Id: pos.Id},
+			VinculacionDocenteRegistrada: &models.VinculacionDocente{Id: vinculacion_nueva},
+			Horas: pos.NumeroHorasSemanales,
+		}
+		errorMod := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/", "POST", &respuesta_mod_vin, temp)
+
+		if errorMod != nil {
+			beego.Error("error en actualizacion de modificacion vinculacion de modificacion vinculacion", err)
+			respuesta = "error"
+		} else {
+			beego.Info("respuesta modificacion vin", respuesta_mod_vin)
+			respuesta = "OK"
+		}
 	}
 
 	c.Data["json"] = respuesta
@@ -179,12 +255,13 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 
 }
 
-// GestionDesvinculacionesController ...
+// AnularDesvinculacionDocente ...
 // @Title AnularDesvinculacionDocente
 // @Description create AnularDesvinculacionDocente
 // @Success 201 {string}
 // @Failure 403 body is empty
 // @router /anular_desvinculacion [post]
+// Usado anteriormente para anular las vinculaciones a cancelaciones (desvinculaciones), cambia por AnularAdicionDocente ya que usa la misma lógica de las adiciones
 func (c *GestionDesvinculacionesController) AnularDesvinculacionDocente() {
 	fmt.Println("anular desvinculacion")
 	var v models.Objeto_Desvinculacion
@@ -222,12 +299,13 @@ func (c *GestionDesvinculacionesController) AnularDesvinculacionDocente() {
 	c.ServeJSON()
 }
 
-// GestionDesvinculacionesController ...
+// AnularAdicionDocente ...
 // @Title AnularAdicionDocente
 // @Description create AnularAdicionDocente
 // @Success 201 {string}
 // @Failure 403 body is empty
 // @router /anular_adicion [post]
+// Se usa para adiciones, reducciones y cancelaciones
 func (c *GestionDesvinculacionesController) AnularAdicionDocente() {
 	fmt.Println("anular adicion")
 	var v models.Objeto_Desvinculacion
