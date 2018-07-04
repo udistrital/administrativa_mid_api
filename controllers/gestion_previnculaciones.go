@@ -387,7 +387,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 		v.TipoDocumento = BuscarTipoDocumento(v.IdPersona)
 		v.ValorContratoInicial = v.ValorContrato
 		v.ValorContratoInicialFormato = FormatMoney(int(v.ValorContrato), 2)
-		v.NumeroHorasSemanales, v.ValorContrato, v.NumeroSemanasNuevas = Calcular_totales_vinculacion_pdf(v.IdPersona, idResolucion)
+		v.NumeroHorasNuevas, v.ValorContrato, v.NumeroSemanasNuevas = Calcular_totales_vinculacion_pdf(v.IdPersona, idResolucion)
 		v.NumeroMeses = strconv.FormatFloat(float64(v.NumeroSemanas)/4, 'f', 2, 64) + " meses"
 		v.ValorContratoFormato = FormatMoney(int(v.ValorContrato), 2)
 		v.ValorModificacionFormato = FormatMoney(int(v.ValorContrato), 2)
@@ -402,16 +402,18 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 
 		for x, pos := range v {
 			llenarVinculacion(&pos)
+			pos.NumeroSemanasNuevas = pos.NumeroSemanas
 			v[x] = pos
 		}
 
 	case tipoCancelacion:
+		//Busca el id de la modificación donde se relacionan la resolución original y la de cancelación asociada
 		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+idResolucion, &modres)
 		if err != nil {
 			beego.Error(err)
 			c.Abort("400")
 		}
-		//If 2 modificacion_vinculacion (get)
+		//If 2 modificacion_vinculacion (get) Busca los ids de las vinculaciones docentes que se modificaron debido a la cancelación
 		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/?query=ModificacionResolucion:"+strconv.Itoa(modres[0].Id), &modvin)
 		if err != nil {
 			beego.Error(err)
@@ -419,7 +421,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 		}
 		//for vinculaciones
 		for x, pos := range modvin {
-			//If 3 vinculacion_docente para el join (get)
+			//If 3 vinculacion_docente para el join (get) Devuelve cada una de las vinculaciones originales asociadas a la primera resolución
 			err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.VinculacionDocenteCancelada.Id), &vinc)
 			if err != nil {
 				beego.Error(err)
@@ -445,13 +447,18 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 		//for vinculaciones
 		for x, pos := range modvin {
 			//If 3 vinculacion_docente para el join (get)
-			err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.VinculacionDocenteRegistrada.Id), &vinc)
+			err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.VinculacionDocenteCancelada.Id), &vinc)
 			if err != nil {
 				beego.Error(err)
 				c.Abort("400")
 			}
+
 			v = append(v, vinc)
 			llenarVinculacion(&vinc)
+			vinc.NumeroMesesNuevos = strconv.FormatFloat(float64(vinc.NumeroSemanas+vinc.NumeroSemanasNuevas)/4, 'f', 2, 64) + " meses"
+			vinc.NumeroSemanasNuevas = vinc.NumeroSemanas + vinc.NumeroSemanasNuevas
+			vinc.ValorContratoFormato = FormatMoney(int(vinc.ValorContratoInicial+vinc.ValorContrato), 2)
+			vinc.NumeroHorasNuevas = vinc.NumeroHorasSemanales + vinc.NumeroHorasNuevas
 			v[x] = vinc
 		}
 	}

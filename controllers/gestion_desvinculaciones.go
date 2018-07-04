@@ -147,7 +147,7 @@ func (c *GestionDesvinculacionesController) ActualizarVinculacionesCancelacion()
 		}
 
 		//CREAR NUEVA Vinculacion
-		vinculacion_nueva, err = InsertarDesvinculaciones(temp_vinculacion)
+		vinculacion_nueva, err = InsertarDesvinculaciones(temp_vinculacion, true)
 		if err != nil {
 			beego.Error("error al realizar vinculacion nueva", err)
 			c.Abort("400")
@@ -190,6 +190,8 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 	var respuesta string
 	var vinculacion_nueva int
 	var temp_vinculacion [1]models.VinculacionDocente
+	var semanasRestantes int
+	var horasTotales int
 
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 	if err != nil {
@@ -197,7 +199,7 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 		c.Data["json"] = "Error al leer json para desvincular"
 	}
 
-	//CAMBIAR ESTADO DE VINCULACIÓN DOCNETE
+	//CAMBIAR ESTADO DE VINCULACIÓN DOCENTE
 	for _, pos := range v.DocentesDesvincular {
 		err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.Id), "PUT", &respuesta, pos)
 		//TODO: unificar errores
@@ -222,8 +224,18 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 			Vigencia:             v.DocentesDesvincular[0].Vigencia,
 		}
 
+		semanasRestantes = v.DocentesDesvincular[0].NumeroSemanasRestantes
+		horasTotales = v.DocentesDesvincular[0].NumeroHorasSemanales + v.DocentesDesvincular[0].NumeroHorasNuevas
+
+		valorContratoAdicion, err := CalcularValorContratoAdicion(temp_vinculacion, semanasRestantes, horasTotales)
+		if err != nil {
+			beego.Error("error al calcular el valor del contrato", err)
+			c.Abort("400")
+		}
+		beego.Info("salario: ", valorContratoAdicion)
+		temp_vinculacion[0].ValorContrato = valorContratoAdicion
 		//CREAR NUEVA Vinculacion
-		vinculacion_nueva, err = InsertarDesvinculaciones(temp_vinculacion)
+		vinculacion_nueva, err = InsertarDesvinculaciones(temp_vinculacion, false)
 		if err != nil {
 			beego.Error("error al realizar vinculacion nueva", err)
 			c.Abort("400")
@@ -373,7 +385,7 @@ func (c *GestionDesvinculacionesController) AnularAdicionDocente() {
 	c.ServeJSON()
 }
 
-func InsertarDesvinculaciones(v [1]models.VinculacionDocente) (id int, err error) {
+func InsertarDesvinculaciones(v [1]models.VinculacionDocente, calcularContrato bool) (id int, err error) {
 	var d []models.VinculacionDocente
 	json_ejemplo, err := json.Marshal(v)
 	if err != nil {
@@ -387,19 +399,63 @@ func InsertarDesvinculaciones(v [1]models.VinculacionDocente) (id int, err error
 		return id, err
 	}
 
-	beego.Debug("docentes a contratar", d)
 	//TODO: unificar cont con error
-	d, err = CalcularSalarioPrecontratacion(d)
-	if err != nil {
-		return id, err
+	if calcularContrato {
+		d, err = CalcularSalarioPrecontratacion(d)
+		if err != nil {
+			return id, err
+		}
 	}
-
 	err = sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &id, &d)
 	if err != nil {
 		beego.Error(err)
 		return 0, err
 	}
 	return id, err
+}
+
+// Calcula el valor del contrato adicional en dos partes:
+// (1) las horas adicionales a partir de la fecha de inicio escogida hasta la fecha final del contrato original,
+// (2) el total de las horas en las semanas adicionales
+func CalcularValorContratoAdicion(v [1]models.VinculacionDocente, semanasRestantes int, horasTotales int) (salarioTotal float64, err error) {
+	var d []models.VinculacionDocente
+	var salarioHorasNuevas float64
+	var salarioSemanasNuevas float64
+
+	jsonEjemplo, err := json.Marshal(v)
+	if err != nil {
+		return salarioTotal, err
+	}
+	err = json.Unmarshal(jsonEjemplo, &d)
+	if err != nil {
+		return salarioTotal, err
+	}
+
+	semanasNuevas := d[0].NumeroSemanas
+	horasNuevas := d[0].NumeroHorasSemanales
+
+	// Si hay semanas restantes y horas nuevas se calcula el valor para esas horas adicionales en esas semanas
+	if semanasRestantes != 0 && horasNuevas != 0 {
+		d[0].NumeroSemanas = semanasRestantes
+		docentes, err := CalcularSalarioPrecontratacion(d)
+		if err != nil {
+			return salarioTotal, err
+		}
+		salarioHorasNuevas = docentes[0].ValorContrato
+	}
+	// Si hay semanas nuevas se calcula el valor para esas semanas y el total de horas
+	if semanasNuevas != 0 {
+		d[0].NumeroSemanas = semanasNuevas
+		d[0].NumeroHorasSemanales = horasTotales
+		docentes, err := CalcularSalarioPrecontratacion(d)
+		if err != nil {
+			return salarioTotal, err
+		}
+		salarioSemanasNuevas = docentes[0].ValorContrato
+	}
+
+	salarioTotal = salarioHorasNuevas + salarioSemanasNuevas
+	return salarioTotal, nil
 }
 
 // GestionCanceladosController ...
