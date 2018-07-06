@@ -149,7 +149,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 	for _, pos := range docentesXcargaHoraria.CargasLectivas.CargaLectiva {
 		catDocente := models.ObjetoCategoriaDocente{}
 		emptyCatDocente := models.ObjetoCategoriaDocente{}
-	        //TODO: quitar el hardconding para WSO2 cuando ya soporte https:
+		//TODO: quitar el hardconding para WSO2 cuando ya soporte https:
 		q := "http://" + beego.AppConfig.String("UrlcrudWSO2") + "/" + beego.AppConfig.String("NscrudUrano") + "/categoria_docente/" + vigencia + "/" + periodo + "/" + pos.DocDocente
 		err = getXml(q, &catDocente.CategoriaDocente)
 		if err != nil {
@@ -385,12 +385,15 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 		v.Dedicacion = BuscarNombreDedicacion(v.IdDedicacion.Id)
 		v.LugarExpedicionCedula = BuscarLugarExpedicion(v.IdPersona)
 		v.TipoDocumento = BuscarTipoDocumento(v.IdPersona)
-		v.NumeroHorasSemanales, v.ValorContrato = Calcular_totales_vinculacion_pdf(v.IdPersona, idResolucion)
+		v.ValorContratoInicial = v.ValorContrato
+		v.ValorContratoInicialFormato = FormatMoney(int(v.ValorContrato), 2)
+		v.NumeroHorasNuevas, v.ValorContrato, v.NumeroSemanasNuevas = Calcular_totales_vinculacion_pdf(v.IdPersona, idResolucion)
 		v.NumeroMeses = strconv.FormatFloat(float64(v.NumeroSemanas)/4, 'f', 2, 64) + " meses"
 		v.ValorContratoFormato = FormatMoney(int(v.ValorContrato), 2)
+		v.ValorModificacionFormato = FormatMoney(int(v.ValorContrato), 2)
 	}
-	switch res.IdTipoResolucion.Id {
-	case tipoVinculacion:
+
+	if res.IdTipoResolucion.Id == tipoVinculacion {
 		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_vinculaciones_agrupadas/"+idResolucion, &v)
 		if err != nil {
 			beego.Error(err)
@@ -399,55 +402,80 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 
 		for x, pos := range v {
 			llenarVinculacion(&pos)
+			pos.NumeroSemanasNuevas = pos.NumeroSemanas
 			v[x] = pos
 		}
+	} else {
+		//Busca el id de la modificación donde se relacionan la resolución original y la de cancelación asociada
+		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+idResolucion, &modres)
+		if err != nil {
+			beego.Error(err)
+			c.Abort("400")
+		}
+		//If 2 modificacion_vinculacion (get) Busca los ids de las vinculaciones docentes que se modificaron debido a la cancelación
+		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/?query=ModificacionResolucion:"+strconv.Itoa(modres[0].Id), &modvin)
+		if err != nil {
+			beego.Error(err)
+			c.Abort("400")
+		}
 
-	case tipoCancelacion:
-		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+idResolucion, &modres)
-		if err != nil {
-			beego.Error(err)
-			c.Abort("400")
-		}
-		//If 2 modificacion_vinculacion (get)
-		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/?query=ModificacionResolucion:"+strconv.Itoa(modres[0].Id), &modvin)
-		if err != nil {
-			beego.Error(err)
-			c.Abort("400")
-		}
-		//for vinculaciones
-		for x, pos := range modvin {
-			//If 3 vinculacion_docente para el join (get)
-			err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.VinculacionDocenteCancelada.Id), &vinc)
-			if err != nil {
-				beego.Error(err)
-				c.Abort("400")
+		switch res.IdTipoResolucion.Id {
+		case tipoCancelacion:
+			//for vinculaciones
+			for x, pos := range modvin {
+				//If 3 vinculacion_docente para el join (get) Devuelve cada una de las vinculaciones originales asociadas a la primera resolución
+				err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.VinculacionDocenteCancelada.Id), &vinc)
+				if err != nil {
+					beego.Error(err)
+					c.Abort("400")
+				}
+				v = append(v, vinc)
+				llenarVinculacion(&vinc)
+
+				vinc.NumeroMesesNuevos = strconv.FormatFloat(float64(vinc.NumeroSemanas-vinc.NumeroSemanasNuevas)/4, 'f', 2, 64) + " meses"
+				vinc.ValorContratoFormato = FormatMoney(int(vinc.ValorContratoInicial-vinc.ValorContrato), 2)
+				v[x] = vinc
 			}
-			v = append(v, vinc)
-			llenarVinculacion(&vinc)
-			v[x] = vinc
-		}
-	default:
-		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+idResolucion, &modres)
-		if err != nil {
-			beego.Error(err)
-			c.Abort("400")
-		}
-		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/?query=ModificacionResolucion:"+strconv.Itoa(modres[0].Id), &modvin)
-		if err != nil {
-			beego.Error(err)
-			c.Abort("400")
-		}
-		//for vinculaciones
-		for x, pos := range modvin {
-			//If 3 vinculacion_docente para el join (get)
-			err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.VinculacionDocenteRegistrada.Id), &vinc)
-			if err != nil {
-				beego.Error(err)
-				c.Abort("400")
+			break
+		case tipoReduccion:
+			//for vinculaciones
+			for x, pos := range modvin {
+				//If 3 vinculacion_docente para el join (get)
+				err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.VinculacionDocenteCancelada.Id), &vinc)
+				if err != nil {
+					beego.Error(err)
+					c.Abort("400")
+				}
+
+				v = append(v, vinc)
+				llenarVinculacion(&vinc)
+				vinc.NumeroMesesNuevos = strconv.FormatFloat(float64(vinc.NumeroSemanas-vinc.NumeroSemanasNuevas)/4, 'f', 2, 64) + " meses"
+				vinc.NumeroSemanasNuevas = vinc.NumeroSemanas - vinc.NumeroSemanasNuevas
+				vinc.ValorContratoFormato = FormatMoney(int(vinc.ValorContratoInicial-vinc.ValorContrato), 2)
+				vinc.NumeroHorasNuevas = vinc.NumeroHorasSemanales - vinc.NumeroHorasNuevas
+				v[x] = vinc
 			}
-			v = append(v, vinc)
-			llenarVinculacion(&vinc)
-			v[x] = vinc
+			break
+		case tipoAdicion:
+			//for vinculaciones
+			for x, pos := range modvin {
+				//If 3 vinculacion_docente para el join (get)
+				err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.VinculacionDocenteCancelada.Id), &vinc)
+				if err != nil {
+					beego.Error(err)
+					c.Abort("400")
+				}
+
+				v = append(v, vinc)
+				llenarVinculacion(&vinc)
+				vinc.NumeroMesesNuevos = strconv.FormatFloat(float64(vinc.NumeroSemanas+vinc.NumeroSemanasNuevas)/4, 'f', 2, 64) + " meses"
+				vinc.NumeroSemanasNuevas = vinc.NumeroSemanas + vinc.NumeroSemanasNuevas
+				vinc.ValorContratoFormato = FormatMoney(int(vinc.ValorContratoInicial+vinc.ValorContrato), 2)
+				vinc.NumeroHorasNuevas = vinc.NumeroHorasSemanales + vinc.NumeroHorasNuevas
+				v[x] = vinc
+			}
+		default:
+			break
 		}
 	}
 	c.Ctx.Output.SetStatus(201)
@@ -483,7 +511,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 		beego.Error(err)
 		c.Abort("400")
 	}
-	beego.Debug(res.IdTipoResolucion)
+
 	switch res.IdTipoResolucion.Id {
 	case tipoVinculacion:
 		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &v)
@@ -607,7 +635,7 @@ func Buscar_Categoria_Docente(vigencia, periodo, documento_ident string) (catego
 	var temp map[string]interface{}
 	var nombreCategoria string
 	var idCategoriaOld string
-        
+
 	//TODO: quitar el hardconding para WSO2 cuando ya soporte https:
 	err = getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudUrano")+"/"+"categoria_docente/"+vigencia+"/"+periodo+"/"+documento_ident, &temp)
 	if err != nil {
@@ -890,7 +918,7 @@ func BuscarLugarExpedicion(Cedula string) (nombre_lugar_exp string) {
 
 }
 
-func Calcular_totales_vinculacion_pdf(cedula, id_resolucion string) (suma_total_horas int, suma_total_contrato float64) {
+func Calcular_totales_vinculacion_pdf(cedula, id_resolucion string) (suma_total_horas int, suma_total_contrato float64, semanas_nuevas int) {
 
 	query := "?limit=-1&query=IdPersona:" + cedula + ",IdResolucion.Id:" + id_resolucion
 	var temp []models.VinculacionDocente
@@ -910,7 +938,7 @@ func Calcular_totales_vinculacion_pdf(cedula, id_resolucion string) (suma_total_
 		total_contrato = 0
 	}
 
-	return total_horas, float64(total_contrato)
+	return total_horas, float64(total_contrato), temp[0].NumeroSemanas
 }
 
 // GestionPrevinculacionesController ...
