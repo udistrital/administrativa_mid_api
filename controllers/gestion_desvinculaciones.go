@@ -183,6 +183,7 @@ func (c *GestionDesvinculacionesController) ActualizarVinculacionesCancelacion()
 // @Success 201 {string}
 // @Failure 403 body is empty
 // @router /adicionar_horas [post]
+// Se usa tanto para adiciones como para reducciones de horas y semanas
 func (c *GestionDesvinculacionesController) AdicionarHoras() {
 
 	var v models.Objeto_Desvinculacion
@@ -192,6 +193,7 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 	var temp_vinculacion [1]models.VinculacionDocente
 	var semanasRestantes int
 	var horasTotales int
+	var horasOriginales int
 
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 	if err != nil {
@@ -225,15 +227,32 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 		}
 
 		semanasRestantes = v.DocentesDesvincular[0].NumeroSemanasRestantes
-		horasTotales = v.DocentesDesvincular[0].NumeroHorasSemanales + v.DocentesDesvincular[0].NumeroHorasNuevas
+		horasOriginales = v.DocentesDesvincular[0].NumeroHorasSemanales
+		horasTotales = horasOriginales + v.DocentesDesvincular[0].NumeroHorasNuevas
 
-		valorContratoAdicion, err := CalcularValorContratoAdicion(temp_vinculacion, semanasRestantes, horasTotales)
-		if err != nil {
-			beego.Error("error al calcular el valor del contrato", err)
-			c.Abort("400")
+		switch v.TipoDesvinculacion {
+		case "Adición":
+			valorContratoAdicion, err := CalcularValorContratoAdicion(temp_vinculacion, semanasRestantes, horasTotales)
+			if err != nil {
+				beego.Error("error al calcular el valor del contrato", err)
+				c.Abort("400")
+			}
+			beego.Info("salario: ", valorContratoAdicion)
+			temp_vinculacion[0].ValorContrato = valorContratoAdicion
+			break
+		case "Reducción":
+			valorContratoReduccion, err := CalcularValorContratoReduccion(temp_vinculacion, semanasRestantes, horasOriginales)
+			if err != nil {
+				beego.Error("error al calcular el valor del contrato", err)
+				c.Abort("400")
+			}
+			beego.Info("salario: ", valorContratoReduccion)
+			temp_vinculacion[0].ValorContrato = valorContratoReduccion
+			break
+		default:
+			break
 		}
-		beego.Info("salario: ", valorContratoAdicion)
-		temp_vinculacion[0].ValorContrato = valorContratoAdicion
+
 		//CREAR NUEVA Vinculacion
 		vinculacion_nueva, err = InsertarDesvinculaciones(temp_vinculacion, false)
 		if err != nil {
@@ -455,6 +474,49 @@ func CalcularValorContratoAdicion(v [1]models.VinculacionDocente, semanasRestant
 	}
 
 	salarioTotal = salarioHorasNuevas + salarioSemanasNuevas
+	return salarioTotal, nil
+}
+
+// Calcula el valor del contrato a reversar en dos partes:
+// (1) el total de las horas durante las semanas a reducir
+// (2) las horas a reversar en las semanas entre la fecha de inicio y la fecha final
+func CalcularValorContratoReduccion(v [1]models.VinculacionDocente, semanasRestantes int, horasOriginales int) (salarioTotal float64, err error) {
+	var d []models.VinculacionDocente
+	var salarioHorasReversar float64
+	var salarioSemanasReversar float64
+
+	jsonEjemplo, err := json.Marshal(v)
+	if err != nil {
+		return salarioTotal, err
+	}
+	err = json.Unmarshal(jsonEjemplo, &d)
+	if err != nil {
+		return salarioTotal, err
+	}
+
+	semanasReversar := d[0].NumeroSemanas
+	horasReversar := d[0].NumeroHorasSemanales
+
+	if semanasReversar != 0 {
+		d[0].NumeroHorasSemanales = horasOriginales
+		docentes, err := CalcularSalarioPrecontratacion(d)
+		if err != nil {
+			return salarioTotal, err
+		}
+		salarioSemanasReversar = docentes[0].ValorContrato
+	}
+
+	if semanasRestantes > 0 && horasReversar != 0 {
+		d[0].NumeroSemanas = semanasRestantes
+		d[0].NumeroHorasSemanales = horasReversar
+		docentes, err := CalcularSalarioPrecontratacion(d)
+		if err != nil {
+			return salarioTotal, err
+		}
+		salarioHorasReversar = docentes[0].ValorContrato
+	}
+
+	salarioTotal = salarioHorasReversar + salarioSemanasReversar
 	return salarioTotal, nil
 }
 

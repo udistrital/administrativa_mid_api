@@ -392,8 +392,8 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 		v.ValorContratoFormato = FormatMoney(int(v.ValorContrato), 2)
 		v.ValorModificacionFormato = FormatMoney(int(v.ValorContrato), 2)
 	}
-	switch res.IdTipoResolucion.Id {
-	case tipoVinculacion:
+
+	if res.IdTipoResolucion.Id == tipoVinculacion {
 		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_vinculaciones_agrupadas/"+idResolucion, &v)
 		if err != nil {
 			beego.Error(err)
@@ -405,8 +405,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 			pos.NumeroSemanasNuevas = pos.NumeroSemanas
 			v[x] = pos
 		}
-
-	case tipoCancelacion:
+	} else {
 		//Busca el id de la modificación donde se relacionan la resolución original y la de cancelación asociada
 		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+idResolucion, &modres)
 		if err != nil {
@@ -419,47 +418,64 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 			beego.Error(err)
 			c.Abort("400")
 		}
-		//for vinculaciones
-		for x, pos := range modvin {
-			//If 3 vinculacion_docente para el join (get) Devuelve cada una de las vinculaciones originales asociadas a la primera resolución
-			err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.VinculacionDocenteCancelada.Id), &vinc)
-			if err != nil {
-				beego.Error(err)
-				c.Abort("400")
-			}
-			v = append(v, vinc)
-			llenarVinculacion(&vinc)
-			vinc.NumeroMesesNuevos = strconv.FormatFloat(float64(vinc.NumeroSemanas-vinc.NumeroSemanasNuevas)/4, 'f', 2, 64) + " meses"
-			vinc.ValorContratoFormato = FormatMoney(int(vinc.ValorContratoInicial-vinc.ValorContrato), 2)
-			v[x] = vinc
-		}
-	default:
-		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+idResolucion, &modres)
-		if err != nil {
-			beego.Error(err)
-			c.Abort("400")
-		}
-		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/?query=ModificacionResolucion:"+strconv.Itoa(modres[0].Id), &modvin)
-		if err != nil {
-			beego.Error(err)
-			c.Abort("400")
-		}
-		//for vinculaciones
-		for x, pos := range modvin {
-			//If 3 vinculacion_docente para el join (get)
-			err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.VinculacionDocenteCancelada.Id), &vinc)
-			if err != nil {
-				beego.Error(err)
-				c.Abort("400")
-			}
 
-			v = append(v, vinc)
-			llenarVinculacion(&vinc)
-			vinc.NumeroMesesNuevos = strconv.FormatFloat(float64(vinc.NumeroSemanas+vinc.NumeroSemanasNuevas)/4, 'f', 2, 64) + " meses"
-			vinc.NumeroSemanasNuevas = vinc.NumeroSemanas + vinc.NumeroSemanasNuevas
-			vinc.ValorContratoFormato = FormatMoney(int(vinc.ValorContratoInicial+vinc.ValorContrato), 2)
-			vinc.NumeroHorasNuevas = vinc.NumeroHorasSemanales + vinc.NumeroHorasNuevas
-			v[x] = vinc
+		switch res.IdTipoResolucion.Id {
+		case tipoCancelacion:
+			//for vinculaciones
+			for x, pos := range modvin {
+				//If 3 vinculacion_docente para el join (get) Devuelve cada una de las vinculaciones originales asociadas a la primera resolución
+				err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.VinculacionDocenteCancelada.Id), &vinc)
+				if err != nil {
+					beego.Error(err)
+					c.Abort("400")
+				}
+				v = append(v, vinc)
+				llenarVinculacion(&vinc)
+
+				vinc.NumeroMesesNuevos = strconv.FormatFloat(float64(vinc.NumeroSemanas-vinc.NumeroSemanasNuevas)/4, 'f', 2, 64) + " meses"
+				vinc.ValorContratoFormato = FormatMoney(int(vinc.ValorContratoInicial-vinc.ValorContrato), 2)
+				v[x] = vinc
+			}
+			break
+		case tipoReduccion:
+			//for vinculaciones
+			for x, pos := range modvin {
+				//If 3 vinculacion_docente para el join (get)
+				err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.VinculacionDocenteCancelada.Id), &vinc)
+				if err != nil {
+					beego.Error(err)
+					c.Abort("400")
+				}
+
+				v = append(v, vinc)
+				llenarVinculacion(&vinc)
+				vinc.NumeroMesesNuevos = strconv.FormatFloat(float64(vinc.NumeroSemanas-vinc.NumeroSemanasNuevas)/4, 'f', 2, 64) + " meses"
+				vinc.NumeroSemanasNuevas = vinc.NumeroSemanas - vinc.NumeroSemanasNuevas
+				vinc.ValorContratoFormato = FormatMoney(int(vinc.ValorContratoInicial-vinc.ValorContrato), 2)
+				vinc.NumeroHorasNuevas = vinc.NumeroHorasSemanales - vinc.NumeroHorasNuevas
+				v[x] = vinc
+			}
+			break
+		case tipoAdicion:
+			//for vinculaciones
+			for x, pos := range modvin {
+				//If 3 vinculacion_docente para el join (get)
+				err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.VinculacionDocenteCancelada.Id), &vinc)
+				if err != nil {
+					beego.Error(err)
+					c.Abort("400")
+				}
+
+				v = append(v, vinc)
+				llenarVinculacion(&vinc)
+				vinc.NumeroMesesNuevos = strconv.FormatFloat(float64(vinc.NumeroSemanas+vinc.NumeroSemanasNuevas)/4, 'f', 2, 64) + " meses"
+				vinc.NumeroSemanasNuevas = vinc.NumeroSemanas + vinc.NumeroSemanasNuevas
+				vinc.ValorContratoFormato = FormatMoney(int(vinc.ValorContratoInicial+vinc.ValorContrato), 2)
+				vinc.NumeroHorasNuevas = vinc.NumeroHorasSemanales + vinc.NumeroHorasNuevas
+				v[x] = vinc
+			}
+		default:
+			break
 		}
 	}
 	c.Ctx.Output.SetStatus(201)
