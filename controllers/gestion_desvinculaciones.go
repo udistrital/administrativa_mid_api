@@ -125,6 +125,12 @@ func (c *GestionDesvinculacionesController) ActualizarVinculacionesCancelacion()
 	beego.Debug("para poner en false", v)
 
 	for _, pos := range v.DocentesDesvincular {
+
+		numerorp := pos.NumeroRp
+		vigenciarp := pos.VigenciaRp
+
+		pos.NumeroRp = 0
+		pos.VigenciaRp = 0
 		err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.Id), "PUT", &respuesta, pos)
 		if err != nil {
 			beego.Error("error en json", err)
@@ -144,8 +150,10 @@ func (c *GestionDesvinculacionesController) ActualizarVinculacionesCancelacion()
 			NivelAcademico:       pos.NivelAcademico,
 			Disponibilidad:       pos.Disponibilidad,
 			Vigencia:             pos.Vigencia,
+			NumeroRp:			  numerorp,
+			VigenciaRp: 		  vigenciarp,
 		}
-
+		fmt.Println("RP: ", temp_vinculacion[0].NumeroRp)
 		//CREAR NUEVA Vinculacion
 		vinculacion_nueva, err = InsertarDesvinculaciones(temp_vinculacion, true)
 		if err != nil {
