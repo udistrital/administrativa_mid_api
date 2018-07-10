@@ -30,7 +30,11 @@ func (this *CambioEstadoContratoValidoController) ValidarCambioEstado() {
 
 	var estados []models.EstadoContrato //0: actual y 1:siguiente
 
-	reglasbase := CargarReglasBase("AdministrativaContratacion")
+	reglasbase, err := CargarReglasBase("AdministrativaContratacion")
+	if err != nil {
+		beego.Error(err)
+		this.Abort("400")
+	}
 
 	m := NewMachine().Consult(reglasbase)
 

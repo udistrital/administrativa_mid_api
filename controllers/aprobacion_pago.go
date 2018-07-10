@@ -97,6 +97,7 @@ func (c *AprobacionPagoController) GetContratosDocente() {
 			//for vinculaciones
 			for _, vinculacion := range vinculaciones {
 				//If dependencia get
+
 				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudOikos")+"/"+beego.AppConfig.String("NscrudOikos")+"/dependencia/"+strconv.Itoa(vinculacion.IdProyectoCurricular), &dep); err == nil {
 					//If resolucion get
 					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+strconv.Itoa(vinculacion.IdResolucion.Id), &res); err == nil {
@@ -109,7 +110,9 @@ func (c *AprobacionPagoController) GetContratosDocente() {
 								for _, actaInicio := range actasInicio {
 									actaInicio.FechaInicio = actaInicio.FechaInicio.UTC()
 									actaInicio.FechaFin = actaInicio.FechaFin.UTC()
+
 									if int(actaInicio.FechaInicio.Month()) <= int(time.Now().Month()) && actaInicio.FechaInicio.Year() <= time.Now().Year() && int(actaInicio.FechaFin.Month()) >= int(time.Now().Month()) && actaInicio.FechaFin.Year() <= time.Now().Year() {
+
 										cd.NumeroVinculacion = vinculacion.NumeroContrato.String
 										cd.Vigencia = vinculacion.Vigencia.Int64
 										cd.Resolucion = res.NumeroResolucion
@@ -802,8 +805,8 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 	var novedades_postcontractuales []models.NovedadPostcontractual
 	var informacion_proveedores []models.InformacionProveedor
 	contratos_persona := GetContratosPersona(numero_documento)
-
 	if contratos_persona.ContratosPersonas.ContratoPersona == nil {// Si no tiene contrato
+
 		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+numero_documento,&informacion_proveedores); err == nil {
 			
 			for _,persona := range informacion_proveedores {
@@ -863,7 +866,6 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 	for _, contrato_persona := range contratos_persona.ContratosPersonas.ContratoPersona {
 		var contrato models.InformacionContrato
 		contrato = GetContrato(contrato_persona.NumeroContrato, contrato_persona.Vigencia)
-
 		//var novedad_postcontractual models.NovedadPostcontractual
 		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/novedad_postcontractual/?query=NumeroContrato:"+contrato_persona.NumeroContrato+",Vigencia:"+contrato_persona.Vigencia+"&sortby=FechaInicio&order=desc&limit=1",&novedades_postcontractuales); err == nil {
 		//var	prueba []models.NovedadPostcontractual
@@ -1233,6 +1235,76 @@ func (c *AprobacionPagoController) AprobarMultiplesPagosContratistas() {
 	c.ServeJSON()
 }
 
+
+
+// AprobacionPagoController ...
+// @Title certificacion_cumplidos_contratistas
+// @Description get certificacion_cumplidos_contratistas
+// @Param dependencia query string true "Dependencia supervisor"
+// @Param dependencia query string true "Mes del certificado"
+// @Param dependencia query string true "Año del certificado"
+// @Success 201
+// @Failure 403 :dependencia is empty
+// @Failure 403 :mes is empty
+// @Failure 403 :anio is empty
+// @router /certificacion_cumplidos_contratistas/:dependencia/:mes/:anio [get]
+func (c *AprobacionPagoController) CertificacionCumplidosContratistas() {
+
+	var contrato_dependencia models.ContratoDependencia
+	var pagos_mensuales []models.PagoMensual
+	var contratistas []models.InformacionProveedor
+	var persona models.Persona
+	var personas []models.Persona
+
+	dependencia := c.GetString(":dependencia")
+	mes := c.GetString(":mes")
+	anio := c.GetString(":anio")
+
+
+	var nmes,_ =strconv.Atoi(mes)
+	
+	contrato_dependencia = GetContratosDependencia(dependencia, anio + "-"+ mes)
+
+	for _,cd := range contrato_dependencia.Contratos.Contrato {
+
+		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?query=EstadoPagoMensual.CodigoAbreviacion.in:AS|AP,NumeroContrato:"+cd.NumeroContrato+",VigenciaContrato:"+cd.Vigencia+",Mes:"+strconv.Itoa(nmes)+",Ano:"+anio, &pagos_mensuales); err == nil {
+
+			for v := range pagos_mensuales{
+
+				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pagos_mensuales[v].Persona, &contratistas); err == nil {
+
+					for _, contratista := range contratistas{
+					persona.NumDocumento = contratista.NumDocumento
+					persona.Nombre = contratista.NomProveedor
+					persona.NumeroContrato = pagos_mensuales[v].NumeroContrato
+					persona.Vigencia,_ = strconv.Atoi(cd.Vigencia)
+
+					personas = append(personas, persona)
+					}
+
+				}else{//If informacion_proveedor get
+
+					fmt.Println("Mirenme, me morí en If informacion_proveedor get, solucioname!!! ", err)
+					return
+
+				}
+			}
+		}else{//If pago_mensual get
+
+			fmt.Println("Mirenme, me morí en If pago_mensual get, solucioname!!! ", err)
+			return
+
+		}
+
+
+	}
+
+	c.Data["json"] = personas
+
+	c.ServeJSON()
+}
+
+
 func GetRP(numero_cdp string, vigencia_cdp string) (rp models.InformacionCdpRp) {
 
 	var temp map[string]interface{}
@@ -1329,4 +1401,27 @@ func GetInformacionContratoContratista(num_contrato_suscrito string, vigencia st
 	}
 
 	return informacion_contrato_contratista
+}
+
+func GetContratosDependencia(dependencia string, fecha string) (contratos_dependencia models.ContratoDependencia) {
+
+	var temp map[string]interface{}
+
+	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contratos_dependencia/"+dependencia+"/"+fecha+"/"+fecha, &temp); err == nil {
+		json_contrato, error_json := json.Marshal(temp)
+
+		if error_json == nil {
+			json.Unmarshal(json_contrato, &contratos_dependencia)
+			return contratos_dependencia
+		} else {
+			fmt.Println(error_json.Error())
+		}
+
+	} else {
+
+		fmt.Println(err)
+	}
+
+
+	return contratos_dependencia
 }
