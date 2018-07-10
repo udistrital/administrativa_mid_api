@@ -1058,6 +1058,8 @@ func (c *AprobacionPagoController) GetSolicitudesSupervisorContratistas() {
 								pago_contratista_cdp_rp.VigenciaCdp = strconv.Itoa(contrato_disponibilidad.VigenciaCdp)
 								pago_contratista_cdp_rp.NumeroRp = rp.RpNumeroRegistro
 								pago_contratista_cdp_rp.VigenciaRp = rp.RpVigencia
+								pago_contratista_cdp_rp.Rubro = contrato.Contrato.Rubro
+
 
 								pagos_contratista_cdp_rp = append(pagos_contratista_cdp_rp, pago_contratista_cdp_rp)
 
@@ -1134,6 +1136,7 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistas() {
 								pago_contratista_cdp_rp.VigenciaCdp = strconv.Itoa(contrato_disponibilidad.VigenciaCdp)
 								pago_contratista_cdp_rp.NumeroRp = rp.RpNumeroRegistro
 								pago_contratista_cdp_rp.VigenciaRp = rp.RpVigencia
+								pago_contratista_cdp_rp.Rubro = contrato.Contrato.Rubro
 
 								pagos_contratista_cdp_rp = append(pagos_contratista_cdp_rp, pago_contratista_cdp_rp)
 

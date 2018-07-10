@@ -32,5 +32,6 @@ type InformacionContrato struct {
 		NumeroContrato string `json:"numero_contrato"`
 		PlazoEjecucion string `json:"plazo_ejecucion"`
 		ValorContrato string `json:"valor_contrato"` 
+		Rubro string `json:"rubro"`
 	} `json:"contrato"`
 }

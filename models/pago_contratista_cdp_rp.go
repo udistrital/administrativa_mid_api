@@ -8,4 +8,5 @@ type PagoContratistaCdpRp struct {
 	 NumeroRp string
 	 VigenciaRp string
 	 NombreDependencia string
+	 Rubro string
 }
