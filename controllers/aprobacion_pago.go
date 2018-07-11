@@ -1060,6 +1060,8 @@ func (c *AprobacionPagoController) GetSolicitudesSupervisorContratistas() {
 								pago_contratista_cdp_rp.VigenciaCdp = strconv.Itoa(contrato_disponibilidad.VigenciaCdp)
 								pago_contratista_cdp_rp.NumeroRp = rp.RpNumeroRegistro
 								pago_contratista_cdp_rp.VigenciaRp = rp.RpVigencia
+								pago_contratista_cdp_rp.Rubro = contrato.Contrato.Rubro
+
 
 								pagos_contratista_cdp_rp = append(pagos_contratista_cdp_rp, pago_contratista_cdp_rp)
 
@@ -1136,6 +1138,7 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistas() {
 								pago_contratista_cdp_rp.VigenciaCdp = strconv.Itoa(contrato_disponibilidad.VigenciaCdp)
 								pago_contratista_cdp_rp.NumeroRp = rp.RpNumeroRegistro
 								pago_contratista_cdp_rp.VigenciaRp = rp.RpVigencia
+								pago_contratista_cdp_rp.Rubro = contrato.Contrato.Rubro
 
 								pagos_contratista_cdp_rp = append(pagos_contratista_cdp_rp, pago_contratista_cdp_rp)
 
@@ -1270,11 +1273,15 @@ func (c *AprobacionPagoController) CertificacionCumplidosContratistas() {
 
 				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pagos_mensuales[v].Persona, &contratistas); err == nil {
 
+					var contrato models.InformacionContrato
+					contrato = GetContrato(pagos_mensuales[v].NumeroContrato, strconv.FormatFloat(pagos_mensuales[v].VigenciaContrato, 'f', 0, 64))
+
 					for _, contratista := range contratistas{
 					persona.NumDocumento = contratista.NumDocumento
 					persona.Nombre = contratista.NomProveedor
 					persona.NumeroContrato = pagos_mensuales[v].NumeroContrato
 					persona.Vigencia,_ = strconv.Atoi(cd.Vigencia)
+					persona.Rubro = contrato.Contrato.Rubro
 
 					personas = append(personas, persona)
 					}

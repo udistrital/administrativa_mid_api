@@ -32,7 +32,7 @@ func (c *GestionDesvinculacionesController) URLMapping() {
 func (c *GestionDesvinculacionesController) ListarDocentesDesvinculados() {
 	fmt.Println("docentes desvinculados")
 	id_resolucion := c.GetString("id_resolucion")
-	query := "?limit=-1&query=IdResolucion.Id:" + id_resolucion + ",Estado:false"
+	query := "?limit=-1&query=IdResolucion.Id:" + id_resolucion
 	v := []models.VinculacionDocente{}
 
 	err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &v)
@@ -63,6 +63,7 @@ func (c *GestionDesvinculacionesController) ListarDocentesDesvinculados() {
 // @Success 201 {string}
 // @Failure 403 body is empty
 // @router /actualizar_vinculaciones [post]
+// Usado anteriormente para vincular docentes a cancelaciones, cambia por ActualizarVinculacionesCancelacion
 func (c *GestionDesvinculacionesController) ActualizarVinculaciones() {
 
 	var v models.Objeto_Desvinculacion
@@ -101,12 +102,88 @@ func (c *GestionDesvinculacionesController) ActualizarVinculaciones() {
 
 }
 
+// ActualizarVinculacionesCancelacion ...
+// @Title ActualizarVinculacionesCancelacion
+// @Description create ActualizarVinculacionesCancelacion
+// @Success 201 {string}
+// @Failure 403 body is empty
+// @router /actualizar_vinculaciones_cancelacion [post]
+func (c *GestionDesvinculacionesController) ActualizarVinculacionesCancelacion() {
+
+	var v models.Objeto_Desvinculacion
+	var respuesta interface{}
+	var respuesta_mod_vin models.ModificacionVinculacion
+	// var respuesta string
+	var vinculacion_nueva int
+	var temp_vinculacion [1]models.VinculacionDocente
+
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &v)
+	if err != nil {
+		beego.Error(err)
+		c.Abort("400")
+	}
+	beego.Debug("para poner en false", v)
+
+	for _, pos := range v.DocentesDesvincular {
+		err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.Id), "PUT", &respuesta, pos)
+		if err != nil {
+			beego.Error("error en json", err)
+			c.Abort("403")
+		}
+
+		//Verificar objeto para crear nuevas resoluciones
+		temp_vinculacion[0] = models.VinculacionDocente{
+			IdPersona:            pos.IdPersona,
+			NumeroHorasSemanales: pos.NumeroHorasSemanales,
+			NumeroSemanas:        pos.NumeroSemanasNuevas,
+			IdResolucion:         &models.ResolucionVinculacionDocente{Id: v.IdNuevaResolucion},
+			IdDedicacion:         pos.IdDedicacion,
+			IdProyectoCurricular: pos.IdProyectoCurricular,
+			Categoria:            pos.Categoria,
+			Dedicacion:           pos.Dedicacion,
+			NivelAcademico:       pos.NivelAcademico,
+			Disponibilidad:       pos.Disponibilidad,
+			Vigencia:             pos.Vigencia,
+		}
+
+		//CREAR NUEVA Vinculacion
+		vinculacion_nueva, err = InsertarDesvinculaciones(temp_vinculacion, true)
+		if err != nil {
+			beego.Error("error al realizar vinculacion nueva", err)
+			c.Abort("400")
+		}
+
+		//INSERCION  TABLA  DE TRAZA MODIFICACION VINCULACION
+		temp := models.ModificacionVinculacion{
+			ModificacionResolucion:       &models.ModificacionResolucion{Id: v.IdModificacionResolucion},
+			VinculacionDocenteCancelada:  &models.VinculacionDocente{Id: pos.Id},
+			VinculacionDocenteRegistrada: &models.VinculacionDocente{Id: vinculacion_nueva},
+			Horas: pos.NumeroHorasSemanales,
+		}
+		errorMod := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/", "POST", &respuesta_mod_vin, temp)
+
+		if errorMod != nil {
+			beego.Error("error en actualizacion de modificacion vinculacion de modificacion vinculacion", err)
+			respuesta = "error"
+		} else {
+			beego.Info("respuesta modificacion vin", respuesta_mod_vin)
+			respuesta = "OK"
+		}
+	}
+
+	c.Data["json"] = respuesta
+
+	c.ServeJSON()
+
+}
+
 // AdicionarHoras ...
 // @Title AdicionarHoras
 // @Description create AdicionarHoras
 // @Success 201 {string}
 // @Failure 403 body is empty
 // @router /adicionar_horas [post]
+// Se usa tanto para adiciones como para reducciones de horas y semanas
 func (c *GestionDesvinculacionesController) AdicionarHoras() {
 
 	var v models.Objeto_Desvinculacion
@@ -114,6 +191,9 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 	var respuesta string
 	var vinculacion_nueva int
 	var temp_vinculacion [1]models.VinculacionDocente
+	var semanasRestantes int
+	var horasTotales int
+	var horasOriginales int
 
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 	if err != nil {
@@ -121,7 +201,7 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 		c.Data["json"] = "Error al leer json para desvincular"
 	}
 
-	//CAMBIAR ESTADO DE VINCULACIÓN DOCNETE
+	//CAMBIAR ESTADO DE VINCULACIÓN DOCENTE
 	for _, pos := range v.DocentesDesvincular {
 		err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.Id), "PUT", &respuesta, pos)
 		//TODO: unificar errores
@@ -146,8 +226,35 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 			Vigencia:             v.DocentesDesvincular[0].Vigencia,
 		}
 
+		semanasRestantes = v.DocentesDesvincular[0].NumeroSemanasRestantes
+		horasOriginales = v.DocentesDesvincular[0].NumeroHorasSemanales
+		horasTotales = horasOriginales + v.DocentesDesvincular[0].NumeroHorasNuevas
+
+		switch v.TipoDesvinculacion {
+		case "Adición":
+			valorContratoAdicion, err := CalcularValorContratoAdicion(temp_vinculacion, semanasRestantes, horasTotales)
+			if err != nil {
+				beego.Error("error al calcular el valor del contrato", err)
+				c.Abort("400")
+			}
+			beego.Info("salario: ", valorContratoAdicion)
+			temp_vinculacion[0].ValorContrato = valorContratoAdicion
+			break
+		case "Reducción":
+			valorContratoReduccion, err := CalcularValorContratoReduccion(temp_vinculacion, semanasRestantes, horasOriginales)
+			if err != nil {
+				beego.Error("error al calcular el valor del contrato", err)
+				c.Abort("400")
+			}
+			beego.Info("salario: ", valorContratoReduccion)
+			temp_vinculacion[0].ValorContrato = valorContratoReduccion
+			break
+		default:
+			break
+		}
+
 		//CREAR NUEVA Vinculacion
-		vinculacion_nueva, err = InsertarDesvinculaciones(temp_vinculacion)
+		vinculacion_nueva, err = InsertarDesvinculaciones(temp_vinculacion, false)
 		if err != nil {
 			beego.Error("error al realizar vinculacion nueva", err)
 			c.Abort("400")
@@ -179,12 +286,13 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 
 }
 
-// GestionDesvinculacionesController ...
+// AnularDesvinculacionDocente ...
 // @Title AnularDesvinculacionDocente
 // @Description create AnularDesvinculacionDocente
 // @Success 201 {string}
 // @Failure 403 body is empty
 // @router /anular_desvinculacion [post]
+// Usado anteriormente para anular las vinculaciones a cancelaciones (desvinculaciones), cambia por AnularAdicionDocente ya que usa la misma lógica de las adiciones
 func (c *GestionDesvinculacionesController) AnularDesvinculacionDocente() {
 	fmt.Println("anular desvinculacion")
 	var v models.Objeto_Desvinculacion
@@ -222,12 +330,13 @@ func (c *GestionDesvinculacionesController) AnularDesvinculacionDocente() {
 	c.ServeJSON()
 }
 
-// GestionDesvinculacionesController ...
+// AnularAdicionDocente ...
 // @Title AnularAdicionDocente
 // @Description create AnularAdicionDocente
 // @Success 201 {string}
 // @Failure 403 body is empty
 // @router /anular_adicion [post]
+// Se usa para adiciones, reducciones y cancelaciones
 func (c *GestionDesvinculacionesController) AnularAdicionDocente() {
 	fmt.Println("anular adicion")
 	var v models.Objeto_Desvinculacion
@@ -295,7 +404,7 @@ func (c *GestionDesvinculacionesController) AnularAdicionDocente() {
 	c.ServeJSON()
 }
 
-func InsertarDesvinculaciones(v [1]models.VinculacionDocente) (id int, err error) {
+func InsertarDesvinculaciones(v [1]models.VinculacionDocente, calcularContrato bool) (id int, err error) {
 	var d []models.VinculacionDocente
 	json_ejemplo, err := json.Marshal(v)
 	if err != nil {
@@ -309,19 +418,106 @@ func InsertarDesvinculaciones(v [1]models.VinculacionDocente) (id int, err error
 		return id, err
 	}
 
-	beego.Debug("docentes a contratar", d)
 	//TODO: unificar cont con error
-	d, err = CalcularSalarioPrecontratacion(d)
-	if err != nil {
-		return id, err
+	if calcularContrato {
+		d, err = CalcularSalarioPrecontratacion(d)
+		if err != nil {
+			return id, err
+		}
 	}
-
 	err = sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &id, &d)
 	if err != nil {
 		beego.Error(err)
 		return 0, err
 	}
 	return id, err
+}
+
+// Calcula el valor del contrato adicional en dos partes:
+// (1) las horas adicionales a partir de la fecha de inicio escogida hasta la fecha final del contrato original,
+// (2) el total de las horas en las semanas adicionales
+func CalcularValorContratoAdicion(v [1]models.VinculacionDocente, semanasRestantes int, horasTotales int) (salarioTotal float64, err error) {
+	var d []models.VinculacionDocente
+	var salarioHorasNuevas float64
+	var salarioSemanasNuevas float64
+
+	jsonEjemplo, err := json.Marshal(v)
+	if err != nil {
+		return salarioTotal, err
+	}
+	err = json.Unmarshal(jsonEjemplo, &d)
+	if err != nil {
+		return salarioTotal, err
+	}
+
+	semanasNuevas := d[0].NumeroSemanas
+	horasNuevas := d[0].NumeroHorasSemanales
+
+	// Si hay semanas restantes y horas nuevas se calcula el valor para esas horas adicionales en esas semanas
+	if semanasRestantes != 0 && horasNuevas != 0 {
+		d[0].NumeroSemanas = semanasRestantes
+		docentes, err := CalcularSalarioPrecontratacion(d)
+		if err != nil {
+			return salarioTotal, err
+		}
+		salarioHorasNuevas = docentes[0].ValorContrato
+	}
+	// Si hay semanas nuevas se calcula el valor para esas semanas y el total de horas
+	if semanasNuevas != 0 {
+		d[0].NumeroSemanas = semanasNuevas
+		d[0].NumeroHorasSemanales = horasTotales
+		docentes, err := CalcularSalarioPrecontratacion(d)
+		if err != nil {
+			return salarioTotal, err
+		}
+		salarioSemanasNuevas = docentes[0].ValorContrato
+	}
+
+	salarioTotal = salarioHorasNuevas + salarioSemanasNuevas
+	return salarioTotal, nil
+}
+
+// Calcula el valor del contrato a reversar en dos partes:
+// (1) el total de las horas durante las semanas a reducir
+// (2) las horas a reversar en las semanas entre la fecha de inicio y la fecha final
+func CalcularValorContratoReduccion(v [1]models.VinculacionDocente, semanasRestantes int, horasOriginales int) (salarioTotal float64, err error) {
+	var d []models.VinculacionDocente
+	var salarioHorasReversar float64
+	var salarioSemanasReversar float64
+
+	jsonEjemplo, err := json.Marshal(v)
+	if err != nil {
+		return salarioTotal, err
+	}
+	err = json.Unmarshal(jsonEjemplo, &d)
+	if err != nil {
+		return salarioTotal, err
+	}
+
+	semanasReversar := d[0].NumeroSemanas
+	horasReversar := d[0].NumeroHorasSemanales
+
+	if semanasReversar != 0 {
+		d[0].NumeroHorasSemanales = horasOriginales
+		docentes, err := CalcularSalarioPrecontratacion(d)
+		if err != nil {
+			return salarioTotal, err
+		}
+		salarioSemanasReversar = docentes[0].ValorContrato
+	}
+
+	if semanasRestantes > 0 && horasReversar != 0 {
+		d[0].NumeroSemanas = semanasRestantes
+		d[0].NumeroHorasSemanales = horasReversar
+		docentes, err := CalcularSalarioPrecontratacion(d)
+		if err != nil {
+			return salarioTotal, err
+		}
+		salarioHorasReversar = docentes[0].ValorContrato
+	}
+
+	salarioTotal = salarioHorasReversar + salarioSemanasReversar
+	return salarioTotal, nil
 }
 
 // GestionCanceladosController ...
