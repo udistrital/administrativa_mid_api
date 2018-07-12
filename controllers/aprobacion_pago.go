@@ -97,6 +97,7 @@ func (c *AprobacionPagoController) GetContratosDocente() {
 			//for vinculaciones
 			for _, vinculacion := range vinculaciones {
 				//If dependencia get
+
 				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudOikos")+"/"+beego.AppConfig.String("NscrudOikos")+"/dependencia/"+strconv.Itoa(vinculacion.IdProyectoCurricular), &dep); err == nil {
 					//If resolucion get
 					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+strconv.Itoa(vinculacion.IdResolucion.Id), &res); err == nil {
@@ -104,10 +105,14 @@ func (c *AprobacionPagoController) GetContratosDocente() {
 
 						if vinculacion.NumeroContrato.Valid == true {
 							if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/acta_inicio/?query=NumeroContrato:"+vinculacion.NumeroContrato.String+",Vigencia:"+strconv.FormatInt(vinculacion.Vigencia.Int64, 10), &actasInicio); err == nil {
-
+	
 								//If Estado = 4
 								for _, actaInicio := range actasInicio {
+									actaInicio.FechaInicio = actaInicio.FechaInicio.UTC()
+									actaInicio.FechaFin = actaInicio.FechaFin.UTC()
+
 									if int(actaInicio.FechaInicio.Month()) <= int(time.Now().Month()) && actaInicio.FechaInicio.Year() <= time.Now().Year() && int(actaInicio.FechaFin.Month()) >= int(time.Now().Month()) && actaInicio.FechaFin.Year() <= time.Now().Year() {
+
 										cd.NumeroVinculacion = vinculacion.NumeroContrato.String
 										cd.Vigencia = vinculacion.Vigencia.Int64
 										cd.Resolucion = res.NumeroResolucion
@@ -873,6 +878,64 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 	
 		for _, novedad := range novedades_postcontractuales {
 			if novedad.TipoNovedad == 219 {// si es una cesión
+
+				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+numero_documento,&informacion_proveedores); err == nil {
+			
+					for _,persona := range informacion_proveedores {
+						
+						if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/novedad_postcontractual/?query=Contratista:"+ strconv.Itoa(persona.Id)+"&sortby=FechaInicio&order=desc&limit=1", &novedades_postcontractuales); err == nil {
+		
+							for _, novedad := range novedades_postcontractuales {
+								var contrato models.InformacionContrato
+								contrato = GetContrato(novedad.NumeroContrato, strconv.Itoa(novedad.Vigencia))
+		
+								var informacion_contrato_contratista models.InformacionContratoContratista
+				informacion_contrato_contratista = GetInformacionContratoContratista(novedad.NumeroContrato, strconv.Itoa(novedad.Vigencia))
+				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
+		
+		
+					for _, contrato_disponibilidad := range contratos_disponibilidad {
+		
+		
+						var cdprp models.InformacionCdpRp
+						cdprp = GetRP(strconv.Itoa(contrato_disponibilidad.NumeroCdp), strconv.Itoa(contrato_disponibilidad.VigenciaCdp))
+		
+						for _, rp := range cdprp.CdpXRp.CdpRp {
+							
+							var contrato_disponibilidad_rp models.ContratoDisponibilidadRp
+		
+							contrato_disponibilidad_rp.NumeroContratoSuscrito = novedad.NumeroContrato
+							contrato_disponibilidad_rp.Vigencia = strconv.Itoa(novedad.Vigencia)
+							contrato_disponibilidad_rp.NumeroCdp = strconv.Itoa(contrato_disponibilidad.NumeroCdp)
+							contrato_disponibilidad_rp.VigenciaCdp = strconv.Itoa(contrato_disponibilidad.VigenciaCdp)
+							contrato_disponibilidad_rp.NumeroRp = rp.RpNumeroRegistro
+							contrato_disponibilidad_rp.VigenciaRp = rp.RpVigencia
+		
+							contrato_disponibilidad_rp.NombreDependencia = informacion_contrato_contratista.InformacionContratista.Dependencia
+							contrato_disponibilidad_rp.NumDocumentoSupervisor = contrato.Contrato.Supervisor.DocumentoIdentificacion
+		
+							contratos_disponibilidad_rp = append(contratos_disponibilidad_rp, contrato_disponibilidad_rp)
+						}
+		
+					}
+		
+				} else { // If contrato_disponibilidad get
+					fmt.Println("Mirenme, me morí en If contrato_disponibilidad get, solucioname!!! ", err)
+				
+				}
+							}
+		
+						}else{ // If novedad_postcontractual get
+							fmt.Println("Mirenme, me morí en If novedad_postcontractual get, solucioname!!! ", err.Error())
+						}	
+					}
+		
+				}else{// If informacion_proveedor get
+					fmt.Println("Mirenme, me morí en If informacion_proveedor get, solucioname!!! ", err.Error())
+				}
+
+
+
 			}else{// si no es una cesión
 				var cdprp models.InformacionCdpRp
 				cdprp = GetRP(strconv.Itoa(novedad.NumeroCdp),strconv.Itoa(novedad.VigenciaCdp))
@@ -997,6 +1060,8 @@ func (c *AprobacionPagoController) GetSolicitudesSupervisorContratistas() {
 								pago_contratista_cdp_rp.VigenciaCdp = strconv.Itoa(contrato_disponibilidad.VigenciaCdp)
 								pago_contratista_cdp_rp.NumeroRp = rp.RpNumeroRegistro
 								pago_contratista_cdp_rp.VigenciaRp = rp.RpVigencia
+								pago_contratista_cdp_rp.Rubro = contrato.Contrato.Rubro
+
 
 								pagos_contratista_cdp_rp = append(pagos_contratista_cdp_rp, pago_contratista_cdp_rp)
 
@@ -1073,6 +1138,7 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistas() {
 								pago_contratista_cdp_rp.VigenciaCdp = strconv.Itoa(contrato_disponibilidad.VigenciaCdp)
 								pago_contratista_cdp_rp.NumeroRp = rp.RpNumeroRegistro
 								pago_contratista_cdp_rp.VigenciaRp = rp.RpVigencia
+								pago_contratista_cdp_rp.Rubro = contrato.Contrato.Rubro
 
 								pagos_contratista_cdp_rp = append(pagos_contratista_cdp_rp, pago_contratista_cdp_rp)
 
@@ -1207,11 +1273,15 @@ func (c *AprobacionPagoController) CertificacionCumplidosContratistas() {
 
 				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pagos_mensuales[v].Persona, &contratistas); err == nil {
 
+					var contrato models.InformacionContrato
+					contrato = GetContrato(pagos_mensuales[v].NumeroContrato, strconv.FormatFloat(pagos_mensuales[v].VigenciaContrato, 'f', 0, 64))
+
 					for _, contratista := range contratistas{
 					persona.NumDocumento = contratista.NumDocumento
 					persona.Nombre = contratista.NomProveedor
 					persona.NumeroContrato = pagos_mensuales[v].NumeroContrato
 					persona.Vigencia,_ = strconv.Atoi(cd.Vigencia)
+					persona.Rubro = contrato.Contrato.Rubro
 
 					personas = append(personas, persona)
 					}
