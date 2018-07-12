@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/administrativa_mid_api/models"
@@ -388,7 +389,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 		v.TipoDocumento = BuscarTipoDocumento(v.IdPersona)
 		v.ValorContratoInicial = v.ValorContrato
 		v.ValorContratoInicialFormato = FormatMoney(int(v.ValorContrato), 2)
-		v.NumeroHorasNuevas, v.ValorContrato, v.NumeroSemanasNuevas, v.NumeroRp, v.VigenciaRp = Calcular_totales_vinculacion_pdf(v.IdPersona, idResolucion)
+		v.NumeroHorasNuevas, v.ValorContrato, v.NumeroSemanasNuevas, v.NumeroRp, v.VigenciaRp, v.FechaInicio = Calcular_totales_vinculacion_pdf(v.IdPersona, idResolucion)
 		v.NumeroMeses = strconv.FormatFloat(float64(v.NumeroSemanas)/4, 'f', 2, 64) + " meses"
 		v.ValorContratoFormato = FormatMoney(int(v.ValorContrato), 2)
 		v.ValorModificacionFormato = FormatMoney(int(v.ValorContrato), 2)
@@ -407,7 +408,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 			v[x] = pos
 		}
 	} else {
-		//Busca el id de la modificación donde se relacionan la resolución original y la de cancelación asociada
+		//Busca el id de la modificación donde se relacionan la resolución original y la de modificación asociada
 		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+idResolucion, &modres)
 		if err != nil {
 			beego.Error(err)
@@ -919,13 +920,14 @@ func BuscarLugarExpedicion(Cedula string) (nombre_lugar_exp string) {
 
 }
 
-func Calcular_totales_vinculacion_pdf(cedula, id_resolucion string) (suma_total_horas int, suma_total_contrato float64, semanas_nuevas int, numero_rp int, vigencia_rp int) {
+func Calcular_totales_vinculacion_pdf(cedula, id_resolucion string) (suma_total_horas int, suma_total_contrato float64, semanas_nuevas int, numero_rp int, vigencia_rp int, fechaInicio time.Time) {
 
 	query := "?limit=-1&query=IdPersona:" + cedula + ",IdResolucion.Id:" + id_resolucion
 	var temp []models.VinculacionDocente
 	var total_contrato int
 	var total_horas int
 
+	// Busca la vinculación docente de modificación
 	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &temp); err2 == nil {
 
 		for _, pos := range temp {
@@ -939,7 +941,7 @@ func Calcular_totales_vinculacion_pdf(cedula, id_resolucion string) (suma_total_
 		total_contrato = 0
 	}
 
-	return total_horas, float64(total_contrato), temp[0].NumeroSemanas, temp[0].NumeroRp, temp[0].VigenciaRp
+	return total_horas, float64(total_contrato), temp[0].NumeroSemanas, temp[0].NumeroRp, temp[0].VigenciaRp, temp[0].FechaInicio
 }
 
 // GestionPrevinculacionesController ...
@@ -985,12 +987,10 @@ func (c *GestionDesvinculacionesController) GetVinculacionesAgrupadasCanceladas(
 
 }
 
-
-
 func GetInformacionRpDocente(numero_cdp string, vigencia_cdp string, identificacion string) (informacion_rp_docente models.RpDocente) {
 
 	var temp map[string]interface{}
-	fmt.Println(numero_cdp + " "+vigencia_cdp+" "+ identificacion )
+	fmt.Println(numero_cdp + " " + vigencia_cdp + " " + identificacion)
 	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudFinanciera")+"/"+"cdprpdocente/"+numero_cdp+"/"+vigencia_cdp+"/"+identificacion, &temp); err == nil {
 		json_cdp_rp, error_json := json.Marshal(temp)
 
@@ -1026,20 +1026,16 @@ func (c *GestionPrevinculacionesController) GetCdpRpDocente() {
 	vigencia := c.Ctx.Input.Param(":vigencia")
 	identificacion := c.Ctx.Input.Param(":identificacion")
 
-
 	var contratoDisponibilidad []models.ContratoDisponibilidad
 	var rpdocente models.RpDocente
 
-
-
 	//If 1 contrato_disponibilidad (get)
-	if err := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+num_vinculacion+",Vigencia:"+vigencia, &contratoDisponibilidad); err == nil {		//If 2  (get)
-			//for contrato_disponibilidad
-			for _, pos := range contratoDisponibilidad {
-					fmt.Println(pos)
-						rpdocente = GetInformacionRpDocente( strconv.Itoa(pos.NumeroCdp), strconv.Itoa(pos.VigenciaCdp), identificacion)
-						c.Data["json"] = rpdocente
-			}
+	if err := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+num_vinculacion+",Vigencia:"+vigencia, &contratoDisponibilidad); err == nil { //If 2  (get)
+		//for contrato_disponibilidad
+		for _, pos := range contratoDisponibilidad {
+			rpdocente = GetInformacionRpDocente(strconv.Itoa(pos.NumeroCdp), strconv.Itoa(pos.VigenciaCdp), identificacion)
+			c.Data["json"] = rpdocente
+		}
 
 	} else { //If 1 contrato_disponibilidad (get)
 		fmt.Println("He fallado en If 1 contrato_disponibilidad (get), solucioname!!!", err)

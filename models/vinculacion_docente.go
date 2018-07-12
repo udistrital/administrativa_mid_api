@@ -39,6 +39,7 @@ type VinculacionDocente struct {
 	ValorContratoInicialFormato string
 	ValorModificacionFormato    string
 	DependenciaAcademica        int
-	NumeroRp			 		int						   
-	VigenciaRp			 		int						  
+	NumeroRp                    int
+	VigenciaRp                  int
+	FechaInicio                 time.Time
 }
