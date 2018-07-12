@@ -213,6 +213,8 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 	//CAMBIAR ESTADO DE VINCULACIÓN DOCENTE
 	for _, pos := range v.DocentesDesvincular {
 		pos.FechaInicio = time.Time{}
+		pos.NumeroRp = 0
+		pos.VigenciaRp = 0
 		err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.Id), "PUT", &respuesta, pos)
 		//TODO: unificar errores
 		if err != nil {
@@ -235,6 +237,8 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 			Disponibilidad:       v.DisponibilidadNueva,
 			Vigencia:             v.DocentesDesvincular[0].Vigencia,
 			FechaInicio:          v.DocentesDesvincular[0].FechaInicio,
+			NumeroRp:			  v.DocentesDesvincular[0].NumeroRp,
+			VigenciaRp:			  v.DocentesDesvincular[0].VigenciaRp,
 		}
 
 		semanasRestantes = v.DocentesDesvincular[0].NumeroSemanasRestantes
