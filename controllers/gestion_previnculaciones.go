@@ -226,9 +226,9 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 			return docentes_a_insertar, err
 		}
 		if p && strings.ToLower(nivelAcademico) == "posgrado" {
-			categoria = docente.Categoria + "ud"
+			categoria = strings.TrimSpace(docente.Categoria) + "ud"
 		} else {
-			categoria = docente.Categoria
+			categoria = strings.TrimSpace(docente.Categoria)
 		}
 
 		var predicados string
