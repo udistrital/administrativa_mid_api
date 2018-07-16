@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/administrativa_mid_api/models"
@@ -125,6 +126,12 @@ func (c *GestionDesvinculacionesController) ActualizarVinculacionesCancelacion()
 	beego.Debug("para poner en false", v)
 
 	for _, pos := range v.DocentesDesvincular {
+
+		numerorp := pos.NumeroRp
+		vigenciarp := pos.VigenciaRp
+
+		pos.NumeroRp = 0
+		pos.VigenciaRp = 0
 		err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.Id), "PUT", &respuesta, pos)
 		if err != nil {
 			beego.Error("error en json", err)
@@ -144,8 +151,10 @@ func (c *GestionDesvinculacionesController) ActualizarVinculacionesCancelacion()
 			NivelAcademico:       pos.NivelAcademico,
 			Disponibilidad:       pos.Disponibilidad,
 			Vigencia:             pos.Vigencia,
+			NumeroRp:             numerorp,
+			VigenciaRp:           vigenciarp,
 		}
-
+		fmt.Println("RP: ", temp_vinculacion[0].NumeroRp)
 		//CREAR NUEVA Vinculacion
 		vinculacion_nueva, err = InsertarDesvinculaciones(temp_vinculacion, true)
 		if err != nil {
@@ -203,6 +212,9 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 
 	//CAMBIAR ESTADO DE VINCULACIÓN DOCENTE
 	for _, pos := range v.DocentesDesvincular {
+		pos.FechaInicio = time.Time{}
+		pos.NumeroRp = 0
+		pos.VigenciaRp = 0
 		err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.Id), "PUT", &respuesta, pos)
 		//TODO: unificar errores
 		if err != nil {
@@ -224,6 +236,9 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 			NivelAcademico:       v.DocentesDesvincular[0].NivelAcademico,
 			Disponibilidad:       v.DisponibilidadNueva,
 			Vigencia:             v.DocentesDesvincular[0].Vigencia,
+			FechaInicio:          v.DocentesDesvincular[0].FechaInicio,
+			NumeroRp:			  v.DocentesDesvincular[0].NumeroRp,
+			VigenciaRp:			  v.DocentesDesvincular[0].VigenciaRp,
 		}
 
 		semanasRestantes = v.DocentesDesvincular[0].NumeroSemanasRestantes
@@ -549,6 +564,7 @@ func (c *GestionDesvinculacionesController) ListarDocentesCancelados() {
 					cv.NumeroDisponibilidad = BuscarNumeroDisponibilidad(vinculacion.VinculacionDocenteCancelada.Disponibilidad)
 					cv.Dedicacion = BuscarNombreDedicacion(vinculacion.VinculacionDocenteCancelada.IdDedicacion.Id)
 					cv.LugarExpedicionCedula = BuscarLugarExpedicion(vinculacion.VinculacionDocenteCancelada.IdPersona)
+					cv.NumeroSemanasNuevas = vinculacion.VinculacionDocenteCancelada.NumeroSemanas - vinculacion.VinculacionDocenteRegistrada.NumeroSemanas
 				} else { // if 1 - vinculacion_docente
 					fmt.Println("Error de consulta en vinculacion, solucioname!!!, if 1 - vinculacion_docente: ", err)
 				}
