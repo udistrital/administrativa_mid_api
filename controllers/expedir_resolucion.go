@@ -530,6 +530,8 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 					contrato := vinculacion.ContratoGeneral
 					var sup models.SupervisorContrato
 					acta := vinculacion.ActaInicio
+					fechaInicioOriginal := acta.FechaInicio
+					acta.FechaInicio = time.Date(fechaInicioOriginal.Year(), fechaInicioOriginal.Month(), fechaInicioOriginal.Day(), 0, 0, 0, 0, fechaInicioOriginal.Location())
 					aux1 := 181
 					contrato.VigenciaContrato = vigencia
 					contrato.Id = "DVE" + strconv.Itoa(numeroContratos)
