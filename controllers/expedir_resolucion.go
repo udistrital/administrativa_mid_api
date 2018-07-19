@@ -570,10 +570,10 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 								if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/acta_inicio/?query=NumeroContrato:"+modVin[0].VinculacionDocenteCancelada.NumeroContrato.String+",Vigencia:"+strconv.Itoa(int(modVin[0].VinculacionDocenteCancelada.Vigencia.Int64)), &actaInicioAnterior); err == nil {
 									semanasTotales := vinculacion.VinculacionDocente.NumeroSemanasNuevas
 									semanasIniciales := modVin[0].VinculacionDocenteCancelada.NumeroSemanas
+									semanasModificar := modVin[0].VinculacionDocenteRegistrada.NumeroSemanas
 									horasTotales := vinculacion.VinculacionDocente.NumeroHorasNuevas
 									horasIniciales := modVin[0].VinculacionDocenteCancelada.NumeroHorasSemanales
-									fechaFinNuevoContrato := CalcularFechaFin(actaInicioAnterior[0].FechaInicio, vinculacion.VinculacionDocente.NumeroSemanasNuevas)
-
+									fechaFinNuevoContrato := CalcularFechaFin(acta.FechaInicio, semanasModificar)
 									// Sólo si es reducción cambia la fecha fin del acta anterior y el valor del nuevo contrato
 									if semanasTotales < semanasIniciales || horasTotales < horasIniciales {
 										var aini models.ActaInicio
@@ -583,9 +583,7 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 										aini.Descripcion = actaInicioAnterior[0].Descripcion
 										aini.FechaInicio = actaInicioAnterior[0].FechaInicio
 										aini.FechaFin = acta.FechaInicio
-										if fechaFinNuevoContrato.Before(acta.FechaInicio) {
-											aini.FechaFin = fechaFinNuevoContrato
-										}
+										fechaFinNuevoContrato = actaInicioAnterior[0].FechaFin
 										// If put acta_inicio cancelando - cambia fecha fin del acta anterior por la fecha inicio escogida por el usuario
 										if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/acta_inicio/"+strconv.Itoa(aini.Id), "PUT", &response, &aini); err == nil {
 											fmt.Println("Acta anterior cancelada en la fecha indicada")
@@ -602,14 +600,13 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 											semanasTranscurridas = semanasTranscurridas + 1
 										}
 										var semanasTranscurridasInt = int(semanasTranscurridas)
-										semanasContrato := semanasTotales - semanasTranscurridasInt
+										semanasRestantes := semanasIniciales - semanasTranscurridasInt - semanasModificar
 										var vinc [1]models.VinculacionDocente
-										var d []models.VinculacionDocente
 										vinc[0] = models.VinculacionDocente{
 											IdResolucion:         &models.ResolucionVinculacionDocente{Id: m.IdResolucion},
 											IdPersona:            v.IdPersona,
 											NumeroHorasSemanales: horasTotales,
-											NumeroSemanas:        semanasContrato,
+											NumeroSemanas:        semanasModificar,
 											IdDedicacion:         v.IdDedicacion,
 											IdProyectoCurricular: v.IdProyectoCurricular,
 											Categoria:            v.Categoria,
@@ -618,26 +615,14 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 											Vigencia:             v.Vigencia,
 											Disponibilidad:       v.Disponibilidad,
 										}
-										jsonVinc, err := json.Marshal(vinc)
-										if err != nil {
-											amazon.Rollback()
-											flyway.Rollback()
-											return
-										}
-										err = json.Unmarshal(jsonVinc, &d)
-										if err != nil {
-											amazon.Rollback()
-											flyway.Rollback()
-											return
-										}
-										docente, err := CalcularSalarioPrecontratacion(d)
+										salario, err := CalcularValorContratoReduccion(vinc, semanasRestantes, horasIniciales)
 										if err != nil {
 											fmt.Println("He fallado en cálculo del contrato reducción, solucioname!!!", err)
 											amazon.Rollback()
 											flyway.Rollback()
 											return
 										}
-										contrato.ValorContrato = docente[0].ValorContrato
+										contrato.ValorContrato = salario
 										beego.Info(contrato.ValorContrato)
 									}
 
@@ -661,9 +646,6 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 											ai.Vigencia = aux2
 											ai.Descripcion = acta.Descripcion
 											ai.FechaInicio = acta.FechaInicio
-											if fechaFinNuevoContrato.Before(acta.FechaInicio) {
-												ai.FechaInicio = fechaFinNuevoContrato
-											}
 											ai.FechaFin = fechaFinNuevoContrato
 											// If 3 - Acta_inicio
 											if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/acta_inicio", "POST", &response, &ai); err == nil {
@@ -816,4 +798,41 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 	amazon.Commit()
 	flyway.Commit()
 	c.ServeJSON()
+}
+
+// Calcula el valor del contrato a reversar en dos partes:
+// (1) las horas a reducir durante las semanas a reducir
+// (2) las horas a originales en las semanas restantes (si quedan después de la reducción)
+func CalcularValorContratoReduccion(v [1]models.VinculacionDocente, semanasRestantes int, horasOriginales int) (salarioTotal float64, err error) {
+	var d []models.VinculacionDocente
+	var salarioSemanasReducidas float64
+	var salarioSemanasRestantes float64
+
+	jsonEjemplo, err := json.Marshal(v)
+	if err != nil {
+		return salarioTotal, err
+	}
+	err = json.Unmarshal(jsonEjemplo, &d)
+	if err != nil {
+		return salarioTotal, err
+	}
+
+	docentes, err := CalcularSalarioPrecontratacion(d)
+	if err != nil {
+		return salarioTotal, err
+	}
+	salarioSemanasReducidas = docentes[0].ValorContrato
+
+	if semanasRestantes > 0 {
+		d[0].NumeroSemanas = semanasRestantes
+		d[0].NumeroHorasSemanales = horasOriginales
+		docentes, err := CalcularSalarioPrecontratacion(d)
+		if err != nil {
+			return salarioTotal, err
+		}
+		salarioSemanasRestantes = docentes[0].ValorContrato
+	}
+
+	salarioTotal = salarioSemanasReducidas + salarioSemanasRestantes
+	return salarioTotal, nil
 }
