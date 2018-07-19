@@ -140,12 +140,27 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 	var cont bool
 	var respuesta_modificacion_res models.ModificacionResolucion
 	var resVieja models.Resolucion
+	var motivo string
+	var dedicacion string
 
 	temp.Vigencia, _, _ = time.Now().Date()
 	temp.FechaRegistro = time.Now()
 	temp.Estado = true
+	switch resolucion.ResolucionVinculacionDocente.Dedicacion {
+	case "HCH":
+		motivo = "reconocen HONORARIOS a"
+		dedicacion = "HORA CÁTEDRA HONORARIOS"
+		break
+	case "HCP":
+		motivo = "vinculan"
+		dedicacion = "HORA CÁTEDRA"
+		break
+	case "TCO-MTO":
+		motivo = "vinculan"
+		dedicacion = "MEDIO TIEMPO OCASIONAL y TIEMPO COMPLETO OCASIONAL"
+	}
 	if temp.IdTipoResolucion.Id == 1 {
-		temp.Titulo = "“Por la cual se vinculan docentes para el Primer Periodo Académico de 2018 en la modalidad de Docentes de HORA CÁTEDRA (Vinculación Especial) para la " + resolucion.NomDependencia + " en " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ".”"
+		temp.Titulo = "“Por la cual se " + motivo + " docentes para el Tercer Periodo Académico de 2018 en la modalidad de Docentes de " + dedicacion + " (Vinculación Especial) para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas en " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ".”"
 	}
 
 	if temp.IdTipoResolucion.Id != 1 {
