@@ -594,7 +594,7 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 											return
 										}
 										// Calcula el valor del nuevo contrato con base en las semanas desde la fecha inicio escogida hasta la nueva fecha fin y las nuevas horas
-										semanasTranscurridasDecimal := (acta.FechaInicio.Sub(actaInicioAnterior[0].FechaInicio).Hours()) / 24 / 7
+										semanasTranscurridasDecimal := (acta.FechaInicio.Sub(actaInicioAnterior[0].FechaInicio).Hours()) / 24 / 30 * 4 // cálculo con base en meses de 30 días y 4 semanas
 										semanasTranscurridas, decimal := math.Modf(semanasTranscurridasDecimal)
 										if decimal > 0 {
 											semanasTranscurridas = semanasTranscurridas + 1
