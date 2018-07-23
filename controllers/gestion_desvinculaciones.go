@@ -156,7 +156,7 @@ func (c *GestionDesvinculacionesController) ActualizarVinculacionesCancelacion()
 		}
 		fmt.Println("RP: ", temp_vinculacion[0].NumeroRp)
 		//CREAR NUEVA Vinculacion
-		vinculacion_nueva, err = InsertarDesvinculaciones(temp_vinculacion, true)
+		vinculacion_nueva, err = InsertarDesvinculaciones(temp_vinculacion)
 		if err != nil {
 			beego.Error("error al realizar vinculacion nueva", err)
 			c.Abort("400")
@@ -200,9 +200,6 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 	var respuesta string
 	var vinculacion_nueva int
 	var temp_vinculacion [1]models.VinculacionDocente
-	var semanasRestantes int
-	var horasTotales int
-	var horasOriginales int
 
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 	if err != nil {
@@ -237,39 +234,12 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 			Disponibilidad:       v.DisponibilidadNueva,
 			Vigencia:             v.DocentesDesvincular[0].Vigencia,
 			FechaInicio:          v.DocentesDesvincular[0].FechaInicio,
-			NumeroRp:			  v.DocentesDesvincular[0].NumeroRp,
-			VigenciaRp:			  v.DocentesDesvincular[0].VigenciaRp,
-		}
-
-		semanasRestantes = v.DocentesDesvincular[0].NumeroSemanasRestantes
-		horasOriginales = v.DocentesDesvincular[0].NumeroHorasSemanales
-		horasTotales = horasOriginales + v.DocentesDesvincular[0].NumeroHorasNuevas
-
-		switch v.TipoDesvinculacion {
-		case "Adición":
-			valorContratoAdicion, err := CalcularValorContratoAdicion(temp_vinculacion, semanasRestantes, horasTotales)
-			if err != nil {
-				beego.Error("error al calcular el valor del contrato", err)
-				c.Abort("400")
-			}
-			beego.Info("salario: ", valorContratoAdicion)
-			temp_vinculacion[0].ValorContrato = valorContratoAdicion
-			break
-		case "Reducción":
-			valorContratoReduccion, err := CalcularValorContratoReduccion(temp_vinculacion, semanasRestantes, horasOriginales)
-			if err != nil {
-				beego.Error("error al calcular el valor del contrato", err)
-				c.Abort("400")
-			}
-			beego.Info("salario: ", valorContratoReduccion)
-			temp_vinculacion[0].ValorContrato = valorContratoReduccion
-			break
-		default:
-			break
+			NumeroRp:             v.DocentesDesvincular[0].NumeroRp,
+			VigenciaRp:           v.DocentesDesvincular[0].VigenciaRp,
 		}
 
 		//CREAR NUEVA Vinculacion
-		vinculacion_nueva, err = InsertarDesvinculaciones(temp_vinculacion, false)
+		vinculacion_nueva, err = InsertarDesvinculaciones(temp_vinculacion)
 		if err != nil {
 			beego.Error("error al realizar vinculacion nueva", err)
 			c.Abort("400")
@@ -419,7 +389,7 @@ func (c *GestionDesvinculacionesController) AnularAdicionDocente() {
 	c.ServeJSON()
 }
 
-func InsertarDesvinculaciones(v [1]models.VinculacionDocente, calcularContrato bool) (id int, err error) {
+func InsertarDesvinculaciones(v [1]models.VinculacionDocente) (id int, err error) {
 	var d []models.VinculacionDocente
 	json_ejemplo, err := json.Marshal(v)
 	if err != nil {
@@ -434,105 +404,17 @@ func InsertarDesvinculaciones(v [1]models.VinculacionDocente, calcularContrato b
 	}
 
 	//TODO: unificar cont con error
-	if calcularContrato {
-		d, err = CalcularSalarioPrecontratacion(d)
-		if err != nil {
-			return id, err
-		}
+	d, err = CalcularSalarioPrecontratacion(d)
+	if err != nil {
+		return id, err
 	}
+
 	err = sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &id, &d)
 	if err != nil {
 		beego.Error(err)
 		return 0, err
 	}
 	return id, err
-}
-
-// Calcula el valor del contrato adicional en dos partes:
-// (1) las horas adicionales a partir de la fecha de inicio escogida hasta la fecha final del contrato original,
-// (2) el total de las horas en las semanas adicionales
-func CalcularValorContratoAdicion(v [1]models.VinculacionDocente, semanasRestantes int, horasTotales int) (salarioTotal float64, err error) {
-	var d []models.VinculacionDocente
-	var salarioHorasNuevas float64
-	var salarioSemanasNuevas float64
-
-	jsonEjemplo, err := json.Marshal(v)
-	if err != nil {
-		return salarioTotal, err
-	}
-	err = json.Unmarshal(jsonEjemplo, &d)
-	if err != nil {
-		return salarioTotal, err
-	}
-
-	semanasNuevas := d[0].NumeroSemanas
-	horasNuevas := d[0].NumeroHorasSemanales
-
-	// Si hay semanas restantes y horas nuevas se calcula el valor para esas horas adicionales en esas semanas
-	if semanasRestantes != 0 && horasNuevas != 0 {
-		d[0].NumeroSemanas = semanasRestantes
-		docentes, err := CalcularSalarioPrecontratacion(d)
-		if err != nil {
-			return salarioTotal, err
-		}
-		salarioHorasNuevas = docentes[0].ValorContrato
-	}
-	// Si hay semanas nuevas se calcula el valor para esas semanas y el total de horas
-	if semanasNuevas != 0 {
-		d[0].NumeroSemanas = semanasNuevas
-		d[0].NumeroHorasSemanales = horasTotales
-		docentes, err := CalcularSalarioPrecontratacion(d)
-		if err != nil {
-			return salarioTotal, err
-		}
-		salarioSemanasNuevas = docentes[0].ValorContrato
-	}
-
-	salarioTotal = salarioHorasNuevas + salarioSemanasNuevas
-	return salarioTotal, nil
-}
-
-// Calcula el valor del contrato a reversar en dos partes:
-// (1) el total de las horas durante las semanas a reducir
-// (2) las horas a reversar en las semanas entre la fecha de inicio y la fecha final
-func CalcularValorContratoReduccion(v [1]models.VinculacionDocente, semanasRestantes int, horasOriginales int) (salarioTotal float64, err error) {
-	var d []models.VinculacionDocente
-	var salarioHorasReversar float64
-	var salarioSemanasReversar float64
-
-	jsonEjemplo, err := json.Marshal(v)
-	if err != nil {
-		return salarioTotal, err
-	}
-	err = json.Unmarshal(jsonEjemplo, &d)
-	if err != nil {
-		return salarioTotal, err
-	}
-
-	semanasReversar := d[0].NumeroSemanas
-	horasReversar := d[0].NumeroHorasSemanales
-
-	if semanasReversar != 0 {
-		d[0].NumeroHorasSemanales = horasOriginales
-		docentes, err := CalcularSalarioPrecontratacion(d)
-		if err != nil {
-			return salarioTotal, err
-		}
-		salarioSemanasReversar = docentes[0].ValorContrato
-	}
-
-	if semanasRestantes > 0 && horasReversar != 0 {
-		d[0].NumeroSemanas = semanasRestantes
-		d[0].NumeroHorasSemanales = horasReversar
-		docentes, err := CalcularSalarioPrecontratacion(d)
-		if err != nil {
-			return salarioTotal, err
-		}
-		salarioHorasReversar = docentes[0].ValorContrato
-	}
-
-	salarioTotal = salarioHorasReversar + salarioSemanasReversar
-	return salarioTotal, nil
 }
 
 // GestionCanceladosController ...
