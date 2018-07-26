@@ -248,6 +248,7 @@ func InsertarTexto(id_res int, dedicacion, nivel_academico string) {
 func InsertarArticulos(id_resolucion int, articulos []models.Articulo) {
 	fmt.Println("Articulos y parágrafos")
 	var respuesta models.ComponenteResolucion
+	var respuesta2 models.ComponenteResolucion
 
 	for x, pos := range articulos {
 		temp := models.ComponenteResolucion{
@@ -264,8 +265,7 @@ func InsertarArticulos(id_resolucion int, articulos []models.Articulo) {
 					TipoComponente:  "Paragrafo",
 					ComponentePadre: &models.ComponenteResolucion{Id: respuesta.Id},
 				}
-
-				if err2 := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/componente_resolucion", "POST", &respuesta, &temp2); err == nil {
+				if err2 := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/componente_resolucion", "POST", &respuesta2, &temp2); err == nil {
 
 				} else {
 					fmt.Println("error al insertar parágrafos", err2)
