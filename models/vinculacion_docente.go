@@ -29,6 +29,7 @@ type VinculacionDocente struct {
 	Disponibilidad              int
 	LugarExpedicionCedula       string
 	NumeroHorasNuevas           int
+	NumeroHorasModificacion     int
 	NumeroSemanasNuevas         int
 	NumeroSemanasRestantes      int
 	Periodo                     int

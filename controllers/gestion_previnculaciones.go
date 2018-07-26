@@ -389,7 +389,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 		v.TipoDocumento = BuscarTipoDocumento(v.IdPersona)
 		v.ValorContratoInicial = v.ValorContrato
 		v.ValorContratoInicialFormato = FormatMoney(int(v.ValorContrato), 2)
-		v.NumeroHorasNuevas, v.ValorContrato, v.NumeroSemanasNuevas, v.NumeroRp, v.VigenciaRp, v.FechaInicio = Calcular_totales_vinculacion_pdf(v.IdPersona, idResolucion)
+		v.NumeroHorasModificacion, v.ValorContrato, v.NumeroSemanasNuevas, v.NumeroRp, v.VigenciaRp, v.FechaInicio = Calcular_totales_vinculacion_pdf(v.IdPersona, idResolucion)
 		v.NumeroMeses = strconv.FormatFloat(float64(v.NumeroSemanas)/4, 'f', 2, 64) + " meses"
 		v.ValorContratoFormato = FormatMoney(int(v.ValorContrato), 2)
 		v.ValorModificacionFormato = FormatMoney(int(v.ValorContrato), 2)
@@ -451,10 +451,10 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 
 				v = append(v, vinc)
 				llenarVinculacion(&vinc)
-				vinc.NumeroMesesNuevos = strconv.FormatFloat(float64(vinc.NumeroSemanas-vinc.NumeroSemanasNuevas)/4, 'f', 2, 64) + " meses"
+				vinc.NumeroMesesNuevos = strconv.FormatFloat(float64(vinc.NumeroSemanasNuevas)/4, 'f', 2, 64) + " meses"
 				vinc.NumeroSemanasNuevas = vinc.NumeroSemanas - vinc.NumeroSemanasNuevas
 				vinc.ValorContratoFormato = FormatMoney(int(vinc.ValorContratoInicial-vinc.ValorContrato), 2)
-				vinc.NumeroHorasNuevas = vinc.NumeroHorasSemanales - vinc.NumeroHorasNuevas
+				vinc.NumeroHorasNuevas = vinc.NumeroHorasSemanales - vinc.NumeroHorasModificacion
 				v[x] = vinc
 			}
 			break
@@ -470,10 +470,10 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 
 				v = append(v, vinc)
 				llenarVinculacion(&vinc)
-				vinc.NumeroMesesNuevos = strconv.FormatFloat(float64(vinc.NumeroSemanas+vinc.NumeroSemanasNuevas)/4, 'f', 2, 64) + " meses"
+				vinc.NumeroMesesNuevos = strconv.FormatFloat(float64(vinc.NumeroSemanasNuevas)/4, 'f', 2, 64) + " meses"
 				vinc.NumeroSemanasNuevas = vinc.NumeroSemanas + vinc.NumeroSemanasNuevas
 				vinc.ValorContratoFormato = FormatMoney(int(vinc.ValorContratoInicial+vinc.ValorContrato), 2)
-				vinc.NumeroHorasNuevas = vinc.NumeroHorasSemanales + vinc.NumeroHorasNuevas
+				vinc.NumeroHorasNuevas = vinc.NumeroHorasSemanales + vinc.NumeroHorasModificacion
 				v[x] = vinc
 			}
 		default:
