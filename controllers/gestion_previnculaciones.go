@@ -389,7 +389,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 		v.TipoDocumento = BuscarTipoDocumento(v.IdPersona)
 		v.ValorContratoInicial = v.ValorContrato
 		v.ValorContratoInicialFormato = FormatMoney(int(v.ValorContrato), 2)
-		v.NumeroHorasModificacion, v.ValorContrato, v.NumeroSemanasNuevas, v.NumeroRp, v.VigenciaRp, v.FechaInicio = Calcular_totales_vinculacion_pdf(v.IdPersona, idResolucion)
+		v.NumeroHorasModificacion, v.ValorContrato, v.NumeroSemanasNuevas, v.NumeroRp, v.VigenciaRp, v.FechaInicio = Calcular_totales_vinculacion_pdf(v.IdPersona, idResolucion, v.IdDedicacion.Id)
 		v.NumeroMeses = strconv.FormatFloat(float64(v.NumeroSemanas)/4, 'f', 2, 64) + " meses"
 		v.ValorContratoFormato = FormatMoney(int(v.ValorContrato), 2)
 		v.ValorModificacionFormato = FormatMoney(int(v.ValorContrato), 2)
@@ -405,6 +405,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 		for x, pos := range v {
 			llenarVinculacion(&pos)
 			pos.NumeroSemanasNuevas = pos.NumeroSemanas
+			pos.NumeroHorasSemanales = pos.NumeroHorasModificacion
 			v[x] = pos
 		}
 	} else {
@@ -920,19 +921,24 @@ func BuscarLugarExpedicion(Cedula string) (nombre_lugar_exp string) {
 
 }
 
-func Calcular_totales_vinculacion_pdf(cedula, id_resolucion string) (suma_total_horas int, suma_total_contrato float64, semanas_nuevas int, numero_rp int, vigencia_rp int, fechaInicio time.Time) {
+func Calcular_totales_vinculacion_pdf(cedula, id_resolucion string, IdDedicacion int) (suma_total_horas int, suma_total_contrato float64, semanas_nuevas int, numero_rp int, vigencia_rp int, fechaInicio time.Time) {
 
 	query := "?limit=-1&query=IdPersona:" + cedula + ",IdResolucion.Id:" + id_resolucion
 	var temp []models.VinculacionDocente
 	var total_contrato int
 	var total_horas int
 
-	// Busca la vinculación docente de modificación
+	// Busca las vinculaciones del docente en la misma resolución (aplica para diferentes proyectos curriculares en vinculaciones y las de modificación)
 	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &temp); err2 == nil {
 
-		for _, pos := range temp {
-			total_horas = total_horas + pos.NumeroHorasSemanales
-			total_contrato = total_contrato + int(pos.ValorContrato)
+		if IdDedicacion != 3 && IdDedicacion != 4 {
+			for _, pos := range temp {
+				total_horas = total_horas + pos.NumeroHorasSemanales
+				total_contrato = total_contrato + int(pos.ValorContrato)
+			}
+		} else {
+			total_horas = temp[0].NumeroHorasSemanales
+			total_contrato = int(temp[0].ValorContrato)
 		}
 
 	} else {
