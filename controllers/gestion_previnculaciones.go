@@ -194,12 +194,12 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 	}
 	//RETORNAR PROYECTOS CURRICUALRES HOMOLOGADOS!!
 	for x, pos := range newDocentesXcargaHoraria.CargasLectivas.CargaLectiva {
-		pos.IDProyecto, err = HomologarProyectoCurricular(pos.IDProyecto)
+		pos.DependenciaAcademica, err = strconv.Atoi(pos.IDProyecto)
 		if err != nil {
 			beego.Error(err)
 			c.Abort("403")
 		}
-		pos.DependenciaAcademica, err = strconv.Atoi(pos.IDProyecto)
+		pos.IDProyecto, err = HomologarProyectoCurricular(pos.IDProyecto)
 		if err != nil {
 			beego.Error(err)
 			c.Abort("403")
