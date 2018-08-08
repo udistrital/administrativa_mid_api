@@ -383,16 +383,16 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 		documentoIdentidad, _ := strconv.Atoi(v.IdPersona)
 
 		v.NombreCompleto = BuscarNombreProveedor(documentoIdentidad)
-		v.NumeroDisponibilidad = BuscarNumeroDisponibilidad(v.Disponibilidad)
 		v.Dedicacion = BuscarNombreDedicacion(v.IdDedicacion.Id)
 		v.LugarExpedicionCedula = BuscarLugarExpedicion(v.IdPersona)
 		v.TipoDocumento = BuscarTipoDocumento(v.IdPersona)
 		v.ValorContratoInicial = v.ValorContrato
 		v.ValorContratoInicialFormato = FormatMoney(int(v.ValorContrato), 2)
-		v.NumeroHorasModificacion, v.ValorContrato, v.NumeroSemanasNuevas, v.NumeroRp, v.VigenciaRp, v.FechaInicio = Calcular_totales_vinculacion_pdf(v.IdPersona, idResolucion, v.IdDedicacion.Id)
+		v.NumeroHorasModificacion, v.ValorContrato, v.NumeroSemanasNuevas, v.NumeroRp, v.VigenciaRp, v.FechaInicio, v.Disponibilidad = Calcular_totales_vinculacion_pdf(v.IdPersona, idResolucion, v.IdDedicacion.Id)
 		v.NumeroMeses = strconv.FormatFloat(float64(v.NumeroSemanas)/4, 'f', 2, 64) + " meses"
 		v.ValorContratoFormato = FormatMoney(int(v.ValorContrato), 2)
 		v.ValorModificacionFormato = FormatMoney(int(v.ValorContrato), 2)
+		v.NumeroDisponibilidad = BuscarNumeroDisponibilidad(v.Disponibilidad)
 	}
 
 	if res.IdTipoResolucion.Id == tipoVinculacion {
@@ -921,7 +921,7 @@ func BuscarLugarExpedicion(Cedula string) (nombre_lugar_exp string) {
 
 }
 
-func Calcular_totales_vinculacion_pdf(cedula, id_resolucion string, IdDedicacion int) (suma_total_horas int, suma_total_contrato float64, semanas_nuevas int, numero_rp int, vigencia_rp int, fechaInicio time.Time) {
+func Calcular_totales_vinculacion_pdf(cedula, id_resolucion string, IdDedicacion int) (suma_total_horas int, suma_total_contrato float64, semanas_nuevas int, numero_rp int, vigencia_rp int, fechaInicio time.Time, disponibilidad int) {
 
 	query := "?limit=-1&query=IdPersona:" + cedula + ",IdResolucion.Id:" + id_resolucion
 	var temp []models.VinculacionDocente
@@ -947,7 +947,7 @@ func Calcular_totales_vinculacion_pdf(cedula, id_resolucion string, IdDedicacion
 		total_contrato = 0
 	}
 
-	return total_horas, float64(total_contrato), temp[0].NumeroSemanas, temp[0].NumeroRp, temp[0].VigenciaRp, temp[0].FechaInicio
+	return total_horas, float64(total_contrato), temp[0].NumeroSemanas, temp[0].NumeroRp, temp[0].VigenciaRp, temp[0].FechaInicio, temp[0].Disponibilidad
 }
 
 // GestionPrevinculacionesController ...
