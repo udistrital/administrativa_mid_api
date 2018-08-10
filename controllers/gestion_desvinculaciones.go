@@ -153,6 +153,7 @@ func (c *GestionDesvinculacionesController) ActualizarVinculacionesCancelacion()
 			Vigencia:             pos.Vigencia,
 			NumeroRp:             numerorp,
 			VigenciaRp:           vigenciarp,
+			DependenciaAcademica: pos.DependenciaAcademica,
 		}
 		fmt.Println("RP: ", temp_vinculacion[0].NumeroRp)
 		//CREAR NUEVA Vinculacion
@@ -236,6 +237,7 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 			FechaInicio:          v.DocentesDesvincular[0].FechaInicio,
 			NumeroRp:             v.DocentesDesvincular[0].NumeroRp,
 			VigenciaRp:           v.DocentesDesvincular[0].VigenciaRp,
+			DependenciaAcademica: v.DocentesDesvincular[0].DependenciaAcademica,
 		}
 
 		//CREAR NUEVA Vinculacion
