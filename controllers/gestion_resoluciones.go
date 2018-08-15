@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/astaxie/beego/httplib"
+
 	"github.com/astaxie/beego"
 	"github.com/udistrital/administrativa_mid_api/models"
 )
@@ -31,11 +33,17 @@ func (c *GestionResolucionesController) URLMapping() {
 func (c *GestionResolucionesController) GetResolucionesInscritas() {
 	var resolucion_vinculacion []models.ResolucionVinculacion
 
-	query := c.GetString("query")
+	query := c.GetStrings("query")
 	limit, _ := c.GetInt("limit")
 	offset, _ := c.GetInt("offset")
+	r := httplib.Get(beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudAdmin") + "/" + beego.AppConfig.String("NscrudAdmin") + "/resolucion_vinculacion")
+	r.Param("offset", strconv.Itoa(offset))
+	r.Param("limit", strconv.Itoa(limit))
+	for _, v := range query {
+		r.Param("query", v)
 
-	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion"+"?query="+query+"&offset="+strconv.Itoa(offset)+"&limit="+strconv.Itoa(limit), &resolucion_vinculacion); err == nil {
+	}
+	if err := r.ToJSON(&resolucion_vinculacion); err == nil {
 		for x, pos := range resolucion_vinculacion {
 			resolucion_vinculacion[x].FacultadNombre = BuscarNombreFacultad(pos.Facultad)
 		}
