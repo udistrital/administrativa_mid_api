@@ -214,7 +214,6 @@ func init() {
 			AllowHTTPMethods: []string{"post"},
 			MethodParams: param.Make(),
 			Params: nil})
-  
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"],
 		beego.ControllerComments{
@@ -298,14 +297,6 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"],
 		beego.ControllerComments{
-			Method: "ListarDocentesCargaHoraria",
-			Router: `/Precontratacion/docentes_x_carga_horaria`,
-			AllowHTTPMethods: []string{"get"},
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"],
-		beego.ControllerComments{
 			Method: "Calcular_total_de_salarios_seleccionados",
 			Router: `/Precontratacion/calcular_valor_contratos_seleccionados`,
 			AllowHTTPMethods: []string{"post"},
@@ -314,8 +305,8 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"],
 		beego.ControllerComments{
-			Method: "ListarDocentesPrevinculados",
-			Router: `/docentes_previnculados`,
+			Method: "ListarDocentesCargaHoraria",
+			Router: `/Precontratacion/docentes_x_carga_horaria`,
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
@@ -330,24 +321,32 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"],
 		beego.ControllerComments{
-			Method: "GetCdpRpDocente",
-			Router: `/rp_docente/:num_vinculacion/:vigencia/:identificacion`,
+			Method: "ListarDocentesPrevinculados",
+			Router: `/docentes_previnculados`,
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"],
 		beego.ControllerComments{
-			Method: "GetResolucionesAprobadas",
-			Router: `/get_resoluciones_aprobadas`,
+			Method: "ListarDocentesPrevinculadosAll",
+			Router: `/docentes_previnculados_all`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionPrevinculacionesController"],
+		beego.ControllerComments{
+			Method: "GetCdpRpDocente",
+			Router: `/rp_docente/:num_vinculacion/:vigencia/:identificacion`,
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionResolucionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionResolucionesController"],
 		beego.ControllerComments{
-			Method: "ListarDocentesPrevinculadosAll",
-			Router: `/docentes_previnculados_all`,
+			Method: "GetResolucionesAprobadas",
+			Router: `/get_resoluciones_aprobadas`,
 			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
