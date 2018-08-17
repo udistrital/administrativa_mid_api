@@ -369,12 +369,20 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 	idResolucion := c.GetString("id_resolucion")
 	var v = []models.VinculacionDocente{}
 	var res models.Resolucion
+	var resvinc models.ResolucionVinculacionDocente
 	var modres []models.ModificacionResolucion
 	var modvin []models.ModificacionVinculacion
 	var vinc models.VinculacionDocente
 
+	// Trae el nivel académico, la dedicación y la facultad de la resolución
+	err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion_docente/"+idResolucion, &resvinc)
+	if err != nil {
+		beego.Error(err)
+		c.Abort("400")
+	}
+
 	//If resoluciones (GET)
-	err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+idResolucion, &res)
+	err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+idResolucion, &res)
 	if err != nil {
 		beego.Error(err)
 		c.Abort("400")
@@ -396,7 +404,13 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 	}
 
 	if res.IdTipoResolucion.Id == tipoVinculacion {
-		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_vinculaciones_agrupadas/"+idResolucion, &v)
+
+		if resvinc.NivelAcademico == "POSGRADO" {
+			err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente?limit=-1&query=IdResolucion.Id:"+idResolucion, &v)
+		}
+		if resvinc.NivelAcademico == "PREGRADO" {
+			err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_vinculaciones_agrupadas/"+idResolucion, &v)
+		}
 		if err != nil {
 			beego.Error(err)
 			c.Abort("400")
