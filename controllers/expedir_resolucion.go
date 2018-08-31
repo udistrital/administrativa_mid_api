@@ -513,6 +513,7 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 	var dispoap models.DisponibilidadApropiacion
 	var modVin []models.ModificacionVinculacion
 	var response interface{}
+	var resolucion models.Resolucion
 	vigencia, _, _ := time.Now().Date()
 	//If 13 - Unmarshal
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &m); err == nil {
@@ -563,19 +564,24 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 							temp = proveedor[0].Id
 
 							//If modificacion_vinculacion
-							if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/?query=VinculacionDocenteCancelada:"+strconv.Itoa(v.Id), &modVin); err == nil {
+							if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/?query=VinculacionDocenteRegistrada:"+strconv.Itoa(v.Id), &modVin); err == nil {
 								var actaInicioAnterior []models.ActaInicio
 								vinculacionModificacion := modVin[0].VinculacionDocenteRegistrada
+								vinculacionOriginal := modVin[0].VinculacionDocenteCancelada
+								err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+strconv.Itoa(v.IdResolucion.Id), &resolucion)
+								if err != nil {
+									beego.Error(err)
+									c.Abort("400")
+								}
 								//If get acta_inicio cancelando
 								if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/acta_inicio/?query=NumeroContrato:"+modVin[0].VinculacionDocenteCancelada.NumeroContrato.String+",Vigencia:"+strconv.Itoa(int(modVin[0].VinculacionDocenteCancelada.Vigencia.Int64)), &actaInicioAnterior); err == nil {
-									semanasTotales := vinculacion.VinculacionDocente.NumeroSemanasNuevas
-									semanasIniciales := modVin[0].VinculacionDocenteCancelada.NumeroSemanas
-									semanasModificar := modVin[0].VinculacionDocenteRegistrada.NumeroSemanas
-									horasTotales := vinculacion.VinculacionDocente.NumeroHorasNuevas
-									horasIniciales := modVin[0].VinculacionDocenteCancelada.NumeroHorasSemanales
+									semanasIniciales := vinculacionOriginal.NumeroSemanas
+									semanasModificar := vinculacionModificacion.NumeroSemanas
+									horasIniciales := vinculacionOriginal.NumeroHorasSemanales
 									fechaFinNuevoContrato := CalcularFechaFin(acta.FechaInicio, semanasModificar)
+									horasTotales := horasIniciales + vinculacionModificacion.NumeroHorasSemanales
 									// Sólo si es reducción cambia la fecha fin del acta anterior y el valor del nuevo contrato
-									if semanasTotales < semanasIniciales || horasTotales < horasIniciales {
+									if resolucion.IdTipoResolucion.Id == 4 {
 										var aini models.ActaInicio
 										aini.Id = actaInicioAnterior[0].Id
 										aini.NumeroContrato = actaInicioAnterior[0].NumeroContrato
@@ -601,6 +607,7 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 										}
 										var semanasTranscurridasInt = int(semanasTranscurridas)
 										semanasRestantes := semanasIniciales - semanasTranscurridasInt - semanasModificar
+										horasTotales = horasIniciales - vinculacionModificacion.NumeroHorasSemanales
 										var vinc [1]models.VinculacionDocente
 										vinc[0] = models.VinculacionDocente{
 											IdResolucion:         &models.ResolucionVinculacionDocente{Id: m.IdResolucion},
