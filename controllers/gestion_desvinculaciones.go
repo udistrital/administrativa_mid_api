@@ -221,7 +221,7 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 			c.Abort("403")
 		}
 		beego.Info("respuesta", respuesta)
-
+		beego.Info("fechaAD", v.DocentesDesvincular[0].FechaInicio)
 		temp_vinculacion[0] = models.VinculacionDocente{
 			IdPersona:            v.DocentesDesvincular[0].IdPersona,
 			NumeroHorasSemanales: v.DocentesDesvincular[0].NumeroHorasNuevas,
