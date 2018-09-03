@@ -533,6 +533,7 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 					acta := vinculacion.ActaInicio
 					fechaInicioOriginal := acta.FechaInicio
 					acta.FechaInicio = time.Date(fechaInicioOriginal.Year(), fechaInicioOriginal.Month(), fechaInicioOriginal.Day(), 0, 0, 0, 0, fechaInicioOriginal.Location())
+					beego.Info("nueva ", acta.FechaInicio, " original ", fechaInicioOriginal)
 					aux1 := 181
 					contrato.VigenciaContrato = vigencia
 					contrato.Id = "DVE" + strconv.Itoa(numeroContratos)
@@ -654,6 +655,7 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 											ai.Descripcion = acta.Descripcion
 											ai.FechaInicio = acta.FechaInicio
 											ai.FechaFin = fechaFinNuevoContrato
+											beego.Info("inicio ", ai.FechaInicio, " fin ", ai.FechaFin)
 											// If 3 - Acta_inicio
 											if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/acta_inicio", "POST", &response, &ai); err == nil {
 												var cd models.ContratoDisponibilidad
