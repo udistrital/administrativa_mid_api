@@ -586,39 +586,13 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 		c.Abort("400")
 	}
 
-	switch res.IdTipoResolucion.Id {
-	case tipoVinculacion:
+	if res.IdTipoResolucion.Id == tipoVinculacion {
 		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &v)
-
 		if err != nil {
 			beego.Error(err)
 			c.Abort("400")
 		}
-
-	case tipoCancelacion:
-		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+strconv.Itoa(idResolucion), &modres)
-		if err != nil {
-			beego.Error(err)
-			c.Abort("400")
-		}
-
-		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/?query=ModificacionResolucion:"+strconv.Itoa(modres[0].Id), &modvin)
-		if err != nil {
-			beego.Error(err)
-			c.Abort("400")
-		}
-		arreglo := make([]string, len(modvin))
-		for x, pos := range modvin {
-			arreglo[x] = strconv.Itoa(pos.VinculacionDocenteCancelada.Id)
-		}
-		identificadoresvinc := strings.Join(arreglo, "|")
-		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?query=Estado:False,Id__in:"+identificadoresvinc+"&limit=-1", &v)
-
-		if err != nil {
-			beego.Error(err)
-			c.Abort("400")
-		}
-	default: //los otros tipos
+	} else {
 		err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+strconv.Itoa(idResolucion), &modres)
 		if err != nil {
 			beego.Error(err)
@@ -629,27 +603,20 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 			beego.Error(err)
 			c.Abort("400")
 		}
-		arreglo := make([]string, len(modvin))
-		for x, pos := range modvin {
-			arreglo[x] = strconv.Itoa(pos.VinculacionDocenteRegistrada.Id)
+		if len(modvin) != 0 {
+			arreglo := make([]string, len(modvin))
+			for x, pos := range modvin {
+				arreglo[x] = strconv.Itoa(pos.VinculacionDocenteRegistrada.Id)
+			}
+			identificadoresvinc := strings.Join(arreglo, "|")
+			err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?query=Estado:True,Id__in:"+identificadoresvinc+"&limit=-1", &v)
+			if err != nil {
+				beego.Error(err)
+				c.Abort("400")
+			}
+		} else {
+			v = nil
 		}
-		identificadoresvinc := strings.Join(arreglo, "|")
-		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?query=Estado:True,Id__in:"+identificadoresvinc+"&limit=-1", &v)
-		if err != nil {
-			beego.Error(err)
-			c.Abort("400")
-		}
-		for x, pos := range v {
-			documentoIdentidad, _ := strconv.Atoi(pos.IdPersona)
-			v[x].NombreCompleto = BuscarNombreProveedor(documentoIdentidad)
-			v[x].NumeroDisponibilidad = BuscarNumeroDisponibilidad(pos.Disponibilidad)
-			v[x].Dedicacion = BuscarNombreDedicacion(pos.IdDedicacion.Id)
-			v[x].LugarExpedicionCedula = BuscarLugarExpedicion(pos.IdPersona)
-			v[x].TipoDocumento = BuscarTipoDocumento(pos.IdPersona)
-			v[x].ValorContratoFormato = FormatMoney(int(v[x].ValorContrato), 2)
-			v[x].ProyectoNombre = BuscarNombreFacultad(int(v[x].IdProyectoCurricular))
-		}
-
 	}
 	for x, pos := range v {
 		documentoIdentidad, _ := strconv.Atoi(pos.IdPersona)
