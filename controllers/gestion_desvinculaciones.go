@@ -391,6 +391,88 @@ func (c *GestionDesvinculacionesController) AnularAdicionDocente() {
 	c.ServeJSON()
 }
 
+// AnularModificaciones ...
+// @Title AnularModificaciones
+// @Description create AnularModificaciones
+// @Success 201 {string}
+// @Failure 403 body is empty
+// @router /anular_modificaciones [post]
+// Se usa para cuando se anulan resoluciones modificatorias completas
+func (c *GestionDesvinculacionesController) AnularModificaciones() {
+	var v []models.VinculacionDocente
+	var modRes []models.ModificacionResolucion
+	var respuesta_vinculacion string
+	var vinculacion_cancelada []models.VinculacionDocente
+	var respuesta_delete_vin string
+	var respuesta_delete string
+	var respuesta_total string
+	var respuesta_modificacion_vinculacion []models.ModificacionVinculacion
+
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
+		respuesta_total = "OK"
+		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=resolucionNueva:"+strconv.Itoa(v[0].IdResolucion.Id), &modRes)
+		if err != nil {
+			beego.Error(err)
+			c.Abort("400")
+			respuesta_total = "Error"
+		}
+		for _, pos := range v {
+			//Se trae información de tabla de traza modificacion_vinculacion, para saber cuál vinculación hay que poner en true y cuál eliminar
+			query := "?limit=-1&query=ModificacionResolucion.Id:" + strconv.Itoa(modRes[0].Id) + ",VinculacionDocenteRegistrada.Id:" + strconv.Itoa(pos.Id)
+			err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion"+query, &respuesta_modificacion_vinculacion)
+			fmt.Println("modificacion_vinculacion", respuesta_modificacion_vinculacion)
+			if err2 != nil {
+				beego.Error(err)
+				c.Abort("400")
+				respuesta_total = "Error"
+			}
+
+			//se trae informacion de vinculación que fue cancelada
+			query2 := "?limit=-1&query=Id:" + strconv.Itoa(respuesta_modificacion_vinculacion[0].VinculacionDocenteCancelada.Id)
+			err2 = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query2, &vinculacion_cancelada)
+			fmt.Println("vinculacion_cancelada", vinculacion_cancelada)
+			if err2 != nil {
+				beego.Error(err)
+				c.Abort("400")
+				respuesta_total = "Error"
+			}
+			//se cambia a true vinculación que fue cancelada
+			vinculacion_cancelada[0].Estado = true
+
+			//Se le cambia estado en bd a vinculación cancelada
+			err2 = sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(vinculacion_cancelada[0].Id), "PUT", &respuesta_vinculacion, vinculacion_cancelada[0])
+			fmt.Println("respuesta_vinculacion", respuesta_vinculacion)
+			if err2 != nil {
+				beego.Error(err)
+				c.Abort("400")
+				respuesta_total = "Error"
+			}
+
+			//se elimina registro en modificacion_vinculacion
+			err2 = sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/"+strconv.Itoa(respuesta_modificacion_vinculacion[0].Id), "DELETE", &respuesta_delete, respuesta_modificacion_vinculacion[0])
+			if err2 != nil {
+				beego.Error(err)
+				c.Abort("400")
+				respuesta_total = "Error"
+			}
+
+			//Se elimina vinculacion nueva
+			err2 = sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.Id), "DELETE", &respuesta_delete_vin, pos)
+			fmt.Println("respuesta_eliminar_vin_nueva", respuesta_delete_vin)
+			if err2 != nil {
+				beego.Error(err)
+				c.Abort("400")
+				respuesta_total = "Error"
+			}
+		}
+	} else {
+		respuesta_total = "error"
+	}
+
+	c.Data["json"] = respuesta_total
+	c.ServeJSON()
+}
+
 func InsertarDesvinculaciones(v [1]models.VinculacionDocente) (id int, err error) {
 	var d []models.VinculacionDocente
 	json_ejemplo, err := json.Marshal(v)
