@@ -588,8 +588,11 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 										aini.FechaInicio = actaInicioAnterior[0].FechaInicio
 										aini.FechaFin = acta.FechaInicio
 										fechaFinNuevoContrato = actaInicioAnterior[0].FechaFin
+										beego.Info("fin nuevo ", fechaFinNuevoContrato)
+										beego.Info("fin viejo", aini.FechaFin)
 										// If put acta_inicio cancelando - cambia fecha fin del acta anterior por la fecha inicio escogida por el usuario
 										if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/acta_inicio/"+strconv.Itoa(aini.Id), "PUT", &response, &aini); err == nil {
+											beego.Info("put viejo ", response)
 											fmt.Println("Acta anterior cancelada en la fecha indicada")
 										} else {
 											fmt.Println("He fallado un poquito en If put acta_inicio cancelando, solucioname!!!", err)
@@ -838,7 +841,8 @@ func CalcularValorContratoReduccion(v [1]models.VinculacionDocente, semanasResta
 		}
 		salarioSemanasRestantes = docentes[0].ValorContrato
 	}
-
+	beego.Info("semanas ", semanasRestantes)
+	beego.Info("reducidas ", salarioSemanasReducidas, "restantes ", salarioSemanasRestantes)
 	salarioTotal = salarioSemanasReducidas + salarioSemanasRestantes
 	return salarioTotal, nil
 }
