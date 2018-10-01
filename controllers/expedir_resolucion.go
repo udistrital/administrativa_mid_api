@@ -132,6 +132,7 @@ func (c *ExpedirResolucionController) Expedir() {
 													v.NumeroContrato.Valid = true
 													v.Vigencia.Int64 = int64(aux2)
 													v.Vigencia.Valid = true
+													v.FechaInicio = acta.FechaInicio
 													// If 1 - vinculacion_docente
 													if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(v.Id), "PUT", &response, &v); err == nil {
 														fmt.Println("Vinculacion docente actualizada y lista, vamos por la otra")
