@@ -43,5 +43,6 @@ type VinculacionDocente struct {
 	NumeroRp                    int
 	VigenciaRp                  int
 	FechaInicio                 time.Time
+	FechaInicioNueva            time.Time
 	ProyectoNombre              string
 }
