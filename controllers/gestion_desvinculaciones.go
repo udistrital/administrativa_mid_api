@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
-	"time"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/administrativa_mid_api/models"
@@ -210,7 +209,6 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 
 	//CAMBIAR ESTADO DE VINCULACIÓN DOCENTE
 	for _, pos := range v.DocentesDesvincular {
-		pos.FechaInicio = time.Time{}
 		pos.NumeroRp = 0
 		pos.VigenciaRp = 0
 		err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.Id), "PUT", &respuesta, pos)
@@ -234,7 +232,7 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 			NivelAcademico:       v.DocentesDesvincular[0].NivelAcademico,
 			Disponibilidad:       v.DisponibilidadNueva,
 			Vigencia:             v.DocentesDesvincular[0].Vigencia,
-			FechaInicio:          v.DocentesDesvincular[0].FechaInicio,
+			FechaInicio:          v.DocentesDesvincular[0].FechaInicioNueva,
 			NumeroRp:             v.DocentesDesvincular[0].NumeroRp,
 			VigenciaRp:           v.DocentesDesvincular[0].VigenciaRp,
 			DependenciaAcademica: v.DocentesDesvincular[0].DependenciaAcademica,
