@@ -186,6 +186,52 @@ func (c *GestionDesvinculacionesController) ActualizarVinculacionesCancelacion()
 
 }
 
+// ValidarSaldoCDP ...
+// @Title ValidarSaldoCDP
+// @Description create ValidarSaldoCDP
+// @Success 201 {string}
+// @Failure 403 body is empty
+// @router /validar_saldo_cdp [post]
+// Se usa para validar el saldo de la disponibilidad con el valor del contrato de las adiciones
+func (c *GestionDesvinculacionesController) ValidarSaldoCDP() {
+
+	var validacion models.Objeto_Desvinculacion
+	var respuesta = "OK"
+	var respuestaApropiacion models.DatosApropiacion
+	var saldoDisponibilidad float64
+
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &validacion)
+	if err != nil {
+		beego.Error(err)
+		c.Data["json"] = "Error al leer json para desvincular"
+	}
+
+	validacion.DocentesDesvincular[0].NumeroHorasSemanales = validacion.DocentesDesvincular[0].NumeroHorasNuevas
+	validacion.DocentesDesvincular[0].NumeroSemanas = validacion.DocentesDesvincular[0].NumeroSemanasNuevas
+
+	validacion.DocentesDesvincular, err = CalcularSalarioPrecontratacion(validacion.DocentesDesvincular)
+	if err != nil {
+		beego.Error(err)
+		c.Abort("400")
+	}
+
+	valorContrato := validacion.DocentesDesvincular[0].ValorContrato
+
+	if err2 := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad/SaldoCdp", "POST", &respuestaApropiacion, &validacion.DisponibilidadNueva); err2 == nil {
+		saldoDisponibilidad = float64(respuestaApropiacion.Saldo)
+	} else {
+		beego.Error(err)
+		c.Abort("400")
+	}
+
+	if saldoDisponibilidad-valorContrato < 0 {
+		respuesta = "Error CDP"
+	}
+
+	c.Data["json"] = respuesta
+	c.ServeJSON()
+}
+
 // AdicionarHoras ...
 // @Title AdicionarHoras
 // @Description create AdicionarHoras
@@ -219,7 +265,7 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 			c.Abort("403")
 		}
 		beego.Info("respuesta", respuesta)
-		beego.Info("fechaAD", v.DocentesDesvincular[0].FechaInicio)
+		beego.Info("fechaAD", v.DocentesDesvincular[0].FechaInicioNueva)
 		temp_vinculacion[0] = models.VinculacionDocente{
 			IdPersona:            v.DocentesDesvincular[0].IdPersona,
 			NumeroHorasSemanales: v.DocentesDesvincular[0].NumeroHorasNuevas,
@@ -230,7 +276,7 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 			Categoria:            v.DocentesDesvincular[0].Categoria,
 			Dedicacion:           v.DocentesDesvincular[0].Dedicacion,
 			NivelAcademico:       v.DocentesDesvincular[0].NivelAcademico,
-			Disponibilidad:       v.DisponibilidadNueva,
+			Disponibilidad:       v.DisponibilidadNueva.Id,
 			Vigencia:             v.DocentesDesvincular[0].Vigencia,
 			FechaInicio:          v.DocentesDesvincular[0].FechaInicioNueva,
 			NumeroRp:             v.DocentesDesvincular[0].NumeroRp,
@@ -542,5 +588,36 @@ func (c *GestionDesvinculacionesController) ListarDocentesCancelados() {
 	}
 	c.Ctx.Output.SetStatus(201)
 	c.Data["json"] = v
+	c.ServeJSON()
+}
+
+// ConsultarCategoria ...
+// @Title ConsultarCategoria
+// @Description create ConsultarCategoria
+// @Success 201 {string}
+// @Failure 403 body is empty
+// @router /consultar_categoria [post]
+// Consulta el servicio de categoría en académica para verificar si el docente tiene el semáforo completo
+func (c *GestionDesvinculacionesController) ConsultarCategoria() {
+	var v models.VinculacionDocente
+
+	err := json.Unmarshal(c.Ctx.Input.RequestBody, &v)
+	if err != nil {
+		beego.Error(err)
+		c.Data["json"] = "Error al leer json para desvincular"
+	}
+
+	categoria, _, err := Buscar_Categoria_Docente(strconv.FormatInt(v.Vigencia.Int64, 10), strconv.Itoa(v.Periodo), v.IdPersona)
+	if err != nil {
+		beego.Error(err)
+		c.Abort("403")
+	}
+
+	respuesta := "OK"
+	if categoria == "" {
+		respuesta = "Sin categoría"
+	}
+
+	c.Data["json"] = respuesta
 	c.ServeJSON()
 }
