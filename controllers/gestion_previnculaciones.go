@@ -628,6 +628,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 		pos.TipoDocumento = BuscarTipoDocumento(pos.IdPersona)
 		pos.ValorContratoFormato = FormatMoney(int(v[x].ValorContrato), 2)
 		pos.ProyectoNombre = BuscarNombreFacultad(int(v[x].IdProyectoCurricular))
+		pos.Periodo = res.Periodo
 
 		v[x] = pos
 	}
