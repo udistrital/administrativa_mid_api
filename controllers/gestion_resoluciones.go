@@ -46,6 +46,7 @@ func (c *GestionResolucionesController) GetResolucionesInscritas() {
 	if err := r.ToJSON(&resolucion_vinculacion); err == nil {
 		for x, pos := range resolucion_vinculacion {
 			resolucion_vinculacion[x].FacultadNombre = BuscarNombreFacultad(pos.Facultad)
+			resolucion_vinculacion[x].FacultadFirmaNombre = BuscarNombreFacultad(pos.IdDependenciaFirma)
 		}
 
 		c.Data["json"] = resolucion_vinculacion
@@ -76,7 +77,7 @@ func (c *GestionResolucionesController) GetResolucionesAprobadas() {
 	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion/Aprobada"+"?query="+query+"&offset="+strconv.Itoa(offset)+"&limit="+strconv.Itoa(limit), &resolucion_vinculacion_aprobada); err == nil {
 		for x, pos := range resolucion_vinculacion_aprobada {
 			resolucion_vinculacion_aprobada[x].FacultadNombre = BuscarNombreFacultad(pos.Facultad)
-
+			resolucion_vinculacion_aprobada[x].FacultadFirmaNombre = BuscarNombreFacultad(pos.IdDependenciaFirma)
 		}
 
 		c.Data["json"] = resolucion_vinculacion_aprobada

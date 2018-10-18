@@ -19,4 +19,5 @@ type Resolucion struct {
 	NumeroSemanas           int
 	Periodo                 int
 	Titulo                  string
+	IdDependenciaFirma      int
 }
