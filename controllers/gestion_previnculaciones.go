@@ -310,7 +310,11 @@ func EsDocentePlanta(idPersona string) (docentePlanta bool, err error) {
 	}
 
 	var tempDocentes models.ObjetoDocentePlanta
-	json.Unmarshal(jsonDocentes, &tempDocentes)
+	err = json.Unmarshal(jsonDocentes, &tempDocentes)
+	if err != nil {
+		esDePlanta = false
+		return false, err
+	}
 
 	if tempDocentes.DocenteCollection.Docente[0].Planta == "true" {
 		esDePlanta = true
@@ -666,7 +670,10 @@ func ListarDocentesHorasLectivas(vigencia, periodo, tipo_vinculacion, facultad, 
 		}
 
 		var tempDocentes models.ObjetoCargaLectiva
-		json.Unmarshal(jsonDocentes, &tempDocentes)
+		err = json.Unmarshal(jsonDocentes, &tempDocentes)
+		if err != nil {
+			return docentesXCarga, err
+		}
 		docentesXCarga.CargasLectivas.CargaLectiva = append(docentesXCarga.CargasLectivas.CargaLectiva, tempDocentes.CargasLectivas.CargaLectiva...)
 
 	}
@@ -693,7 +700,11 @@ func Buscar_Categoria_Docente(vigencia, periodo, documento_ident string) (catego
 			return categoria_nombre, categoria_id_old, err
 		}
 		var tempDocentes models.ObjetoCategoriaDocente
-		json.Unmarshal(jsonDocentes, &tempDocentes)
+		err = json.Unmarshal(jsonDocentes, &tempDocentes)
+		if err != nil {
+			return categoria_nombre, categoria_id_old, err
+		}
+
 		nombreCategoria = tempDocentes.CategoriaDocente.Categoria
 		idCategoriaOld = tempDocentes.CategoriaDocente.IDCategoria
 
@@ -752,7 +763,10 @@ func HomologarFacultad(tipo, facultad string) (facultad_old string, err error) {
 		}
 
 		var temp_proy models.ObjetoFacultad
-		json.Unmarshal(json_facultad, &temp_proy)
+		err = json.Unmarshal(json_facultad, &temp_proy)
+		if err != nil {
+			return facultad_old, err
+		}
 
 		if tipo == "new" {
 			id_facultad = temp_proy.Homologacion.IdGeDep
@@ -1072,7 +1086,10 @@ func GetInformacionRpDocente(numero_cdp string, vigencia_cdp string, identificac
 
 		if error_json == nil {
 			var rp_docente models.RpDocente
-			json.Unmarshal(json_cdp_rp, &rp_docente)
+			err = json.Unmarshal(json_cdp_rp, &rp_docente)
+			if err != nil {
+				fmt.Println(err)
+			}
 			informacion_rp_docente = rp_docente
 			fmt.Println(informacion_rp_docente)
 			return informacion_rp_docente

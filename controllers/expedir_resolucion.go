@@ -33,8 +33,14 @@ func (c *ExpedirResolucionController) URLMapping() {
 func (c *ExpedirResolucionController) Expedir() {
 	amazon := orm.NewOrm()
 	flyway := orm.NewOrm()
-	amazon.Using("amazonAdmin")
-	flyway.Using("flywayAdmin")
+	err := amazon.Using("amazonAdmin")
+	if err != nil {
+		beego.Error(err)
+	}
+	err = flyway.Using("flywayAdmin")
+	if err != nil {
+		beego.Error(err)
+	}
 	var m models.ExpedicionResolucion
 	var temp int
 	var cdve int
@@ -138,64 +144,127 @@ func (c *ExpedirResolucionController) Expedir() {
 														fmt.Println("Vinculacion docente actualizada y lista, vamos por la otra")
 													} else { // If 1 - vinculacion_docente
 														fmt.Println("He fallado un poquito en If 1 - vinculacion_docente, solucioname!!! ", err)
-														amazon.Rollback()
-														flyway.Rollback()
+														err = amazon.Rollback()
+														if err != nil {
+															beego.Error(err)
+														}
+														err = flyway.Rollback()
+														if err != nil {
+															beego.Error(err)
+														}
 														return
 													}
 												} else { // If 2 - contrato_disponibilidad
 													fmt.Println("He fallado un poquito en  If 2 - contrato_disponibilidad, solucioname!!!", err)
-													amazon.Rollback()
-													flyway.Rollback()
+													err = amazon.Rollback()
+													if err != nil {
+														beego.Error(err)
+													}
+													err = flyway.Rollback()
+													if err != nil {
+														beego.Error(err)
+													}
 													return
 												}
 											} else { // If 2.5.1 - Get disponibildad
 												fmt.Println("He fallado un poquito en If 2.5.1 - Get disponibildad, solucioname!!!", err)
-												amazon.Rollback()
-												flyway.Rollback()
+												err = amazon.Rollback()
+												if err != nil {
+													beego.Error(err)
+												}
+												err = flyway.Rollback()
+												if err != nil {
+													beego.Error(err)
+												}
 												return
 											}
 										} else { // If 2.5.2 - Get disponibildad_apropiacion
 											fmt.Println("He fallado un poquito en If 2.5.2 - Get disponibildad_apropiacion, solucioname!!!", err)
-											amazon.Rollback()
-											flyway.Rollback()
+											err = amazon.Rollback()
+											if err != nil {
+												beego.Error(err)
+											}
+											err = flyway.Rollback()
+											if err != nil {
+												beego.Error(err)
+											}
 											return
 										}
 									} else { // If 3 - Acta_inicio
 										fmt.Println("He fallado un poquito en If 3 - Acta_inicio, solucioname!!!", err)
-										amazon.Rollback()
-										flyway.Rollback()
+										err = amazon.Rollback()
+										if err != nil {
+											beego.Error(err)
+										}
+										err = flyway.Rollback()
+										if err != nil {
+											beego.Error(err)
+										}
 										return
 									}
 								} else { // If 4 - contrato_estado
 									fmt.Println("He fallado un poquito en If 4 - contrato_estado, solucioname!!!", err)
-									amazon.Rollback()
-									flyway.Rollback()
+									err = amazon.Rollback()
+									if err != nil {
+										beego.Error(err)
+									}
+									err = flyway.Rollback()
+									if err != nil {
+										beego.Error(err)
+									}
 									return
 								}
 							} else { //If insert contrato_general
 								fmt.Println("He fallado un poquito en insert contrato_general, solucioname!!!", err)
-								amazon.Rollback()
-								flyway.Rollback()
+								err = amazon.Rollback()
+								if err != nil {
+									beego.Error(err)
+								}
+								err = flyway.Rollback()
+								if err != nil {
+									beego.Error(err)
+								}
 								return
 							}
 						} else { // Nuevo If
 							fmt.Println("He fallado un poquito en If 5 - Informacion_Proveedor nuevo, solucioname!!!", err)
-							amazon.Rollback()
-							flyway.Rollback()
+							err = amazon.Rollback()
+							if err != nil {
+								beego.Error(err)
+							}
+							err = flyway.Rollback()
+							if err != nil {
+								beego.Error(err)
+							}
 							c.Ctx.Output.SetStatus(233)
-							c.Ctx.Output.Body([]byte("No existe el docente con número de documento " + strconv.Itoa(contrato.Contratista) + " en Ágora"))
+							err = c.Ctx.Output.Body([]byte("No existe el docente con número de documento " + strconv.Itoa(contrato.Contratista) + " en Ágora"))
+							if err != nil {
+								beego.Error(err)
+							}
 							return
 						}
 					} else { // If 5 - Informacion_Proveedor
 						fmt.Println("He fallado un poquito en If 5 - Informacion_Proveedor, solucioname!!!", err)
-						amazon.Rollback()
-						flyway.Rollback()
+						err = amazon.Rollback()
+						if err != nil {
+							beego.Error(err)
+						}
+						err = flyway.Rollback()
+						if err != nil {
+							beego.Error(err)
+						}
 						return
 					}
 				} else { //If 8 - Vinculacion_docente (GET)
 					fmt.Println("He fallado un poquito en If 8 - Vinculacion_docente (GET), solucioname!!!", err)
-					amazon.Rollback()
-					flyway.Rollback()
+					err = amazon.Rollback()
+					if err != nil {
+						beego.Error(err)
+					}
+					err = flyway.Rollback()
+					if err != nil {
+						beego.Error(err)
+					}
 					return
 				}
 			} // for vinculaciones
@@ -219,37 +288,73 @@ func (c *ExpedirResolucionController) Expedir() {
 						c.Data["json"] = v
 					} else { //If 9 - Resolucion_estado
 						fmt.Println("He fallado un poquito en If 9 - Resolucion_estado, solucioname!!!", err)
-						amazon.Rollback()
-						flyway.Rollback()
+						err = amazon.Rollback()
+						if err != nil {
+							beego.Error(err)
+						}
+						err = flyway.Rollback()
+						if err != nil {
+							beego.Error(err)
+						}
 						return
 					}
 				} else { //If 10 - Resolucion (PUT)
 					fmt.Println("He fallado un poquito en If 10 - Resolucion (PUT), solucioname!!! ", err)
-					amazon.Rollback()
-					flyway.Rollback()
+					err = amazon.Rollback()
+					if err != nil {
+						beego.Error(err)
+					}
+					err = flyway.Rollback()
+					if err != nil {
+						beego.Error(err)
+					}
 					return
 				}
 			} else { //If 11 - Resolucion (GET)
 				fmt.Println("He fallado un poquito en If 11 - Resolucion (GET), solucioname!!! ", err)
-				amazon.Rollback()
-				flyway.Rollback()
+				err = amazon.Rollback()
+				if err != nil {
+					beego.Error(err)
+				}
+				err = flyway.Rollback()
+				if err != nil {
+					beego.Error(err)
+				}
 				return
 			}
 		} else { //If 12 - Consecutivo contrato_general
 			fmt.Println("He fallado un poquito en If 12 - Consecutivo contrato_general, solucioname!!! ", err)
-			amazon.Rollback()
-			flyway.Rollback()
+			err = amazon.Rollback()
+			if err != nil {
+				beego.Error(err)
+			}
+			err = flyway.Rollback()
+			if err != nil {
+				beego.Error(err)
+			}
 			return
 		}
 
 	} else { //If 13 - Unmarshal
 		fmt.Println("He fallado un poquito en If 13 - Unmarshal, solucioname!!! ", err)
-		amazon.Rollback()
-		flyway.Rollback()
+		err = amazon.Rollback()
+		if err != nil {
+			beego.Error(err)
+		}
+		err = flyway.Rollback()
+		if err != nil {
+			beego.Error(err)
+		}
 		return
 	}
-	amazon.Commit()
-	flyway.Commit()
+	err = amazon.Commit()
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = flyway.Commit()
+	if err != nil {
+		fmt.Println(err)
+	}
 	c.ServeJSON()
 }
 
@@ -376,8 +481,14 @@ func (c *ExpedirResolucionController) ValidarDatosExpedicion() {
 func (c *ExpedirResolucionController) Cancelar() {
 	amazon := orm.NewOrm()
 	flyway := orm.NewOrm()
-	amazon.Using("amazonAdmin")
-	flyway.Using("flywayAdmin")
+	err := amazon.Using("amazonAdmin")
+	if err != nil {
+		beego.Error(err)
+	}
+	err = flyway.Using("flywayAdmin")
+	if err != nil {
+		beego.Error(err)
+	}
 	var m models.ExpedicionCancelacion
 	var response interface{}
 	//var datosAnular models.DatosAnular
@@ -435,63 +546,123 @@ func (c *ExpedirResolucionController) Cancelar() {
 											c.Data["json"] = v
 										} else { //If  Resolucion_estado (post)
 											fmt.Println("He fallado un poquito en If  Resolucion_estado (post), solucioname!!! ", err)
-											amazon.Rollback()
-											flyway.Rollback()
+											err = amazon.Rollback()
+											if err != nil {
+												beego.Error(err)
+											}
+											err = flyway.Rollback()
+											if err != nil {
+												beego.Error(err)
+											}
 											return
 										}
 									} else { //If Resolucion (PUT)
 										fmt.Println("He fallado un poquito en If Resolucion (PUT), solucioname!!! ", err)
-										amazon.Rollback()
-										flyway.Rollback()
+										err = amazon.Rollback()
+										if err != nil {
+											beego.Error(err)
+										}
+										err = flyway.Rollback()
+										if err != nil {
+											beego.Error(err)
+										}
 										return
 									}
 								} else { // If Resolucion (GET)
 									fmt.Println("He fallado un poquito en If Resolucion (PUT), solucioname!!! ", err)
-									amazon.Rollback()
-									flyway.Rollback()
+									err = amazon.Rollback()
+									if err != nil {
+										beego.Error(err)
+									}
+									err = flyway.Rollback()
+									if err != nil {
+										beego.Error(err)
+									}
 									return
 								}
 							} else { // If contrato_estado (post)
 								fmt.Println("He fallado un poquito en If Resolucion (GET), solucioname!!! ", err)
-								amazon.Rollback()
-								flyway.Rollback()
+								err = amazon.Rollback()
+								if err != nil {
+									beego.Error(err)
+								}
+								err = flyway.Rollback()
+								if err != nil {
+									beego.Error(err)
+								}
 								return
 							}
 						} else { // If acta_inicio (post)
 							fmt.Println("He fallado un poquito en If Acta_Inicio (POST), solucioname!!! ", err)
-							amazon.Rollback()
-							flyway.Rollback()
+							err = amazon.Rollback()
+							if err != nil {
+								beego.Error(err)
+							}
+							err = flyway.Rollback()
+							if err != nil {
+								beego.Error(err)
+							}
 							return
 						}
 					} else { // if acta_inicio (get)
 						fmt.Println("He fallado un poquito en if acta_inicio (GET), solucioname!!! ", err)
-						amazon.Rollback()
-						flyway.Rollback()
+						err = amazon.Rollback()
+						if err != nil {
+							beego.Error(err)
+						}
+						err = flyway.Rollback()
+						if err != nil {
+							beego.Error(err)
+						}
 						return
 					}
 				} else { // if contrato_cancelado (post)
 					fmt.Println("He fallado un poquito en if contrato_cancelado (post), solucioname!!! ", err)
-					amazon.Rollback()
-					flyway.Rollback()
+					err = amazon.Rollback()
+					if err != nil {
+						beego.Error(err)
+					}
+					err = flyway.Rollback()
+					if err != nil {
+						beego.Error(err)
+					}
 					return
 				}
 			} else {
 				//If vinculacion_docente (get)
 				fmt.Println("He fallado un poquito en If vinculacion_docente (get), solucioname!!! ", err)
-				amazon.Rollback()
-				flyway.Rollback()
+				err = amazon.Rollback()
+				if err != nil {
+					beego.Error(err)
+				}
+				err = flyway.Rollback()
+				if err != nil {
+					beego.Error(err)
+				}
 				return
 			}
 		} // for vinculaciones
 
 	} else { //If 13 - Unmarshal
 		fmt.Println("He fallado un poquito en If 13 - Unmarshal, solucioname!!! ", err)
-		amazon.Rollback()
-		flyway.Rollback()
+		err = amazon.Rollback()
+		if err != nil {
+			beego.Error(err)
+		}
+		err = flyway.Rollback()
+		if err != nil {
+			beego.Error(err)
+		}
 		return
 	}
-	amazon.Commit()
-	flyway.Commit()
+	err = amazon.Commit()
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = flyway.Commit()
+	if err != nil {
+		fmt.Println(err)
+	}
 	c.ServeJSON()
 }
 
@@ -504,8 +675,14 @@ func (c *ExpedirResolucionController) Cancelar() {
 func (c *ExpedirResolucionController) ExpedirModificacion() {
 	amazon := orm.NewOrm()
 	flyway := orm.NewOrm()
-	amazon.Using("amazonAdmin")
-	flyway.Using("flywayAdmin")
+	err := amazon.Using("amazonAdmin")
+	if err != nil {
+		beego.Error(err)
+	}
+	err = flyway.Using("flywayAdmin")
+	if err != nil {
+		beego.Error(err)
+	}
 	var m models.ExpedicionResolucion
 	var temp int
 	var cdve int
@@ -596,8 +773,14 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 											fmt.Println("Acta anterior cancelada en la fecha indicada")
 										} else {
 											fmt.Println("He fallado un poquito en If put acta_inicio cancelando, solucioname!!!", err)
-											amazon.Rollback()
-											flyway.Rollback()
+											err = amazon.Rollback()
+											if err != nil {
+												beego.Error(err)
+											}
+											err = flyway.Rollback()
+											if err != nil {
+												beego.Error(err)
+											}
 											return
 										}
 										// Calcula el valor del nuevo contrato con base en las semanas desde la fecha inicio escogida hasta la nueva fecha fin y las nuevas horas
@@ -626,8 +809,14 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 										salario, err := CalcularValorContratoReduccion(vinc, semanasRestantes, horasIniciales, v.NivelAcademico)
 										if err != nil {
 											fmt.Println("He fallado en cálculo del contrato reducción, solucioname!!!", err)
-											amazon.Rollback()
-											flyway.Rollback()
+											err = amazon.Rollback()
+											if err != nil {
+												beego.Error(err)
+											}
+											err = flyway.Rollback()
+											if err != nil {
+												beego.Error(err)
+											}
 											return
 										}
 										// Si es de posgrado calcula el valor que se le ha pagado hasta la fecha de inicio y se resta del total que debe quedar con la reducción
@@ -690,77 +879,152 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 																	fmt.Println("Vinculacion docente actualizada y lista, vamos por la otra")
 																} else { // If 1 - vinculacion_docente
 																	fmt.Println("He fallado un poquito en If 1 - vinculacion_docente, solucioname!!! ", err)
-																	amazon.Rollback()
-																	flyway.Rollback()
+																	err = amazon.Rollback()
+																	if err != nil {
+																		beego.Error(err)
+																	}
+																	err = flyway.Rollback()
+																	if err != nil {
+																		beego.Error(err)
+																	}
 																	return
 																}
 															} else { // If 2 - contrato_disponibilidad
 																fmt.Println("He fallado un poquito en  If 2 - contrato_disponibilidad, solucioname!!!", err)
-																amazon.Rollback()
-																flyway.Rollback()
+																err = amazon.Rollback()
+																if err != nil {
+																	beego.Error(err)
+																}
+																err = flyway.Rollback()
+																if err != nil {
+																	beego.Error(err)
+																}
 																return
 															}
 														} else { // If 2.5.1 - Get disponibildad
 															fmt.Println("He fallado un poquito en If 2.5.1 - Get disponibildad, solucioname!!!", err)
-															amazon.Rollback()
-															flyway.Rollback()
+															err = amazon.Rollback()
+															if err != nil {
+																beego.Error(err)
+															}
+															err = flyway.Rollback()
+															if err != nil {
+																beego.Error(err)
+															}
 															return
 														}
 													} else { // If 2.5.2 - Get disponibildad_apropiacion
 														fmt.Println("He fallado un poquito en If 2.5.2 - Get disponibildad_apropiacion, solucioname!!!", err)
-														amazon.Rollback()
-														flyway.Rollback()
+														err = amazon.Rollback()
+														if err != nil {
+															beego.Error(err)
+														}
+														err = flyway.Rollback()
+														if err != nil {
+															beego.Error(err)
+														}
 														return
 													}
 												} else { // If 3 - Acta_inicio
 													fmt.Println("He fallado un poquito en If 3 - Acta_inicio, solucioname!!!", err)
-													amazon.Rollback()
-													flyway.Rollback()
+													err = amazon.Rollback()
+													if err != nil {
+														beego.Error(err)
+													}
+													err = flyway.Rollback()
+													if err != nil {
+														beego.Error(err)
+													}
 													return
 												}
 											} else { // If 4 - contrato_estado
 												fmt.Println("He fallado un poquito en If 4 - contrato_estado, solucioname!!!", err)
-												amazon.Rollback()
-												flyway.Rollback()
+												err = amazon.Rollback()
+												if err != nil {
+													beego.Error(err)
+												}
+												err = flyway.Rollback()
+												if err != nil {
+													beego.Error(err)
+												}
 												return
 											}
 										} else { //If insert contrato_general
 											fmt.Println("He fallado un poquito en insert contrato_general, solucioname!!!", err)
-											amazon.Rollback()
-											flyway.Rollback()
+											err = amazon.Rollback()
+											if err != nil {
+												beego.Error(err)
+											}
+											err = flyway.Rollback()
+											if err != nil {
+												beego.Error(err)
+											}
 											return
 										}
 									}
 								} else { //If get acta_inicio cancelando
 									fmt.Println("He fallado un poquito en If get acta_inicio cancelando, solucioname!!!", err)
-									amazon.Rollback()
-									flyway.Rollback()
+									err = amazon.Rollback()
+									if err != nil {
+										beego.Error(err)
+									}
+									err = flyway.Rollback()
+									if err != nil {
+										beego.Error(err)
+									}
 									return
 								}
 							} else { //If modificacion_vinculacion
 								fmt.Println("He fallado un poquito en If modificacion_vinculacion, solucioname!!!", err)
-								amazon.Rollback()
-								flyway.Rollback()
+								err = amazon.Rollback()
+								if err != nil {
+									beego.Error(err)
+								}
+								err = flyway.Rollback()
+								if err != nil {
+									beego.Error(err)
+								}
 								return
 							}
 						} else { // Nuevo If
 							fmt.Println("He fallado un poquito en If 5 - Informacion_Proveedor nuevo, solucioname!!!", err)
-							amazon.Rollback()
-							flyway.Rollback()
+							err = amazon.Rollback()
+							if err != nil {
+								beego.Error(err)
+							}
+							err = flyway.Rollback()
+							if err != nil {
+								beego.Error(err)
+							}
 							c.Ctx.Output.SetStatus(233)
-							c.Ctx.Output.Body([]byte("No existe el docente con número de documento " + strconv.Itoa(contrato.Contratista) + " en Ágora"))
+							err = c.Ctx.Output.Body([]byte("No existe el docente con número de documento " + strconv.Itoa(contrato.Contratista) + " en Ágora"))
+							if err != nil {
+								beego.Error(err)
+							}
 							return
 						}
 					} else { // If 5 - Informacion_Proveedor
 						fmt.Println("He fallado un poquito en If 5 - Informacion_Proveedor, solucioname!!!", err)
-						amazon.Rollback()
-						flyway.Rollback()
+						err = amazon.Rollback()
+						if err != nil {
+							beego.Error(err)
+						}
+						err = flyway.Rollback()
+						if err != nil {
+							beego.Error(err)
+						}
 						return
 					}
 				} else { //If 8 - Vinculacion_docente (GET)
 					fmt.Println("He fallado un poquito en If 8 - Vinculacion_docente (GET), solucioname!!!", err)
-					amazon.Rollback()
-					flyway.Rollback()
+					err = amazon.Rollback()
+					if err != nil {
+						beego.Error(err)
+					}
+					err = flyway.Rollback()
+					if err != nil {
+						beego.Error(err)
+					}
 					return
 				}
 			} // for vinculaciones
@@ -784,37 +1048,73 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 						c.Data["json"] = v
 					} else { //If 9 - Resolucion_estado
 						fmt.Println("He fallado un poquito en If 9 - Resolucion_estado, solucioname!!!", err)
-						amazon.Rollback()
-						flyway.Rollback()
+						err = amazon.Rollback()
+						if err != nil {
+							beego.Error(err)
+						}
+						err = flyway.Rollback()
+						if err != nil {
+							beego.Error(err)
+						}
 						return
 					}
 				} else { //If 10 - Resolucion (PUT)
 					fmt.Println("He fallado un poquito en If 10 - Resolucion (PUT), solucioname!!! ", err)
-					amazon.Rollback()
-					flyway.Rollback()
+					err = amazon.Rollback()
+					if err != nil {
+						beego.Error(err)
+					}
+					err = flyway.Rollback()
+					if err != nil {
+						beego.Error(err)
+					}
 					return
 				}
 			} else { //If 11 - Resolucion (GET)
 				fmt.Println("He fallado un poquito en If 11 - Resolucion (GET), solucioname!!! ", err)
-				amazon.Rollback()
-				flyway.Rollback()
+				err = amazon.Rollback()
+				if err != nil {
+					beego.Error(err)
+				}
+				err = flyway.Rollback()
+				if err != nil {
+					beego.Error(err)
+				}
 				return
 			}
 		} else { //If 12 - Consecutivo contrato_general
 			fmt.Println("He fallado un poquito en If 12 - Consecutivo contrato_general, solucioname!!! ", err)
-			amazon.Rollback()
-			flyway.Rollback()
+			err = amazon.Rollback()
+			if err != nil {
+				beego.Error(err)
+			}
+			err = flyway.Rollback()
+			if err != nil {
+				beego.Error(err)
+			}
 			return
 		}
 
 	} else { //If 13 - Unmarshal
 		fmt.Println("He fallado un poquito en If 13 - Unmarshal, solucioname!!! ", err)
-		amazon.Rollback()
-		flyway.Rollback()
+		err = amazon.Rollback()
+		if err != nil {
+			beego.Error(err)
+		}
+		err = flyway.Rollback()
+		if err != nil {
+			beego.Error(err)
+		}
 		return
 	}
-	amazon.Commit()
-	flyway.Commit()
+	err = amazon.Commit()
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = flyway.Commit()
+	if err != nil {
+		fmt.Println(err)
+	}
 	c.ServeJSON()
 }
 
