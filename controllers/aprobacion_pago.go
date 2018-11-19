@@ -47,7 +47,7 @@ func (c *AprobacionPagoController) ObtenerInfoCoordinador() {
 
 		if error_json == nil {
 			var temp_homologacion models.ObjetoProyectoCurricular
-			json.Unmarshal(json_proyecto_curricular, &temp_homologacion)
+			if err:= json.Unmarshal(json_proyecto_curricular, &temp_homologacion); err== nil {
 			id_proyecto_snies := temp_homologacion.Homologacion.IDSnies
 
 			if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAcademica")+"/"+"carrera_snies/"+id_proyecto_snies, &temp_snies); err == nil && temp_snies != nil {
@@ -55,12 +55,21 @@ func (c *AprobacionPagoController) ObtenerInfoCoordinador() {
 
 				if error_json == nil {
 					var temp_info_coordinador models.InformacionCoordinador
-					json.Unmarshal(json_info_coordinador, &temp_info_coordinador)
+					if err:= json.Unmarshal(json_info_coordinador, &temp_info_coordinador); err==nil {
+
+					
 					fmt.Println(temp_info_coordinador)
 					info_coordinador = temp_info_coordinador
+					}else{
+					fmt.Println(err)	
+					}
 				} else {
 					fmt.Println(error_json.Error())
 				}
+			}
+
+			}else{
+				fmt.Println(err)
 			}
 
 		} else {
@@ -112,7 +121,8 @@ func (c *AprobacionPagoController) GetContratosDocente() {
 									actaInicio.FechaInicio = actaInicio.FechaInicio.UTC()
 									actaInicio.FechaFin = actaInicio.FechaFin.UTC()
 
-									if int(actaInicio.FechaInicio.Month()) <= int(time.Now().Month()) && actaInicio.FechaInicio.Year() <= time.Now().Year() && int(actaInicio.FechaFin.Month()) >= int(time.Now().Month()) && actaInicio.FechaFin.Year() <= time.Now().Year() {
+									if (int(actaInicio.FechaInicio.Month()) <= int(time.Now().Month()) && actaInicio.FechaInicio.Year() == time.Now().Year() && int(actaInicio.FechaFin.Month()) >= int(time.Now().Month()) && actaInicio.FechaFin.Year() == time.Now().Year()) ||
+									 (int(actaInicio.FechaInicio.Month()) >= int(time.Now().Month()) && actaInicio.FechaInicio.Year() <= time.Now().Year() && int(actaInicio.FechaFin.Month()) <= int(time.Now().Month()) && actaInicio.FechaFin.Year() >= time.Now().Year() && actaInicio.FechaFin.Year()>actaInicio.FechaInicio.Year() ) {
 
 										cd.NumeroVinculacion = vinculacion.NumeroContrato.String
 										cd.Vigencia = vinculacion.Vigencia.Int64
@@ -175,7 +185,7 @@ func (c *AprobacionPagoController) ObtenerInfoOrdenador() {
 		json_contrato_elaborado, error_json := json.Marshal(temp)
 
 		if error_json == nil {
-			json.Unmarshal(json_contrato_elaborado, &contrato_elaborado)
+			if err:= json.Unmarshal(json_contrato_elaborado, &contrato_elaborado); err == nil {
 			if contrato_elaborado.Contrato.TipoContrato == "2" || contrato_elaborado.Contrato.TipoContrato == "3" || contrato_elaborado.Contrato.TipoContrato == "18" {
 				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ordenador_gasto/?query=Id:"+contrato_elaborado.Contrato.OrdenadorGasto, &ordenadores_gasto); err == nil {
 
@@ -231,6 +241,9 @@ func (c *AprobacionPagoController) ObtenerInfoOrdenador() {
 
 				}
 
+			}
+			}else{
+				fmt.Println(err)
 			}
 		} else {
 			fmt.Println(error_json.Error())
@@ -1302,9 +1315,12 @@ func GetRP(numero_cdp string, vigencia_cdp string) (rp models.InformacionCdpRp) 
 		json_cdp_rp, error_json := json.Marshal(temp)
 
 		if error_json == nil {
-			json.Unmarshal(json_cdp_rp, &temp_cdp_rp)
+			if err:= json.Unmarshal(json_cdp_rp, &temp_cdp_rp);err == nil {
 			rp = temp_cdp_rp
 			return rp
+			} else {
+			fmt.Println(err)	
+			}
 
 		} else {
 			fmt.Println(error_json.Error())
@@ -1326,9 +1342,12 @@ func GetContratosPersona(num_documento string) (contratos_persona models.Informa
 		json_contratos, error_json := json.Marshal(temp)
 
 		if error_json == nil {
-			json.Unmarshal(json_contratos, &contratos)
+			if err:= json.Unmarshal(json_contratos, &contratos); err== nil{
 			contratos_persona = contratos
 			return contratos_persona
+			} else {
+				fmt.Println(err)
+			}
 
 		} else {
 			fmt.Println(error_json.Error())
@@ -1352,9 +1371,12 @@ func GetContrato(num_contrato_suscrito string, vigencia string) (informacion_con
 
 		if error_json == nil {
 			var contrato models.InformacionContrato
-			json.Unmarshal(json_contrato, &contrato)
+			if err:= json.Unmarshal(json_contrato, &contrato); err == nil{
 			informacion_contrato = contrato
 			return informacion_contrato
+			} else {
+				fmt.Println(err)
+			}
 		} else {
 			fmt.Println(error_json.Error())
 		}
@@ -1376,9 +1398,12 @@ func GetInformacionContratoContratista(num_contrato_suscrito string, vigencia st
 
 		if error_json == nil {
 			var contrato_contratista models.InformacionContratoContratista
-			json.Unmarshal(json_contrato, &contrato_contratista)
+			if err:=json.Unmarshal(json_contrato, &contrato_contratista); err == nil{
 			informacion_contrato_contratista = contrato_contratista
 			return informacion_contrato_contratista
+			} else {
+				fmt.Println(err)
+			}
 		} else {
 			fmt.Println(error_json.Error())
 		}
@@ -1399,8 +1424,11 @@ func GetContratosDependencia(dependencia string, fecha string) (contratos_depend
 		json_contrato, error_json := json.Marshal(temp)
 
 		if error_json == nil {
-			json.Unmarshal(json_contrato, &contratos_dependencia)
+			if err:= json.Unmarshal(json_contrato, &contratos_dependencia); err == nil {
 			return contratos_dependencia
+			} else {
+			fmt.Println(err)	
+			}
 		} else {
 			fmt.Println(error_json.Error())
 		}
