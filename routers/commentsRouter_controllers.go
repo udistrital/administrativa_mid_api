@@ -209,6 +209,14 @@ func init() {
 
 	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"],
 		beego.ControllerComments{
+			Method: "GetVinculacionesAgrupadasCanceladas",
+			Router: `/vinculaciones_agrupadas_canceladas/:id_resolucion`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"],
+		beego.ControllerComments{
 			Method: "ListarDocentesDesvinculados",
 			Router: `/docentes_desvinculados`,
 			AllowHTTPMethods: []string{"get"},
@@ -284,14 +292,6 @@ func init() {
 			Method: "ConsultarCategoria",
 			Router: `/consultar_categoria`,
 			AllowHTTPMethods: []string{"post"},
-			MethodParams: param.Make(),
-			Params: nil})
-
-	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:GestionDesvinculacionesController"],
-		beego.ControllerComments{
-			Method: "GetVinculacionesAgrupadasCanceladas",
-			Router: `/vinculaciones_agrupadas_canceladas/:id_resolucion`,
-			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
 
@@ -388,6 +388,14 @@ func init() {
 			Method: "InsertarResolucionCompleta",
 			Router: `/insertar_resolucion_completa`,
 			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:SolicitudNecesidadController"] = append(beego.GlobalControllerRouter["github.com/udistrital/administrativa_mid_api/controllers:SolicitudNecesidadController"],
+		beego.ControllerComments{
+			Method: "FuentesApropiacionNecesidad",
+			Router: `/fuente_apropiacion_necesidad/:id_necesidad`,
+			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
 
