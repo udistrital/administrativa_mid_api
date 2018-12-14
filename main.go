@@ -6,9 +6,9 @@ import (
 	_ "github.com/udistrital/administrativa_mid_api/routers"
 
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/plugins/cors"
-	"github.com/astaxie/beego/logs"
 	_ "github.com/lib/pq"
 	"github.com/udistrital/utils_oas/apiStatusLib"
 )
@@ -16,9 +16,20 @@ import (
 func init() {
 	orm.DefaultTimeLoc = time.UTC
 	//orm.Debug = true
-	orm.RegisterDataBase("amazonAdmin", "postgres", "postgres://"+beego.AppConfig.String("UsercrudAgora")+":"+beego.AppConfig.String("PasscrudAgora")+"@"+beego.AppConfig.String("HostcrudAgora")+"/"+beego.AppConfig.String("BdcrudAgora")+"?sslmode=disable&search_path="+beego.AppConfig.String("SchcrudAgora")+"&timezone=UTC")
-	orm.RegisterDataBase("flywayAdmin", "postgres", "postgres://"+beego.AppConfig.String("UsercrudAdmin")+":"+beego.AppConfig.String("PasscrudAdmin")+"@"+beego.AppConfig.String("HostcrudAdmin")+"/"+beego.AppConfig.String("BdcrudAdmin")+"?sslmode=disable&search_path="+beego.AppConfig.String("SchcrudAdmin")+"&timezone=UTC")
-	orm.RegisterDataBase("default", "postgres", "postgres://"+beego.AppConfig.String("UsercrudAgora")+":"+beego.AppConfig.String("PasscrudAgora")+"@"+beego.AppConfig.String("HostcrudAgora")+"/"+beego.AppConfig.String("BdcrudAgora")+"?sslmode=disable&search_path="+beego.AppConfig.String("SchcrudAgora")+"&timezone=UTC")
+	amazon := "postgres://" + beego.AppConfig.String("UsercrudAgora") + ":" + beego.AppConfig.String("PasscrudAgora") + "@" + beego.AppConfig.String("HostcrudAgora") + "/" + beego.AppConfig.String("BdcrudAgora") + "?sslmode=disable&search_path=" + beego.AppConfig.String("SchcrudAgora") + "&timezone=UTC"
+	flyway := "postgres://" + beego.AppConfig.String("UsercrudAdmin") + ":" + beego.AppConfig.String("PasscrudAdmin") + "@" + beego.AppConfig.String("HostcrudAdmin") + "/" + beego.AppConfig.String("BdcrudAdmin") + "?sslmode=disable&search_path=" + beego.AppConfig.String("SchcrudAdmin") + "&timezone=UTC"
+
+	if err := orm.RegisterDataBase("amazonAdmin", "postgres", amazon); err != nil {
+		panic(err)
+	}
+
+	if err := orm.RegisterDataBase("flywayAdmin", "postgres", flyway); err != nil {
+		panic(err)
+	}
+
+	if err := orm.RegisterDataBase("default", "postgres", amazon); err != nil {
+		panic(err)
+	}
 }
 
 func main() {
@@ -39,15 +50,15 @@ func main() {
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	}
 
-
 	// Custom JSON error pages
-	beego.ErrorHandler("400", BadRequestJsonPage)
-	beego.ErrorHandler("403", forgivenJsonPage)
-	beego.ErrorHandler("404", notFoundJsonPage)
-	beego.ErrorHandler("233", notValidJsonPage)
+	beego.ErrorHandler("400", badRequestJSONPage)
+	beego.ErrorHandler("403", forgivenJSONPage)
+	beego.ErrorHandler("404", notFoundJSONPage)
+	beego.ErrorHandler("233", notValidJSONPage)
 
-	logs.SetLogger(logs.AdapterFile, `{"filename":"/var/log/beego/administrativa_mid_api.log"}`)
-
+	if err := logs.SetLogger(logs.AdapterFile, `{"filename":"/var/log/beego/administrativa_mid_api.log"}`); err != nil {
+		beego.Info(err)
+	}
 
 	apistatus.Init()
 	beego.Run()
