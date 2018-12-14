@@ -13,28 +13,40 @@ type outJSON struct {
 
 var out bytes.Buffer
 
-func genericError(rw http.ResponseWriter, customError outJSON) error {
+func genericError(rw http.ResponseWriter, customError outJSON) (err error) {
 	cj, err := json.Marshal(customError)
 	if err != nil {
-		return err
+		return
 	}
-	json.Indent(&out, cj, "", "\t")
-	out.WriteTo(rw)
+	if err = json.Indent(&out, cj, "", "\t"); err != nil {
+		return
+	}
+	if _, err = out.WriteTo(rw); err != nil {
+		return
+	}
 	return nil
 }
 
-func forgivenJsonPage(rw http.ResponseWriter, r *http.Request) {
-	genericError(rw, outJSON{Err: "The page you have requested is forbidden", Status: 403})
+func forgivenJSONPage(rw http.ResponseWriter, r *http.Request) {
+	if err := genericError(rw, outJSON{Err: "The page you have requested is forbidden", Status: 403}); err != nil {
+		panic(err) //Nunca debe pasar
+	}
 }
 
-func notFoundJsonPage(rw http.ResponseWriter, r *http.Request) {
-	genericError(rw, outJSON{Err: "This entrypoint not exist", Status: 404})
+func notFoundJSONPage(rw http.ResponseWriter, r *http.Request) {
+	if err := genericError(rw, outJSON{Err: "This entrypoint not exist", Status: 404}); err != nil {
+		panic(err) //Nunca debe pasar
+	}
 }
 
-func BadRequestJsonPage(rw http.ResponseWriter, r *http.Request) {
-	genericError(rw, outJSON{Err: "bad syntax or bad request", Status: 400})
+func badRequestJSONPage(rw http.ResponseWriter, r *http.Request) {
+	if err := genericError(rw, outJSON{Err: "bad syntax or bad request", Status: 400}); err != nil {
+		panic(err) //Nunca debe pasar
+	}
 }
 
-func notValidJsonPage(rw http.ResponseWriter, r *http.Request) {
-	genericError(rw, outJSON{Err: "This element is not validable", Status: 233})
+func notValidJSONPage(rw http.ResponseWriter, r *http.Request) {
+	if err := genericError(rw, outJSON{Err: "This element is not validable", Status: 233}); err != nil {
+		panic(err) //Nunca debe pasar
+	}
 }
