@@ -7,6 +7,8 @@ import (
 	"reflect"
 	"strings"
 	"sync"
+
+	"github.com/astaxie/beego"
 )
 
 func FillStruct(m interface{}, s interface{}) (err error) {
@@ -80,10 +82,16 @@ func FillStructDeep(m map[string]interface{}, fields string, s interface{}) (err
 
 		if i == 0 {
 			//fmt.Println(m[value])
-			FillStruct(m[value], &load)
+			if err := FillStruct(m[value], &load); err != nil {
+				beego.Error(err)
+			}
 		} else {
-			FillStruct(load, &aux)
-			FillStruct(aux[value], &load)
+			if err := FillStruct(load, &aux); err != nil {
+				beego.Error(err)
+			}
+			if err = FillStruct(aux[value], &load); err != nil {
+				beego.Error(err)
+			}
 			//fmt.Println(aux[value])
 		}
 	}

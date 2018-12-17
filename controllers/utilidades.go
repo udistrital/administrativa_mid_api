@@ -18,7 +18,9 @@ import (
 func sendJson(url string, trequest string, target interface{}, datajson interface{}) error {
 	b := new(bytes.Buffer)
 	if datajson != nil {
-		json.NewEncoder(b).Encode(datajson)
+		if err := json.NewEncoder(b).Encode(datajson); err != nil {
+			beego.Error(err)
+		}
 	}
 	client := &http.Client{}
 	req, err := http.NewRequest(trequest, url, b)
@@ -27,7 +29,11 @@ func sendJson(url string, trequest string, target interface{}, datajson interfac
 		beego.Error("error", err)
 		return err
 	}
-	defer r.Body.Close()
+	defer func() {
+		if err := r.Body.Close(); err != nil {
+			beego.Error(err)
+		}
+	}()
 
 	return json.NewDecoder(r.Body).Decode(target)
 }
@@ -37,7 +43,11 @@ func getJson(url string, target interface{}) error {
 	if err != nil {
 		return err
 	}
-	defer r.Body.Close()
+	defer func() {
+		if err := r.Body.Close(); err != nil {
+			beego.Error(err)
+		}
+	}()
 
 	return json.NewDecoder(r.Body).Decode(target)
 }
@@ -47,7 +57,11 @@ func getXml(url string, target interface{}) error {
 	if err != nil {
 		return err
 	}
-	defer r.Body.Close()
+	defer func() {
+		if err := r.Body.Close(); err != nil {
+			beego.Error(err)
+		}
+	}()
 
 	return xml.NewDecoder(r.Body).Decode(target)
 }
@@ -62,7 +76,11 @@ func getJsonWSO2(urlp string, target interface{}) error {
 		beego.Error("error", err)
 		return err
 	}
-	defer r.Body.Close()
+	defer func() {
+		if err := r.Body.Close(); err != nil {
+			beego.Error(err)
+		}
+	}()
 
 	return json.NewDecoder(r.Body).Decode(target)
 }
