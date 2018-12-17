@@ -1099,13 +1099,21 @@ func (c *AprobacionPagoController) GetSolicitudesSupervisorContratistas() {
 func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistas() {
 
 	doc_ordenador := c.GetString(":docordenador")
+	limit, _ := c.GetInt("limit")
+	offset, _ := c.GetInt("offset")
+
 
 	var pagos_mensuales []models.PagoMensual
 	var contratistas []models.InformacionProveedor
 	var pagos_contratista_cdp_rp []models.PagoContratistaCdpRp
 	var contratos_disponibilidad []models.ContratoDisponibilidad
 
-	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?limit=-1&query=EstadoPagoMensual.CodigoAbreviacion:AS,Responsable:"+doc_ordenador, &pagos_mensuales); err == nil {
+	r := httplib.Get(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/")
+	r.Param("offset", strconv.Itoa(offset))
+	r.Param("limit", strconv.Itoa(limit))
+	r.Param("query", "EstadoPagoMensual.CodigoAbreviacion:AS,Responsable:"+doc_ordenador)
+
+	if err := r.ToJSON(&pagos_mensuales); err == nil {
 
 		for v, _ := range pagos_mensuales {
 
