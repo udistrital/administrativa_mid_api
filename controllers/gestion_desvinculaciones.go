@@ -607,7 +607,7 @@ func (c *GestionDesvinculacionesController) ConsultarCategoria() {
 		c.Data["json"] = "Error al leer json para desvincular"
 	}
 
-	categoria, _, err := Buscar_Categoria_Docente(strconv.FormatInt(v.Vigencia.Int64, 10), strconv.Itoa(v.Periodo), v.IdPersona)
+	categoria, _, err := Buscar_Categoria_Docente(strconv.Itoa(v.VigenciaCarga), strconv.Itoa(v.PeriodoCarga), v.IdPersona)
 	if err != nil {
 		beego.Error(err)
 		c.Abort("403")

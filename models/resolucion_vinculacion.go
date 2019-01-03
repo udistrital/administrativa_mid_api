@@ -19,4 +19,6 @@ type ResolucionVinculacion struct {
 	FacultadNombre      string
 	IdDependenciaFirma  int
 	FacultadFirmaNombre string
+	VigenciaCarga       int
+	PeriodoCarga        int
 }
