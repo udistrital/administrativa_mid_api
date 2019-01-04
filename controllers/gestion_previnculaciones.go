@@ -220,6 +220,11 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 	var a string
 	var categoria string
 
+	salarioMinimo, err := CargarSalarioMinimo(vigencia)
+	if err != nil {
+		return docentes_a_insertar, err
+	}
+
 	for x, docente := range docentes_a_vincular {
 		p, err := EsDocentePlanta(docente.IdPersona)
 		if err != nil {
@@ -233,10 +238,6 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 
 		var predicados string
 		if strings.ToLower(nivelAcademico) == "posgrado" {
-			salarioMinimo, err := CargarSalarioMinimo()
-			if err != nil {
-				return docentes_a_insertar, err
-			}
 			predicados = "valor_salario_minimo(" + strconv.Itoa(salarioMinimo.Valor) + "," + vigencia + ")." + "\n"
 			docente.NumeroSemanas = 1
 		} else if strings.ToLower(nivelAcademico) == "pregrado" {
@@ -284,10 +285,10 @@ func CargarPuntoSalarial() (p models.PuntoSalarial, err error) {
 	return v[0], err
 }
 
-func CargarSalarioMinimo() (p models.SalarioMinimo, err error) {
+func CargarSalarioMinimo(vigencia string) (p models.SalarioMinimo, err error) {
 	var v []models.SalarioMinimo
 
-	err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/salario_minimo/?sortby=Vigencia&order=desc&limit=1", &v)
+	err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/salario_minimo/?limit=1&query=Vigencia:"+vigencia, &v)
 	if err != nil {
 		err = fmt.Errorf("He fallado en salario_minimo (get) función CargarSalarioMinimo, %s", err)
 	}
@@ -633,6 +634,8 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 		pos.ValorContratoFormato = FormatMoney(int(v[x].ValorContrato), 2)
 		pos.ProyectoNombre = BuscarNombreFacultad(int(v[x].IdProyectoCurricular))
 		pos.Periodo = res.Periodo
+		pos.VigenciaCarga = res.VigenciaCarga
+		pos.PeriodoCarga = res.PeriodoCarga
 
 		v[x] = pos
 	}

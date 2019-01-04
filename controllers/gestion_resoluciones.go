@@ -179,6 +179,8 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 		} else {
 			fmt.Println("Error al consultar resolución vieja", err)
 		}
+		temp.VigenciaCarga = resVieja.VigenciaCarga
+		temp.PeriodoCarga = resVieja.PeriodoCarga
 	}
 	temp.PreambuloResolucion = "El decano de la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas en uso de sus facultades legales y estatutarias y"
 	if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion", "POST", &respuesta, &temp); err == nil {
