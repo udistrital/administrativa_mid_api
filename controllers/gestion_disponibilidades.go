@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/administrativa_mid_api/models"
@@ -32,8 +33,12 @@ func (c *GestionDisponibilidadController) ListarApropiaciones() {
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 
 		for x, pos := range v {
-
-			if err2 := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad/SaldoCdp", "POST", &respuesta, &pos); err2 == nil {
+			var fuente string
+			if pos.FuenteFinanciamiento.Codigo != "" {
+				fuente = "fuente=" + pos.FuenteFinanciamiento.Codigo
+			}
+			query := strconv.Itoa(pos.Disponibilidad.Id) + "/" + pos.Apropiacion.Rubro.Codigo + "/?" + fuente
+			if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NsmidFinanciera")+"/disponibilidad/SaldoCdp/"+query, &respuesta); err2 == nil {
 				v[x].Apropiacion.Saldo = int(respuesta.Saldo)
 				fmt.Println("respuesta", respuesta)
 
