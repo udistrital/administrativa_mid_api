@@ -7,4 +7,5 @@ type ApropiacionRubro struct {
 	Rubro    *Rubro
 	Valor    float64
 	Estado   *ApropiacionRubroEstado
+	Saldo    int
 }
