@@ -38,7 +38,7 @@ func (c *GestionDisponibilidadController) ListarApropiaciones() {
 				fuente = "fuente=" + pos.FuenteFinanciamiento.Codigo
 			}
 			query := strconv.Itoa(pos.Disponibilidad.Id) + "/" + pos.Apropiacion.Rubro.Codigo + "/?" + fuente
-			if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NsmidFinanciera")+"/disponibilidad/SaldoCdp/"+query, &respuesta); err2 == nil {
+			if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlmidFinanciera")+"/"+beego.AppConfig.String("NsmidFinanciera")+"/disponibilidad/SaldoCdp/"+query, &respuesta); err2 == nil {
 				v[x].Apropiacion.Saldo = int(respuesta.Saldo)
 				fmt.Println("respuesta", respuesta)
 
