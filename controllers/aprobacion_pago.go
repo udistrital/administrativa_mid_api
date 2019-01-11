@@ -801,7 +801,6 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 	var contratos_disponibilidad_rp []models.ContratoDisponibilidadRp
 	var novedades_postcontractuales []models.NovedadPostcontractual
 	var informacion_proveedores []models.InformacionProveedor
-	var contratos_estado []models.ContratoEstado
 	contratos_persona := GetContratosPersona(numero_documento)
 	if contratos_persona.ContratosPersonas.ContratoPersona == nil {// Si no tiene contrato
 
@@ -811,14 +810,18 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 				
 				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/novedad_postcontractual/?query=Contratista:"+ strconv.Itoa(persona.Id)+"&sortby=FechaInicio&order=desc&limit=1", &novedades_postcontractuales); err == nil {
 
+					
+
 					for _, novedad := range novedades_postcontractuales {
+
+						
+						if ( novedad.FechaInicio.Year() == time.Now().Year() && int(novedad.FechaFin.Month()) >= int(time.Now().Month()) && novedad.FechaFin.Year() == time.Now().Year()) ||
+									 ( novedad.FechaInicio.Year() <= time.Now().Year() && int(novedad.FechaFin.Month()) <= int(time.Now().Month()) && novedad.FechaFin.Year() >= time.Now().Year() && novedad.FechaFin.Year()>novedad.FechaInicio.Year() ){
+
+
 						var contrato models.InformacionContrato
 						contrato = GetContrato(novedad.NumeroContrato, strconv.Itoa(novedad.Vigencia))
-						if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/novedad_postcontractual/contrato_estado/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia+"&sortby=FechaRegistro&order=desc&limit=1", &contratos_estado); err == nil {
 
-							for _,contrato_estado := range contratos_estado {
-
-							if contrato_estado.Estado.Id == 4 {
 						var informacion_contrato_contratista models.InformacionContratoContratista
 		informacion_contrato_contratista = GetInformacionContratoContratista(novedad.NumeroContrato, strconv.Itoa(novedad.Vigencia))
 		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
@@ -853,14 +856,12 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 			fmt.Println("Mirenme, me morí en If contrato_disponibilidad get, solucioname!!! ", err)
 		
 		}
-	}
-		//
-	}
-					}else{// If contrato_estado get
-						fmt.Println("Mirenme, me morí en If contrato_estado get, solucioname!!! ", err)
-					}
+									 }
+	
+//		
 
 				}
+
 				}else{ // If novedad_postcontractual get
 					fmt.Println("Mirenme, me morí en If novedad_postcontractual get, solucioname!!! ", err.Error())
 				}	
