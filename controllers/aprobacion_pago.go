@@ -800,6 +800,7 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 	var contratos_disponibilidad []models.ContratoDisponibilidad
 	var contratos_disponibilidad_rp []models.ContratoDisponibilidadRp
 	var novedades_postcontractuales []models.NovedadPostcontractual
+	var novedades_novedad []models.NovedadPostcontractual
 	var informacion_proveedores []models.InformacionProveedor
 	contratos_persona := GetContratosPersona(numero_documento)
 	if contratos_persona.ContratosPersonas.ContratoPersona == nil {// Si no tiene contrato
@@ -814,16 +815,58 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 
 					for _, novedad := range novedades_postcontractuales {
 
+						var contrato models.InformacionContrato
+						contrato = GetContrato(novedad.NumeroContrato, strconv.Itoa(novedad.Vigencia))
+
+						var informacion_contrato_contratista models.InformacionContratoContratista
+						informacion_contrato_contratista = GetInformacionContratoContratista(novedad.NumeroContrato, strconv.Itoa(novedad.Vigencia))
+
+						if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/novedad_postcontractual/?query=NumeroContrato:"+novedad.NumeroContrato+",Vigencia:"+strconv.Itoa(novedad.Vigencia)+"&sortby=FechaInicio&order=desc&limit=1",&novedades_novedad); err == nil {
+
+						for _, novedad_novedad := range novedades_novedad{
+
+						if novedad_novedad != novedad {
+
+							if ( novedad_novedad.FechaInicio.Year() == time.Now().Year() && int(novedad_novedad.FechaFin.Month()) >= int(time.Now().Month()) && novedad_novedad.FechaFin.Year() == time.Now().Year()) ||
+									 ( novedad_novedad.FechaInicio.Year() <= time.Now().Year() && int(novedad_novedad.FechaFin.Month()) <= int(time.Now().Month()) && novedad_novedad.FechaFin.Year() >= time.Now().Year() && novedad_novedad.FechaFin.Year()>novedad_novedad.FechaInicio.Year() ){
+
+							if novedad_novedad.TipoNovedad == 219 {// si es una cesión
+
+
+							}else{
+
+
+								var cdprp models.InformacionCdpRp
+								cdprp = GetRP(strconv.Itoa(novedad_novedad.NumeroCdp),strconv.Itoa(novedad_novedad.VigenciaCdp))
+				
+								for _, rp := range cdprp.CdpXRp.CdpRp {
+								var contrato_disponibilidad_rp models.ContratoDisponibilidadRp
+				
+								contrato_disponibilidad_rp.NumeroContratoSuscrito = novedad_novedad.NumeroContrato
+								contrato_disponibilidad_rp.Vigencia = strconv.Itoa(novedad_novedad.Vigencia)
+								contrato_disponibilidad_rp.NumeroCdp = strconv.Itoa(novedad_novedad.NumeroCdp)
+								contrato_disponibilidad_rp.VigenciaCdp = strconv.Itoa(novedad_novedad.VigenciaCdp)
+								contrato_disponibilidad_rp.NumeroRp = rp.RpNumeroRegistro
+								contrato_disponibilidad_rp.VigenciaRp = rp.RpVigencia
+				
+								contrato_disponibilidad_rp.NombreDependencia = informacion_contrato_contratista.InformacionContratista.Dependencia
+								contrato_disponibilidad_rp.NumDocumentoSupervisor = contrato.Contrato.Supervisor.DocumentoIdentificacion
+				
+								contratos_disponibilidad_rp = append(contratos_disponibilidad_rp, contrato_disponibilidad_rp)
+								}
+
+
+
+							}
+						}
+
+						}else{
 						
 						if ( novedad.FechaInicio.Year() == time.Now().Year() && int(novedad.FechaFin.Month()) >= int(time.Now().Month()) && novedad.FechaFin.Year() == time.Now().Year()) ||
 									 ( novedad.FechaInicio.Year() <= time.Now().Year() && int(novedad.FechaFin.Month()) <= int(time.Now().Month()) && novedad.FechaFin.Year() >= time.Now().Year() && novedad.FechaFin.Year()>novedad.FechaInicio.Year() ){
 
 
-						var contrato models.InformacionContrato
-						contrato = GetContrato(novedad.NumeroContrato, strconv.Itoa(novedad.Vigencia))
 
-						var informacion_contrato_contratista models.InformacionContratoContratista
-		informacion_contrato_contratista = GetInformacionContratoContratista(novedad.NumeroContrato, strconv.Itoa(novedad.Vigencia))
 		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
 
 
@@ -858,8 +901,13 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 		}
 									 }
 	
-//		
+		}
 
+		}//fin for novedad novedad
+
+	}else{ // If novedad_postcontractual get
+		fmt.Println("Mirenme, me morí en If novedad_postcontractual de la novedad get, solucioname!!! ", err.Error())
+	}
 				}
 
 				}else{ // If novedad_postcontractual get
