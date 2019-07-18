@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/astaxie/beego/logs"
+
 	"github.com/astaxie/beego/httplib"
 
 	"github.com/astaxie/beego"
@@ -96,6 +98,8 @@ func (c *GestionResolucionesController) GetResolucionesAprobadas() {
 // @Failure 403 body is empty
 // @router /insertar_resolucion_completa [post]
 func (c *GestionResolucionesController) InsertarResolucionCompleta() {
+	logs.Info("resolucion completa")
+	logs.Info(tiempo_bogota())
 	var v models.ObjetoResolucion
 	var id_resolucion_creada int
 	var texto_resolucion models.ResolucionCompleta
