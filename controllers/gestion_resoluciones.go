@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"github.com/udistrital/utils_oas/time_bogota"
 
 	"github.com/astaxie/beego/logs"
 
@@ -98,8 +99,8 @@ func (c *GestionResolucionesController) GetResolucionesAprobadas() {
 // @router /insertar_resolucion_completa [post]
 func (c *GestionResolucionesController) InsertarResolucionCompleta() {
 	logs.Info("resolucion completa")
-	// tiempo_prueba := tiempo_bogota()
-	logs.Info(tiempo_bogota())
+	// tiempo_prueba := time_bogota.tiempo_bogota()
+	logs.Info(time_bogota.Tiempo_bogota())
 	var v models.ObjetoResolucion
 	var id_resolucion_creada int
 	var texto_resolucion models.ResolucionCompleta
@@ -158,8 +159,8 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 	var dedicacion string
 	var reanudar string
 
-	temp.Vigencia, _, _ = tiempo_bogota().Date()
-	temp.FechaRegistro = tiempo_bogota()
+	temp.Vigencia, _, _ = time_bogota.Tiempo_bogota().Date()
+	temp.FechaRegistro = time_bogota.Tiempo_bogota()
 	fmt.Println("fecha de registro en insertar resolucion")
 	logs.Error(temp.FechaRegistro)
 	temp.Estado = true
@@ -224,7 +225,7 @@ func InsertarResolucionEstado(id_res int) (contr bool) {
 	var respuesta models.ResolucionEstado
 	var cont bool
 	temp := models.ResolucionEstado{
-		FechaRegistro: tiempoBogotaFormato(),
+		FechaRegistro: time_bogota.TiempoBogotaFormato(),
 		Estado:        &models.EstadoResolucion{Id: 1},
 		Resolucion:    &models.Resolucion{Id: id_res},
 	}
