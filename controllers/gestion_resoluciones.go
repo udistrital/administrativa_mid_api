@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/astaxie/beego/logs"
 
@@ -224,7 +225,7 @@ func InsertarResolucionEstado(id_res int) (contr bool) {
 	var respuesta models.ResolucionEstado
 	var cont bool
 	temp := models.ResolucionEstado{
-		FechaRegistro: tiempo_bogota(),
+		FechaRegistro: tiempo_bogota().Format(time.RFC3339Nano),
 		Estado:        &models.EstadoResolucion{Id: 1},
 		Resolucion:    &models.Resolucion{Id: id_res},
 	}
