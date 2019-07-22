@@ -22,3 +22,10 @@ func tiempo_bogota() time.Time {
 	logs.Info(tiempoBogota)
 	return tiempoBogota
 }
+
+func tiempoBogotaFormato() string {
+	fmt.Println("tiempo con formato")
+	var tiempoFormato = tiempo_bogota().Format(time.RFC3339Nano)
+	logs.Info(tiempoFormato)
+	return tiempoFormato
+}
