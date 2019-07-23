@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+
 	"github.com/udistrital/utils_oas/time_bogota"
 
 	"github.com/astaxie/beego/logs"
@@ -108,6 +109,7 @@ func (c *GestionResolucionesController) InsertarResolucionCompleta() {
 	var control bool
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		//****MANEJO DE TRANSACCIONES!***!//
+		logs.Info(v.Usuario)
 
 		//Se trae cuerpo de resolución según tipo
 		if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/contenido_resolucion/ResolucionTemplate/"+
@@ -122,7 +124,7 @@ func (c *GestionResolucionesController) InsertarResolucionCompleta() {
 		if control {
 			//Si se inserta bien en resolución, se puede insertar en resolucion_vinculacion_docente y en resolucion_estado
 			control = InsertarResolucionVinDocente(id_resolucion_creada, v.ResolucionVinculacionDocente)
-			control = InsertarResolucionEstado(id_resolucion_creada)
+			control = InsertarResolucionEstado(id_resolucion_creada, v.Usuario)
 			//Si todo sigue bien, se inserta en componente_resolucion
 			if control {
 				InsertarArticulos(id_resolucion_creada, texto_resolucion.Articulos)
@@ -220,7 +222,7 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 	return cont, id_creada
 }
 
-func InsertarResolucionEstado(id_res int) (contr bool) {
+func InsertarResolucionEstado(id_res int, usuario string) (contr bool) {
 
 	var respuesta models.ResolucionEstado
 	var cont bool
@@ -228,6 +230,7 @@ func InsertarResolucionEstado(id_res int) (contr bool) {
 		FechaRegistro: time_bogota.TiempoBogotaFormato(),
 		Estado:        &models.EstadoResolucion{Id: 1},
 		Resolucion:    &models.Resolucion{Id: id_res},
+		Usuario:       usuario,
 	}
 	fmt.Println("temporal en resoluciones_estado")
 	logs.Error(temp)

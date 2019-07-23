@@ -5,4 +5,5 @@ type ObjetoResolucion struct {
 	ResolucionVinculacionDocente *ResolucionVinculacionDocente
 	ResolucionVieja              int
 	NomDependencia               string
+	Usuario						 string
 }
