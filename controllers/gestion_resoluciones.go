@@ -7,8 +7,6 @@ import (
 
 	"github.com/udistrital/utils_oas/time_bogota"
 
-	"github.com/astaxie/beego/logs"
-
 	"github.com/astaxie/beego/httplib"
 
 	"github.com/astaxie/beego"
@@ -99,9 +97,6 @@ func (c *GestionResolucionesController) GetResolucionesAprobadas() {
 // @Failure 403 body is empty
 // @router /insertar_resolucion_completa [post]
 func (c *GestionResolucionesController) InsertarResolucionCompleta() {
-	logs.Info("resolucion completa")
-	// tiempo_prueba := time_bogota.tiempo_bogota()
-	logs.Info(time_bogota.Tiempo_bogota())
 	var v models.ObjetoResolucion
 	var id_resolucion_creada int
 	var texto_resolucion models.ResolucionCompleta
@@ -109,7 +104,6 @@ func (c *GestionResolucionesController) InsertarResolucionCompleta() {
 	var control bool
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		//****MANEJO DE TRANSACCIONES!***!//
-		logs.Info(v.Usuario)
 
 		//Se trae cuerpo de resolución según tipo
 		if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/contenido_resolucion/ResolucionTemplate/"+
@@ -163,8 +157,6 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 
 	temp.Vigencia, _, _ = time_bogota.Tiempo_bogota().Date()
 	temp.FechaRegistro = time_bogota.Tiempo_bogota()
-	fmt.Println("fecha de registro en insertar resolucion")
-	logs.Error(temp.FechaRegistro)
 	temp.Estado = true
 	switch resolucion.ResolucionVinculacionDocente.Dedicacion {
 	case "HCH":
@@ -232,8 +224,6 @@ func InsertarResolucionEstado(id_res int, usuario string) (contr bool) {
 		Resolucion:    &models.Resolucion{Id: id_res},
 		Usuario:       usuario,
 	}
-	fmt.Println("temporal en resoluciones_estado")
-	logs.Error(temp)
 
 	if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_estado", "POST", &respuesta, &temp); err == nil {
 		cont = true
