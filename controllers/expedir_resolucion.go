@@ -281,7 +281,7 @@ func (c *ExpedirResolucionController) Expedir() {
 					e.Resolucion = &r
 					er.Id = 2
 					e.Estado = &er
-					e.FechaRegistro = time.Now()
+					e.FechaRegistro = time.Now().Format(time.RFC3339)
 					//If 9 - Resolucion_estado
 					if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_estado", "POST", &response, &e); err == nil {
 						fmt.Println("Expedición exitosa, ahora va el commit :D")
@@ -539,7 +539,7 @@ func (c *ExpedirResolucionController) Cancelar() {
 										e.Resolucion = &r
 										er.Id = 2
 										e.Estado = &er
-										e.FechaRegistro = time.Now()
+										e.FechaRegistro = time.Now().Format(time.RFC3339)
 										//If  Resolucion_estado (post)
 										if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_estado", "POST", &response, &e); err == nil {
 											fmt.Println("Expedición exitosa, ahora va el commit :D")
@@ -1041,7 +1041,7 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 					e.Resolucion = &r
 					er.Id = 2
 					e.Estado = &er
-					e.FechaRegistro = time.Now()
+					e.FechaRegistro = time.Now().Format(time.RFC3339)
 					//If 9 - Resolucion_estado
 					if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_estado", "POST", &response, &e); err == nil {
 						fmt.Println("Expedición exitosa, ahora va el commit :D")

@@ -13,7 +13,7 @@
             "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
         }
     },
-    "basePath": "/administrativa_mid_api/v1",
+    "basePath": "/v1",
     "paths": {
         "/aprobacion_pago/aprobar_documentos": {
             "post": {
@@ -260,6 +260,23 @@
                 }
             }
         },
+        "/aprobacion_pago/dependencias_sic": {
+            "get": {
+                "tags": [
+                    "aprobacion_pago"
+                ],
+                "description": "create GetDependencias",
+                "operationId": "AprobacionPagoController.GetDependencias",
+                "responses": {
+                    "201": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/aprobacion_pago/get_contratos_docente/{numDocumento}": {
             "get": {
                 "tags": [
@@ -282,7 +299,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/.ContratosDocentes"
+                                "$ref": "#/definitions/models.ContratosDocentes"
                             }
                         }
                     },
@@ -483,6 +500,32 @@
                 }
             }
         },
+        "/aprobacion_pago/solicitudes_ordenador_contratistas_dependencia/{docordenador}/{cod_dependencia}": {
+            "get": {
+                "tags": [
+                    "aprobacion_pago"
+                ],
+                "description": "create GetSolicitudesOrdenadorContratistasDependencia",
+                "operationId": "AprobacionPagoController.GetSolicitudesOrdenadorContratistas",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "docordenador",
+                        "description": "Número del documento del supervisor",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ":docordenador is empty"
+                    }
+                }
+            }
+        },
         "/aprobacion_pago/solicitudes_supervisor/{docsupervisor}": {
             "get": {
                 "tags": [
@@ -579,7 +622,7 @@
                     "200": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/.Contrato_genral"
+                            "$ref": "#/definitions/models.Contrato_genral"
                         }
                     },
                     "403": {
@@ -686,6 +729,23 @@
                 }
             }
         },
+        "/expedir_resolucion/expedirModificacion": {
+            "post": {
+                "tags": [
+                    "expedir_resolucion"
+                ],
+                "description": "create ExpedirModificacion",
+                "operationId": "ExpedirResolucionController.ExpedirModificacion",
+                "responses": {
+                    "201": {
+                        "description": "{int} models.ExpedicionResolucion"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
         "/expedir_resolucion/validar_datos_expedicion": {
             "post": {
                 "tags": [
@@ -710,6 +770,23 @@
                 ],
                 "description": "create ActualizarVinculaciones",
                 "operationId": "GestionDesvinculacionesController.ActualizarVinculaciones",
+                "responses": {
+                    "201": {
+                        "description": "{string}"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/gestion_desvinculaciones/actualizar_vinculaciones_cancelacion": {
+            "post": {
+                "tags": [
+                    "gestion_desvinculaciones"
+                ],
+                "description": "create ActualizarVinculacionesCancelacion",
+                "operationId": "GestionDesvinculacionesController.ActualizarVinculacionesCancelacion",
                 "responses": {
                     "201": {
                         "description": "{string}"
@@ -771,6 +848,40 @@
                 }
             }
         },
+        "/gestion_desvinculaciones/anular_modificaciones": {
+            "post": {
+                "tags": [
+                    "gestion_desvinculaciones"
+                ],
+                "description": "create AnularModificaciones",
+                "operationId": "GestionDesvinculacionesController.AnularModificaciones",
+                "responses": {
+                    "201": {
+                        "description": "{string}"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/gestion_desvinculaciones/consultar_categoria": {
+            "post": {
+                "tags": [
+                    "gestion_desvinculaciones"
+                ],
+                "description": "create ConsultarCategoria",
+                "operationId": "GestionDesvinculacionesController.ConsultarCategoria",
+                "responses": {
+                    "201": {
+                        "description": "{string}"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
         "/gestion_desvinculaciones/docentes_cancelados": {
             "get": {
                 "tags": [
@@ -814,6 +925,23 @@
                 "responses": {
                     "201": {
                         "description": "{int} models.VinculacionDocente"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/gestion_desvinculaciones/validar_saldo_cdp": {
+            "post": {
+                "tags": [
+                    "gestion_desvinculaciones"
+                ],
+                "description": "create ValidarSaldoCDP",
+                "operationId": "GestionDesvinculacionesController.ValidarSaldoCDP",
+                "responses": {
+                    "201": {
+                        "description": "{string}"
                     },
                     "403": {
                         "description": "body is empty"
@@ -964,7 +1092,7 @@
                     "201": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/.Docentes_x_Carga"
+                            "$ref": "#/definitions/models.Docentes_x_Carga"
                         }
                     },
                     "403": {
@@ -1040,6 +1168,42 @@
                 }
             }
         },
+        "/gestion_previnculacion/rp_docente/{num_vinculacion}/{vigencia}/{identificacion}": {
+            "get": {
+                "tags": [
+                    "gestion_previnculacion"
+                ],
+                "description": "Get RPs de la vinculacion docente",
+                "operationId": "GestionPrevinculacionesController.GetCdpRpDocente",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "num_vinculacion",
+                        "description": "Número de la vinculación del docente",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "vigencia",
+                        "description": "Vigencia de la vinculación del docente",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.RpDocente"
+                        }
+                    },
+                    "403": {
+                        "description": ":vigencia is empty"
+                    }
+                }
+            }
+        },
         "/gestion_resoluciones/get_resoluciones_aprobadas": {
             "get": {
                 "tags": [
@@ -1052,13 +1216,15 @@
                         "in": "query",
                         "name": "limit",
                         "description": "Limit the size of result set. Must be an integer",
-                        "type": "string"
+                        "type": "integer",
+                        "format": "int64"
                     },
                     {
                         "in": "query",
                         "name": "offset",
                         "description": "Start position of result set. Must be an integer",
-                        "type": "string"
+                        "type": "integer",
+                        "format": "int64"
                     },
                     {
                         "in": "query",
@@ -1131,6 +1297,32 @@
                 }
             }
         },
+        "/solicitud_necesidad/fuente_apropiacion_necesidad/{id_necesidad}": {
+            "get": {
+                "tags": [
+                    "solicitud_necesidad"
+                ],
+                "description": "create FuentesApropiacionNecesidad",
+                "operationId": "SolicitudNecesidadController.FuentesApropiacionNecesidad",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id_necesidad",
+                        "description": "necesidad a consultar",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{int} models.FuenteApropiacionNecesidad"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
         "/validarCambioEstado/": {
             "post": {
                 "tags": [
@@ -1167,19 +1359,8 @@
         }
     },
     "definitions": {
-        ".Contrato_genral": {
-            "type": "object"
-        },
-        ".ContratosDocentes": {
-            "type": "object"
-        },
-        ".Docentes_x_Carga": {
-            "type": "object"
-        },
-        ".NullInt64": {
-            "type": "object"
-        },
-        ".NullString": {
+        "3748.0xc000542870.false": {
+            "title": "false",
             "type": "object"
         },
         "models.Articulo": {
@@ -1204,6 +1385,14 @@
                     "type": "string"
                 }
             }
+        },
+        "models.Contrato_genral": {
+            "title": "Contrato_genral",
+            "type": "object"
+        },
+        "models.ContratosDocentes": {
+            "title": "ContratosDocentes",
+            "type": "object"
         },
         "models.Dedicacion": {
             "title": "Dedicacion",
@@ -1238,6 +1427,10 @@
                     "format": "double"
                 }
             }
+        },
+        "models.Docentes_x_Carga": {
+            "title": "Docentes_x_Carga",
+            "type": "object"
         },
         "models.OrdenadorGasto": {
             "title": "OrdenadorGasto",
@@ -1328,14 +1521,21 @@
                     "type": "integer",
                     "format": "int64"
                 },
+                "FacultadFirmaNombre": {
+                    "type": "string"
+                },
                 "FacultadNombre": {
                     "type": "string"
                 },
                 "FechaExpedicion": {
                     "type": "string",
-                    "format": "string"
+                    "format": "datetime"
                 },
                 "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "IdDependenciaFirma": {
                     "type": "integer",
                     "format": "int64"
                 },
@@ -1353,10 +1553,18 @@
                     "type": "integer",
                     "format": "int64"
                 },
+                "PeriodoCarga": {
+                    "type": "integer",
+                    "format": "int64"
+                },
                 "TipoResolucion": {
                     "type": "string"
                 },
                 "Vigencia": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "VigenciaCarga": {
                     "type": "integer",
                     "format": "int64"
                 }
@@ -1382,6 +1590,15 @@
                 }
             }
         },
+        "models.RpDocente": {
+            "title": "RpDocente",
+            "type": "object",
+            "properties": {
+                "cdp_rp_docente": {
+                    "$ref": "#/definitions/3748.0xc000542870.false"
+                }
+            }
+        },
         "models.VinculacionDocente": {
             "title": "VinculacionDocente",
             "type": "object",
@@ -1403,9 +1620,17 @@
                 "Estado": {
                     "type": "boolean"
                 },
+                "FechaInicio": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "FechaInicioNueva": {
+                    "type": "string",
+                    "format": "datetime"
+                },
                 "FechaRegistro": {
                     "type": "string",
-                    "format": "string"
+                    "format": "datetime"
                 },
                 "Id": {
                     "type": "integer",
@@ -1448,6 +1673,10 @@
                     "type": "integer",
                     "format": "int64"
                 },
+                "NumeroHorasModificacion": {
+                    "type": "integer",
+                    "format": "int64"
+                },
                 "NumeroHorasNuevas": {
                     "type": "integer",
                     "format": "int64"
@@ -1459,13 +1688,35 @@
                 "NumeroMeses": {
                     "type": "string"
                 },
+                "NumeroMesesNuevos": {
+                    "type": "string"
+                },
+                "NumeroRp": {
+                    "type": "integer",
+                    "format": "int64"
+                },
                 "NumeroSemanas": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "NumeroSemanasNuevas": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "NumeroSemanasRestantes": {
                     "type": "integer",
                     "format": "int64"
                 },
                 "Periodo": {
                     "type": "integer",
                     "format": "int64"
+                },
+                "PeriodoCarga": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "ProyectoNombre": {
+                    "type": "string"
                 },
                 "TipoDocumento": {
                     "type": "string"
@@ -1477,10 +1728,36 @@
                 "ValorContratoFormato": {
                     "type": "string"
                 },
+                "ValorContratoInicial": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "ValorContratoInicialFormato": {
+                    "type": "string"
+                },
+                "ValorModificacionFormato": {
+                    "type": "string"
+                },
                 "Vigencia": {
                     "$ref": "#/definitions/sql.NullInt64"
+                },
+                "VigenciaCarga": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "VigenciaRp": {
+                    "type": "integer",
+                    "format": "int64"
                 }
             }
+        },
+        "sql.NullInt64": {
+            "title": "NullInt64",
+            "type": "object"
+        },
+        "sql.NullString": {
+            "title": "NullString",
+            "type": "object"
         }
     },
     "tags": [
@@ -1519,6 +1796,10 @@
         {
             "name": "aprobacion_pago",
             "description": "AprobacionPagoController operations for AprobacionPago\n"
+        },
+        {
+            "name": "solicitud_necesidad",
+            "description": "SolicitudNecesidadController operations for SolicitudNecesidad\n"
         }
     ]
 }

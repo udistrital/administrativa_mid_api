@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
-	"time"
+
+	"github.com/udistrital/utils_oas/time_bogota"
 
 	"github.com/astaxie/beego/httplib"
 	"github.com/astaxie/beego/logs"
@@ -118,7 +119,7 @@ func (c *GestionResolucionesController) InsertarResolucionCompleta() {
 		if control {
 			//Si se inserta bien en resolución, se puede insertar en resolucion_vinculacion_docente y en resolucion_estado
 			control = InsertarResolucionVinDocente(id_resolucion_creada, v.ResolucionVinculacionDocente)
-			control = InsertarResolucionEstado(id_resolucion_creada)
+			control = InsertarResolucionEstado(id_resolucion_creada, v.Usuario)
 			//Si todo sigue bien, se inserta en componente_resolucion
 			if control {
 				InsertarArticulos(id_resolucion_creada, texto_resolucion.Articulos)
@@ -155,11 +156,10 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 	var dedicacion string
 	var reanudar string
 
-	temp.Vigencia, _, _ = time.Now().Date()
-	//temp.Vigencia = 2018
-	logs.Info(temp.Vigencia)
 
-	temp.FechaRegistro = time.Now()
+	temp.Vigencia, _, _ = time_bogota.Tiempo_bogota().Date()
+	//temp.Vigencia = 2018
+	temp.FechaRegistro = time_bogota.Tiempo_bogota()
 	temp.Estado = true
 	switch resolucion.ResolucionVinculacionDocente.Dedicacion {
 	case "HCH":
@@ -217,14 +217,15 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 	return cont, id_creada
 }
 
-func InsertarResolucionEstado(id_res int) (contr bool) {
+func InsertarResolucionEstado(id_res int, usuario string) (contr bool) {
 
 	var respuesta models.ResolucionEstado
 	var cont bool
 	temp := models.ResolucionEstado{
-		FechaRegistro: time.Now(),
+		FechaRegistro: time_bogota.TiempoBogotaFormato(),
 		Estado:        &models.EstadoResolucion{Id: 1},
 		Resolucion:    &models.Resolucion{Id: id_res},
+		Usuario:       usuario,
 	}
 
 	if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_estado", "POST", &respuesta, &temp); err == nil {
