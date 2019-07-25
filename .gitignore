@@ -5,3 +5,5 @@ coverage.xml
 sonar-project.properties
 .scannerwork/.sonar_lock
 .scannerwork/report-task.txt
+eject_254.sh
+./eject_254.sh

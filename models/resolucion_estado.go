@@ -1,12 +1,8 @@
 package models
 
-import (
-	"time"
-)
-
 type ResolucionEstado struct {
 	Id            int
-	FechaRegistro time.Time
+	FechaRegistro string
 	Usuario       string
 	Estado        *EstadoResolucion
 	Resolucion    *Resolucion
