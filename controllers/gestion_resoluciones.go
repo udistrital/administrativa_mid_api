@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/astaxie/beego/httplib"
+	"github.com/astaxie/beego/logs"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/administrativa_mid_api/models"
@@ -155,6 +156,9 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 	var reanudar string
 
 	temp.Vigencia, _, _ = time.Now().Date()
+	//temp.Vigencia = 2018
+	logs.Info(temp.Vigencia)
+
 	temp.FechaRegistro = time.Now()
 	temp.Estado = true
 	switch resolucion.ResolucionVinculacionDocente.Dedicacion {
