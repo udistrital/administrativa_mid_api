@@ -156,7 +156,7 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 	var reanudar string
 
 	temp.Vigencia, _, _ = time_bogota.Tiempo_bogota().Date()
-	temp.FechaRegistro = time_bogota.Tiempo_bogota()
+	temp.FechaRegistro = time_bogota.TiempoBogotaFormato()
 	temp.Estado = true
 	switch resolucion.ResolucionVinculacionDocente.Dedicacion {
 	case "HCH":
