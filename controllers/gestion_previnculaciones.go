@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/astaxie/beego/logs"
+
 	"github.com/astaxie/beego"
 	"github.com/udistrital/administrativa_mid_api/models"
 	. "github.com/udistrital/golog"
@@ -641,6 +643,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 	}
 	if v == nil {
 		v = []models.VinculacionDocente{}
+		logs.Info(v)
 	}
 	c.Ctx.Output.SetStatus(201)
 
