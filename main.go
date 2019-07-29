@@ -13,7 +13,7 @@ import (
 
 func init() {
 	// orm.DefaultTimeLoc = time.UTC
-	//orm.Debug = true
+	orm.Debug = true
 	amazon := "postgres://" + beego.AppConfig.String("UsercrudAgora") + ":" + beego.AppConfig.String("PasscrudAgora") + "@" + beego.AppConfig.String("HostcrudAgora") + "/" + beego.AppConfig.String("BdcrudAgora") + "?sslmode=disable&search_path=" + beego.AppConfig.String("SchcrudAgora") + "&timezone=UTC"
 	flyway := "postgres://" + beego.AppConfig.String("UsercrudAdmin") + ":" + beego.AppConfig.String("PasscrudAdmin") + "@" + beego.AppConfig.String("HostcrudAdmin") + "/" + beego.AppConfig.String("BdcrudAdmin") + "?sslmode=disable&search_path=" + beego.AppConfig.String("SchcrudAdmin") + "&timezone=UTC"
 
