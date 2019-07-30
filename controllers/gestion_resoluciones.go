@@ -4,11 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/udistrital/utils_oas/time_bogota"
-
 	"github.com/astaxie/beego/httplib"
-
 	"github.com/astaxie/beego"
 	"github.com/udistrital/administrativa_mid_api/models"
 )
@@ -107,7 +106,7 @@ func (c *GestionResolucionesController) InsertarResolucionCompleta() {
 
 		//Se trae cuerpo de resolución según tipo
 		if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/contenido_resolucion/ResolucionTemplate/"+
-			v.ResolucionVinculacionDocente.Dedicacion+"/"+v.ResolucionVinculacionDocente.NivelAcademico+"/"+strconv.Itoa(v.Resolucion.Periodo)+"/"+strconv.Itoa(v.Resolucion.IdTipoResolucion.Id), &texto_resolucion); err2 == nil {
+			v.ResolucionVinculacionDocente.Dedicacion+"/"+v.ResolucionVinculacionDocente.NivelAcademico+"/"+strconv.Itoa(v.Resolucion.Periodo)+"/"+strconv.Itoa(v.Resolucion.IdTipoResolucion.Id)+"/"+v.Resolucion.NumeroResolucion, &texto_resolucion); err2 == nil {
 			v.Resolucion.ConsideracionResolucion = texto_resolucion.Consideracion
 		} else {
 			fmt.Println("Error de consulta en texto de resolucion", err2)
@@ -155,8 +154,9 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 	var dedicacion string
 	var reanudar string
 
+
 	temp.Vigencia, _, _ = time_bogota.Tiempo_bogota().Date()
-	temp.FechaRegistro = time_bogota.TiempoBogotaFormato()
+	temp.FechaRegistro = time_bogota.Tiempo_bogota().Format(time.RFC3339Nano)
 	temp.Estado = true
 	switch resolucion.ResolucionVinculacionDocente.Dedicacion {
 	case "HCH":
