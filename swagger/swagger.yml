@@ -895,7 +895,7 @@ paths:
         "403":
           description: body is empty
 definitions:
-  3748.0xc000542870.false:
+  16690.0xc00060b6e0.false:
     title: "false"
     type: object
   models.Articulo:
@@ -1063,7 +1063,7 @@ definitions:
     type: object
     properties:
       cdp_rp_docente:
-        $ref: '#/definitions/3748.0xc000542870.false'
+        $ref: '#/definitions/16690.0xc00060b6e0.false'
   models.VinculacionDocente:
     title: VinculacionDocente
     type: object
