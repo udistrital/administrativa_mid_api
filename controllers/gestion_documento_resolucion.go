@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/administrativa_mid_api/models"
+	"github.com/udistrital/utils_oas/time_bogota"
 )
 
 //GestionDocumentoResolucionController operations for Preliquidacion
@@ -57,7 +57,7 @@ func (c *GestionDocumentoResolucionController) GetContenidoResolucion() {
 		fmt.Println("Error al consultar contenido", err2)
 	}
 
-	fecha_actual := time.Now().Format("2006-01-02")
+	fecha_actual := time_bogota.Tiempo_bogota().Format("2006-01-02")
 	query = "?query=DependenciaId:" + id_facultad + ",FechaFin__gte:" + fecha_actual + ",FechaInicio__lte:" + fecha_actual
 	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/jefe_dependencia/"+query, &jefe_dependencia); err == nil {
 		contenidoResolucion.OrdenadorGasto.NombreOrdenador = BuscarNombreProveedor(jefe_dependencia[0].TerceroId)

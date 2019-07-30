@@ -10,6 +10,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"github.com/udistrital/administrativa_mid_api/models"
+	"github.com/udistrital/utils_oas/time_bogota"
 )
 
 // ExpedirResolucionController operations for ExpedirResolucion
@@ -48,7 +49,7 @@ func (c *ExpedirResolucionController) Expedir() {
 	var disponibilidad models.Disponibilidad
 	var dispoap models.DisponibilidadApropiacion
 	var response interface{}
-	vigencia, _, _ := time.Now().Date()
+	vigencia, _, _ := time_bogota.Tiempo_bogota().Date()
 	//If 13 - Unmarshal
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &m); err == nil {
 		v := m.Vinculaciones
@@ -85,7 +86,7 @@ func (c *ExpedirResolucionController) Expedir() {
 					contrato.ModalidadSeleccion = 123
 					contrato.TipoCompromiso = 35
 					contrato.TipologiaContrato = 46
-					contrato.FechaRegistro = time.Now()
+					contrato.FechaRegistro = time_bogota.Tiempo_bogota()
 					contrato.UnidadEjecutora = 1
 					sup.Id = SupervisorActual(v.IdResolucion.Id)
 					contrato.Supervisor = &sup
@@ -103,7 +104,7 @@ func (c *ExpedirResolucionController) Expedir() {
 								var ec models.EstadoContrato
 								ce.NumeroContrato = aux1
 								ce.Vigencia = aux2
-								ce.FechaRegistro = time.Now()
+								ce.FechaRegistro = time_bogota.Tiempo_bogota()
 								ec.Id = 4
 								ce.Estado = &ec
 								// If 4 - contrato_estado
@@ -122,7 +123,7 @@ func (c *ExpedirResolucionController) Expedir() {
 										cd.NumeroContrato = aux1
 										cd.Vigencia = aux2
 										cd.Estado = true
-										cd.FechaRegistro = time.Now()
+										cd.FechaRegistro = time_bogota.Tiempo_bogota()
 										// If 2.5.2 - Get disponibildad_apropiacion
 										if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad_apropiacion/"+strconv.Itoa(v.Disponibilidad), &dispoap); err == nil {
 											// If 2.5.1 - Get disponibildad
@@ -281,7 +282,7 @@ func (c *ExpedirResolucionController) Expedir() {
 					e.Resolucion = &r
 					er.Id = 2
 					e.Estado = &er
-					e.FechaRegistro = time.Now().Format(time.RFC3339)
+					e.FechaRegistro = time_bogota.Tiempo_bogota().Format(time.RFC3339)
 					//If 9 - Resolucion_estado
 					if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_estado", "POST", &response, &e); err == nil {
 						fmt.Println("Expedición exitosa, ahora va el commit :D")
@@ -374,7 +375,7 @@ func SupervisorActual(id_resolucion int) (id_supervisor_actual int) {
 	var r models.Resolucion
 	var j []models.JefeDependencia
 	var s []models.SupervisorContrato
-	var fecha = time.Now().Format("2006-01-02")
+	var fecha = time_bogota.Tiempo_bogota().Format("2006-01-02")
 	//If Resolucion (GET)
 	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+strconv.Itoa(id_resolucion), &r); err == nil {
 		//If Jefe_dependencia (GET)
@@ -507,7 +508,7 @@ func (c *ExpedirResolucionController) Cancelar() {
 				contratoCancelado.FechaCancelacion = vinculacion.ContratoCancelado.FechaCancelacion
 				contratoCancelado.MotivoCancelacion = vinculacion.ContratoCancelado.MotivoCancelacion
 				contratoCancelado.Usuario = vinculacion.ContratoCancelado.Usuario
-				contratoCancelado.FechaRegistro = time.Now()
+				contratoCancelado.FechaRegistro = time_bogota.Tiempo_bogota()
 				contratoCancelado.Estado = vinculacion.ContratoCancelado.Estado
 				// if contrato_cancelado (post)
 				if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_cancelado", "POST", &response, &contratoCancelado); err == nil {
@@ -521,7 +522,7 @@ func (c *ExpedirResolucionController) Cancelar() {
 							var ec models.EstadoContrato
 							ce.NumeroContrato = contratoCancelado.NumeroContrato
 							ce.Vigencia = contratoCancelado.Vigencia
-							ce.FechaRegistro = time.Now()
+							ce.FechaRegistro = time_bogota.Tiempo_bogota()
 							ec.Id = 7
 							ce.Estado = &ec
 							// If contrato_estado (post)
@@ -539,7 +540,7 @@ func (c *ExpedirResolucionController) Cancelar() {
 										e.Resolucion = &r
 										er.Id = 2
 										e.Estado = &er
-										e.FechaRegistro = time.Now().Format(time.RFC3339)
+										e.FechaRegistro = time_bogota.Tiempo_bogota().Format(time.RFC3339)
 										//If  Resolucion_estado (post)
 										if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_estado", "POST", &response, &e); err == nil {
 											fmt.Println("Expedición exitosa, ahora va el commit :D")
@@ -692,7 +693,7 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 	var modVin []models.ModificacionVinculacion
 	var response interface{}
 	var resolucion models.Resolucion
-	vigencia, _, _ := time.Now().Date()
+	vigencia, _, _ := time_bogota.Tiempo_bogota().Date()
 	//If 13 - Unmarshal
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &m); err == nil {
 		v := m.Vinculaciones
@@ -729,7 +730,7 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 					contrato.ModalidadSeleccion = 123
 					contrato.TipoCompromiso = 35
 					contrato.TipologiaContrato = 46
-					contrato.FechaRegistro = time.Now()
+					contrato.FechaRegistro = time_bogota.Tiempo_bogota()
 					contrato.UnidadEjecutora = 1
 					sup.Id = SupervisorActual(v.IdResolucion.Id)
 					contrato.Supervisor = &sup
@@ -841,7 +842,7 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 											var ec models.EstadoContrato
 											ce.NumeroContrato = aux1
 											ce.Vigencia = aux2
-											ce.FechaRegistro = time.Now()
+											ce.FechaRegistro = time_bogota.Tiempo_bogota()
 											ec.Id = 4
 											ce.Estado = &ec
 											// If 4 - contrato_estado
@@ -859,7 +860,7 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 													cd.NumeroContrato = aux1
 													cd.Vigencia = aux2
 													cd.Estado = true
-													cd.FechaRegistro = time.Now()
+													cd.FechaRegistro = time_bogota.Tiempo_bogota()
 													// If 2.5.2 - Get disponibildad_apropiacion
 													if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad_apropiacion/"+strconv.Itoa(v.Disponibilidad), &dispoap); err == nil {
 														// If 2.5.1 - Get disponibildad
@@ -1041,7 +1042,7 @@ func (c *ExpedirResolucionController) ExpedirModificacion() {
 					e.Resolucion = &r
 					er.Id = 2
 					e.Estado = &er
-					e.FechaRegistro = time.Now().Format(time.RFC3339)
+					e.FechaRegistro = time_bogota.Tiempo_bogota().Format(time.RFC3339)
 					//If 9 - Resolucion_estado
 					if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_estado", "POST", &response, &e); err == nil {
 						fmt.Println("Expedición exitosa, ahora va el commit :D")

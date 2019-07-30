@@ -641,6 +641,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 	}
 	if v == nil {
 		v = []models.VinculacionDocente{}
+		fmt.Println(v)
 	}
 	c.Ctx.Output.SetStatus(201)
 

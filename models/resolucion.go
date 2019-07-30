@@ -14,7 +14,7 @@ type Resolucion struct {
 	PreambuloResolucion     string
 	ConsideracionResolucion string
 	Estado                  bool
-	FechaRegistro           time.Time
+	FechaRegistro           string
 	Objeto                  string
 	NumeroSemanas           int
 	Periodo                 int
