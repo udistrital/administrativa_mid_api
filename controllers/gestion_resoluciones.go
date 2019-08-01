@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/udistrital/utils_oas/time_bogota"
-	"github.com/astaxie/beego/httplib"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/httplib"
 	"github.com/udistrital/administrativa_mid_api/models"
+	"github.com/udistrital/utils_oas/time_bogota"
 )
 
 //GestionResolucionesController operations for Preliquidacion
@@ -154,7 +154,6 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 	var dedicacion string
 	var reanudar string
 
-
 	temp.Vigencia, _, _ = time_bogota.Tiempo_bogota().Date()
 	temp.FechaRegistro = time_bogota.Tiempo_bogota().Format(time.RFC3339Nano)
 	temp.Estado = true
@@ -172,10 +171,11 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 		dedicacion = "MEDIO TIEMPO OCASIONAL y TIEMPO COMPLETO OCASIONAL"
 	}
 	if resolucion.ResolucionVinculacionDocente.NivelAcademico == "PREGRADO" {
-		reanudar = "reanudar"
+		// reanudar = "reanudar"
+		reanudar = ""
 	}
 	if temp.IdTipoResolucion.Id == 1 {
-		temp.Titulo = "“Por la cual se " + motivo + " Docentes para " + reanudar + " el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " Periodo Académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de Docentes de " + dedicacion + " (Vinculación Especial) para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas en " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ".”"
+		temp.Titulo = "“Por la cual se " + motivo + " docentes para " + reanudar + " el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " Periodo Académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de Docentes de " + dedicacion + " (Vinculación Especial) para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas (" + resolucion.ResolucionVinculacionDocente.NivelAcademico + ").”"
 	}
 
 	if temp.IdTipoResolucion.Id != 1 {
@@ -187,7 +187,7 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 			fmt.Println("Error al consultar resolución vieja", err)
 		}
 	}
-	temp.PreambuloResolucion = "El decano de la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas en uso de sus facultades legales y estatutarias, en particular, de las conferidas por el artículo cuarto de la Resolución de Rectoría 07 de enero 15 de 2019, y"
+	temp.PreambuloResolucion = "El decano de la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas, en uso de sus facultades legales y estatutarias, en particular, de las conferidas por el artículo cuarto de la Resolución de Rectoría 07 de enero 15 de 2019, y"
 	if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion", "POST", &respuesta, &temp); err == nil {
 		id_creada = respuesta.Id
 		cont = true
