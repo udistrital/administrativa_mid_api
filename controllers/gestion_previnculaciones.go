@@ -129,8 +129,8 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 // @Param tipo_vinculacion query string false "vinculacion del docente"
 // @Param facultad query string false "facultad"
 // @Param nivel_academico query string false "nivel_academico"
-// @Success 201 {object} models.Docentes_x_Carga
-// @Failure 403 body is empty
+// @Success 201 {object} models.ObjetoCargaLectiva
+// @Failure 404 not found source
 // @router /Precontratacion/docentes_x_carga_horaria [get]
 func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 
@@ -142,8 +142,9 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 
 	docentesXcargaHoraria, err := ListarDocentesHorasLectivas(vigencia, periodo, tipoVinculacion, facultad, nivelAcademico)
 	if err != nil {
-		beego.Error(err)
-		c.Abort("403")
+		// beego.Error(err)
+		// c.Abort("403")
+		c.Data["json"] = err.Error()
 	}
 	newDocentesXcargaHoraria := models.ObjetoCargaLectiva{}
 
@@ -155,14 +156,16 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 		q := "http://" + beego.AppConfig.String("UrlcrudWSO2") + "/" + beego.AppConfig.String("NscrudUrano") + "/categoria_docente/" + vigencia + "/" + periodo + "/" + pos.DocDocente
 		err = getXml(q, &catDocente.CategoriaDocente)
 		if err != nil {
-			beego.Error(err)
-			c.Abort("403")
+			// beego.Error(err)
+			// c.Abort("403")
+			c.Data["json"] = err.Error()
 		}
 
 		pos.CategoriaNombre, pos.IDCategoria, err = Buscar_Categoria_Docente(vigencia, periodo, pos.DocDocente)
 		if err != nil {
-			beego.Error(err)
-			c.Abort("403")
+			// beego.Error(err)
+			// c.Abort("403")
+			c.Data["json"] = err.Error()
 		}
 		if catDocente.CategoriaDocente != emptyCatDocente.CategoriaDocente {
 			newDocentesXcargaHoraria.CargasLectivas.CargaLectiva = append(newDocentesXcargaHoraria.CargasLectivas.CargaLectiva, pos)
@@ -187,8 +190,9 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 	for x, pos := range newDocentesXcargaHoraria.CargasLectivas.CargaLectiva {
 		pos.IDFacultad, err = HomologarFacultad("old", pos.IDFacultad)
 		if err != nil {
-			beego.Error(err)
-			c.Abort("403")
+			// beego.Error(err)
+			// c.Abort("403")
+			c.Data["json"] = err.Error()
 		}
 		newDocentesXcargaHoraria.CargasLectivas.CargaLectiva[x] = pos
 	}
@@ -196,22 +200,35 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 	for x, pos := range newDocentesXcargaHoraria.CargasLectivas.CargaLectiva {
 		pos.DependenciaAcademica, err = strconv.Atoi(pos.IDProyecto)
 		if err != nil {
-			beego.Error(err)
-			c.Abort("403")
+			// beego.Error(err)
+			// c.Abort("403")
+			c.Data["json"] = err.Error()
 		}
 		pos.IDProyecto, err = HomologarProyectoCurricular(pos.IDProyecto)
 		if err != nil {
-			beego.Error(err)
-			c.Abort("403")
+			// beego.Error(err)
+			// c.Abort("403")
+			c.Data["json"] = err.Error()
 		}
 		newDocentesXcargaHoraria.CargasLectivas.CargaLectiva[x] = pos
 
 	}
 
-	c.Ctx.Output.SetStatus(201)
-	c.Data["json"] = newDocentesXcargaHoraria.CargasLectivas.CargaLectiva
-	c.ServeJSON()
-
+	if newDocentesXcargaHoraria.CargasLectivas.CargaLectiva != nil {
+		c.Ctx.Output.SetStatus(201)
+		c.Data["json"] = newDocentesXcargaHoraria.CargasLectivas.CargaLectiva
+		c.ServeJSON()
+	} else {
+		type vacio struct {
+			valor string
+		}
+		objetoNulo := vacio{
+			valor: "objeto vacio",
+		}
+		c.Ctx.Output.SetStatus(201)
+		c.Data["json"] = objetoNulo
+		c.ServeJSON()
+	}
 }
 
 func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDocente) (docentes_a_insertar []models.VinculacionDocente, err error) {
