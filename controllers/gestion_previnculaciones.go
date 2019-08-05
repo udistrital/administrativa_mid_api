@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/astaxie/beego/logs"
+
 	"github.com/astaxie/beego"
 	"github.com/udistrital/administrativa_mid_api/models"
 	. "github.com/udistrital/golog"
@@ -217,6 +219,8 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 	if newDocentesXcargaHoraria.CargasLectivas.CargaLectiva != nil {
 		c.Ctx.Output.SetStatus(201)
 		c.Data["json"] = newDocentesXcargaHoraria.CargasLectivas.CargaLectiva
+		logs.Info(newDocentesXcargaHoraria.CargasLectivas.CargaLectiva)
+		logs.Info(c.Data["json"])
 		// c.ServeJSON()
 	} else {
 		type vacio struct {
@@ -226,7 +230,10 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 			valor: "objeto vacio",
 		}
 		c.Ctx.Output.SetStatus(201)
+		logs.Info(objetoNulo)
 		c.Data["json"] = objetoNulo
+		logs.Info(c.Data["json"])
+
 	}
 	c.ServeJSON()
 
