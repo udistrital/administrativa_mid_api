@@ -171,6 +171,7 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 	case "TCO-MTO":
 		motivo = "vinculan"
 		dedicacion = "MEDIO TIEMPO OCASIONAL y TIEMPO COMPLETO OCASIONAL"
+		articulo = "cuarto"
 	}
 
 	if temp.IdTipoResolucion.Id == 1 {
