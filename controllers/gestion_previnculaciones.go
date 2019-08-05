@@ -217,7 +217,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 	if newDocentesXcargaHoraria.CargasLectivas.CargaLectiva != nil {
 		c.Ctx.Output.SetStatus(201)
 		c.Data["json"] = newDocentesXcargaHoraria.CargasLectivas.CargaLectiva
-		c.ServeJSON()
+		// c.ServeJSON()
 	} else {
 		type vacio struct {
 			valor string
@@ -227,8 +227,9 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 		}
 		c.Ctx.Output.SetStatus(201)
 		c.Data["json"] = objetoNulo
-		c.ServeJSON()
 	}
+	c.ServeJSON()
+
 }
 
 func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDocente) (docentes_a_insertar []models.VinculacionDocente, err error) {
