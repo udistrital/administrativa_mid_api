@@ -215,7 +215,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 		newDocentesXcargaHoraria.CargasLectivas.CargaLectiva[x] = pos
 
 	}
-
+	logs.Info("paso por el log")
 	if newDocentesXcargaHoraria.CargasLectivas.CargaLectiva != nil {
 		c.Ctx.Output.SetStatus(201)
 		c.Data["json"] = newDocentesXcargaHoraria.CargasLectivas.CargaLectiva
@@ -226,13 +226,16 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 		type vacio struct {
 			valor string
 		}
-		objetoNulo := vacio{
-			valor: "objeto vacio",
+		objetoNulo := []vacio{
+			{
+				valor: "objeto vacio",
+			},
 		}
 		c.Ctx.Output.SetStatus(201)
 		logs.Info(objetoNulo)
 		c.Data["json"] = objetoNulo
 		logs.Info(c.Data["json"])
+		// c.ServeJSON()
 
 	}
 	c.ServeJSON()
