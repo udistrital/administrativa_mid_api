@@ -241,10 +241,14 @@ func InsertarResolucionEstado(id_res int, usuario string) (contr bool) {
 		Resolucion:    &models.Resolucion{Id: id_res},
 		Usuario:       usuario,
 	}
-
+	logs.Error("entro a estado")
 	if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_estado", "POST", &respuesta, &temp); err == nil {
+		logs.Error("Estado true")
+		logs.Warning(err)
 		cont = true
 	} else {
+		logs.Error("Estado false")
+		logs.Warning(err)
 		cont = false
 	}
 
@@ -260,11 +264,11 @@ func InsertarResolucionVinDocente(id_res int, resvindoc *models.ResolucionVincul
 	logs.Error("entro a vinculacion")
 	if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion_docente", "POST", &respuesta, &temp); err == nil {
 		logs.Error("vinculacion true")
-		logs.Error(err)
+		logs.Warning(err)
 		cont = true
 	} else {
 		logs.Error("vinculacion false")
-		logs.Error(err)
+		logs.Warning(err)
 		cont = false
 	}
 
