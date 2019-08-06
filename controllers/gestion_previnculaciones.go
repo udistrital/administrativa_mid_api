@@ -98,6 +98,7 @@ func (c *GestionPrevinculacionesController) CalcularTotalSalarios() {
 	}
 
 	c.Data["json"] = ValorTotalContrato
+	logs.Info(c.Data["json"])
 
 	c.ServeJSON()
 }
@@ -245,7 +246,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 	if newDocentesXcargaHoraria.CargasLectivas.CargaLectiva != nil {
 		c.Ctx.Output.SetStatus(201)
 		c.Data["json"] = newDocentesXcargaHoraria.CargasLectivas.CargaLectiva
-		logs.Info(newDocentesXcargaHoraria.CargasLectivas.CargaLectiva)
+		// logs.Info(newDocentesXcargaHoraria.CargasLectivas.CargaLectiva)
 		logs.Info(c.Data["json"])
 		// c.ServeJSON()
 	} else {
