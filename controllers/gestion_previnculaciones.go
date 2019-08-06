@@ -100,15 +100,12 @@ func (c *GestionPrevinculacionesController) CalcularTotalSalarios() {
 		c.Abort("403")
 	}
 	total = int(totalesSalario) + totalesDisponibilidad
-	type TotalValor struct {
-		valor int
-	}
-	ValorTotalContrato := []TotalValor{
+	ValorTotalContrato := []models.ModeloRefactor{
 		{
-			valor: total,
+			Valor:       total,
+			Descripcion: "Valor contrato seleccionados",
 		},
 	}
-
 	c.Data["json"] = ValorTotalContrato
 	logs.Info(ValorTotalContrato)
 	logs.Info(c.Data["json"])
@@ -142,12 +139,10 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 	}
 
 	err = sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &idRespuesta, &v)
-	type RespuestaID struct {
-		Id int
-	}
-	IdDeRespuesta := []RespuestaID{
+	IdDeRespuesta := []models.ModeloRefactor{
 		{
-			Id: idRespuesta,
+			Valor:       idRespuesta,
+			Descripcion: "ID a responder",
 		},
 	}
 	c.Data["json"] = IdDeRespuesta
@@ -267,9 +262,10 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 		type vacio struct {
 			valor string
 		}
-		objetoNulo := []vacio{
+		objetoNulo := []models.ModeloRefactor{
 			{
-				valor: "objeto vacio",
+				Valor:       0,
+				Descripcion: "objeto de valor nulo",
 			},
 		}
 		c.Ctx.Output.SetStatus(201)
