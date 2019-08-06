@@ -115,20 +115,35 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 	if err != nil {
-		beego.Error("Error al hacer unmarshal", err)
-		c.Abort("403")
+		// beego.Error("Error al hacer unmarshal", err)
+		logs.Error("Error al hacer unmarshal", err)
+		c.Data["json"] = err.Error()
+		// c.Abort("403")
 	}
 	v, err = CalcularSalarioPrecontratacion(v)
 	if err != nil {
-		beego.Error(err)
-		c.Abort("403")
+		// beego.Error(err)
+		// c.Abort("403")
+		c.Data["json"] = err.Error()
 	}
 
 	err = sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &idRespuesta, &v)
-	c.Data["json"] = idRespuesta
+	type RespuestaID struct {
+		Id int
+	}
+	IdDeRespuesta := []RespuestaID{
+		{
+			Id: idRespuesta,
+		},
+	}
+	c.Data["json"] = IdDeRespuesta
+	logs.Info(c.Data["json"])
+
 	if err != nil {
-		beego.Error("Error al insertar docentes", err)
-		c.Abort("403")
+		// beego.Error("Error al insertar docentes", err)
+		logs.Error("Error al insertar docentes", err)
+		// c.Abort("403")
+		c.Data["json"] = err.Error()
 	}
 
 	c.ServeJSON()
