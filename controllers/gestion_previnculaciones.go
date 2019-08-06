@@ -51,13 +51,10 @@ func (c *GestionPrevinculacionesController) Calcular_total_de_salarios_seleccion
 		c.Data["json"] = err.Error()
 	}
 	total = int(CalcularTotalSalario(v))
-	type TotalValor struct {
-		valor int
-	}
-	var ValorTotalContrato []TotalValor
-	ValorTotalContrato = []TotalValor{
+	ValorTotalContrato := []models.ModeloRefactor{
 		{
-			valor: total,
+			Valor:       total,
+			Descripcion: "Valor contrato seleccionados",
 		},
 	}
 
