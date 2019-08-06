@@ -98,6 +98,7 @@ func (c *GestionPrevinculacionesController) CalcularTotalSalarios() {
 	}
 
 	c.Data["json"] = ValorTotalContrato
+	logs.Info(ValorTotalContrato)
 	logs.Info(c.Data["json"])
 
 	c.ServeJSON()
@@ -138,6 +139,7 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 		},
 	}
 	c.Data["json"] = IdDeRespuesta
+	logs.Info(IdDeRespuesta)
 	logs.Info(c.Data["json"])
 
 	if err != nil {
@@ -247,7 +249,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 		c.Ctx.Output.SetStatus(201)
 		c.Data["json"] = newDocentesXcargaHoraria.CargasLectivas.CargaLectiva
 		// logs.Info(newDocentesXcargaHoraria.CargasLectivas.CargaLectiva)
-		logs.Info(c.Data["json"])
+		// logs.Info(c.Data["json"])
 		// c.ServeJSON()
 	} else {
 		type vacio struct {
@@ -259,9 +261,9 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 			},
 		}
 		c.Ctx.Output.SetStatus(201)
-		logs.Info(objetoNulo)
+		// logs.Info(objetoNulo)
 		c.Data["json"] = objetoNulo
-		logs.Info(c.Data["json"])
+		// logs.Info(c.Data["json"])
 		// c.ServeJSON()
 
 	}
