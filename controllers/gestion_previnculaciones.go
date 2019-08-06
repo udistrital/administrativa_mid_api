@@ -54,7 +54,8 @@ func (c *GestionPrevinculacionesController) Calcular_total_de_salarios_seleccion
 	type TotalValor struct {
 		valor int
 	}
-	ValorTotalContrato := []TotalValor{
+	var ValorTotalContrato []TotalValor
+	ValorTotalContrato = []TotalValor{
 		{
 			valor: total,
 		},
