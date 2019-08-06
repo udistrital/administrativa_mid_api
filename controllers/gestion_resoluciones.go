@@ -134,10 +134,22 @@ func (c *GestionResolucionesController) InsertarResolucionCompleta() {
 
 	if control {
 		fmt.Println("okey")
-		c.Data["json"] = id_resolucion_creada
+		IDDesResolucion := []models.ModeloRefactor{
+			{
+				Valor:       id_resolucion_creada,
+				Descripcion: "ID de la resolucion creada",
+			},
+		}
+		c.Data["json"] = IDDesResolucion
 	} else {
 		fmt.Println("not okey")
-		c.Data["json"] = "Error"
+		objetoError := []models.ModeloRefactor{
+			{
+				Valor:       0,
+				Descripcion: "Error: not okey",
+			},
+		}
+		c.Data["json"] = objetoError
 	}
 	c.ServeJSON()
 }
