@@ -67,13 +67,15 @@ func (c *GestionPrevinculacionesController) CalcularTotalSalarios() {
 	var total int
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 	if err != nil {
-		beego.Error(err)
-		c.Abort("400")
+		// beego.Error(err)
+		// c.Abort("403")
+		c.Data["json"] = err.Error()
 	}
 	v, err = CalcularSalarioPrecontratacion(v)
 	if err != nil {
-		beego.Error(err)
-		c.Abort("400")
+		// beego.Error(err)
+		// c.Abort("403")
+		c.Data["json"] = err.Error()
 	}
 	totalesSalario := CalcularTotalSalario(v)
 	vigencia := strconv.Itoa(int(v[0].Vigencia.Int64))
@@ -86,7 +88,16 @@ func (c *GestionPrevinculacionesController) CalcularTotalSalarios() {
 		c.Abort("403")
 	}
 	total = int(totalesSalario) + totalesDisponibilidad
-	c.Data["json"] = total
+	type TotalValor struct {
+		valor int
+	}
+	ValorTotalContrato := []TotalValor{
+		{
+			valor: total,
+		},
+	}
+
+	c.Data["json"] = ValorTotalContrato
 
 	c.ServeJSON()
 }
