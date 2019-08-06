@@ -39,17 +39,31 @@ func (c *GestionPrevinculacionesController) Calcular_total_de_salarios_seleccion
 	var total int
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 	if err != nil {
-		beego.Error(err)
-		c.Abort("400")
+		// beego.Error(err)
+		// c.Abort("400")
+		c.Data["json"] = err.Error()
 	}
 
 	v, err = CalcularSalarioPrecontratacion(v)
 	if err != nil {
-		beego.Error(err)
-		c.Abort("400")
+		// beego.Error(err)
+		// c.Abort("400")
+		c.Data["json"] = err.Error()
 	}
 	total = int(CalcularTotalSalario(v))
-	c.Data["json"] = total
+	type TotalValor struct {
+		valor int
+	}
+	ValorTotalContrato := []TotalValor{
+		{
+			valor: total,
+		},
+	}
+
+	c.Data["json"] = ValorTotalContrato
+	logs.Info(ValorTotalContrato)
+	logs.Info(c.Data["json"])
+	// c.Data["json"] = total
 
 	c.ServeJSON()
 }
