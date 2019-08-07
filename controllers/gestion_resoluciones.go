@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/astaxie/beego/logs"
+
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/httplib"
 	"github.com/udistrital/administrativa_mid_api/models"
@@ -114,10 +116,13 @@ func (c *GestionResolucionesController) InsertarResolucionCompleta() {
 
 		//Primero se inserta la resolución, si eso se realiza correctamente
 		control, id_resolucion_creada = InsertarResolucion(v)
+		logs.Info("id de la resolucion creada: ", id_resolucion_creada)
 		if control {
 			//Si se inserta bien en resolución, se puede insertar en resolucion_vinculacion_docente y en resolucion_estado
 			control = InsertarResolucionVinDocente(id_resolucion_creada, v.ResolucionVinculacionDocente)
+			logs.Info("control docente: ", control)
 			control = InsertarResolucionEstado(id_resolucion_creada, v.Usuario)
+			logs.Info("control estado: ", control)
 			//Si todo sigue bien, se inserta en componente_resolucion
 			if control {
 				InsertarArticulos(id_resolucion_creada, texto_resolucion.Articulos)
@@ -134,10 +139,22 @@ func (c *GestionResolucionesController) InsertarResolucionCompleta() {
 
 	if control {
 		fmt.Println("okey")
-		c.Data["json"] = id_resolucion_creada
+		IDDesResolucion := []models.ModeloRefactor{
+			{
+				Valor:       id_resolucion_creada,
+				Descripcion: "ID de la resolucion creada",
+			},
+		}
+		c.Data["json"] = IDDesResolucion
 	} else {
 		fmt.Println("not okey")
-		c.Data["json"] = "Error"
+		objetoError := []models.ModeloRefactor{
+			{
+				Valor:       0,
+				Descripcion: "Error: not okey",
+			},
+		}
+		c.Data["json"] = objetoError
 	}
 	c.ServeJSON()
 }
@@ -224,10 +241,14 @@ func InsertarResolucionEstado(id_res int, usuario string) (contr bool) {
 		Resolucion:    &models.Resolucion{Id: id_res},
 		Usuario:       usuario,
 	}
-
+	logs.Error("entro a estado")
 	if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_estado", "POST", &respuesta, &temp); err == nil {
+		logs.Error("Estado true")
+		logs.Warning(err)
 		cont = true
 	} else {
+		logs.Error("Estado false")
+		logs.Warning(err)
 		cont = false
 	}
 
@@ -240,12 +261,14 @@ func InsertarResolucionVinDocente(id_res int, resvindoc *models.ResolucionVincul
 
 	var cont bool
 	temp.Id = id_res
-
+	logs.Error("entro a vinculacion")
 	if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion_docente", "POST", &respuesta, &temp); err == nil {
-
+		logs.Error("vinculacion true")
+		logs.Warning(err)
 		cont = true
 	} else {
-
+		logs.Error("vinculacion false")
+		logs.Warning(err)
 		cont = false
 	}
 
