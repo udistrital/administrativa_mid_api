@@ -169,23 +169,26 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 	var resVieja models.Resolucion
 	var motivo string
 	var dedicacion string
-	var reanudar string
+	var articulo string
 
 	temp.Vigencia, _, _ = time_bogota.Tiempo_bogota().Date()
 	temp.FechaRegistro = time_bogota.Tiempo_bogota().Format(time.RFC3339Nano)
 	temp.Estado = true
 	switch resolucion.ResolucionVinculacionDocente.Dedicacion {
 	case "HCH":
-		motivo = "RECONOCEN HONORARIOS a"
+		motivo = "RECONOCEN HONORARIOS "
 		dedicacion = "HORA CÁTEDRA HONORARIOS"
+		articulo = "tercero"
 		break
 	case "HCP":
 		motivo = "vinculan"
 		dedicacion = "HORA CÁTEDRA"
+		articulo = "cuarto"
 		break
 	case "TCO-MTO":
 		motivo = "vinculan"
 		dedicacion = "MEDIO TIEMPO OCASIONAL y TIEMPO COMPLETO OCASIONAL"
+		articulo = "cuarto"
 	}
 	if resolucion.ResolucionVinculacionDocente.NivelAcademico == "PREGRADO" {
 		// reanudar = "reanudar"
@@ -195,7 +198,19 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 		temp.Titulo = "“Por la cual se " + motivo + " docentes para " + reanudar + " el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " Periodo Académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de Docentes de " + dedicacion + " (Vinculación Especial) para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas (" + resolucion.ResolucionVinculacionDocente.NivelAcademico + ").”"
 	}
 
-	if temp.IdTipoResolucion.Id != 1 {
+		}	else{
+			if(resolucion.ResolucionVinculacionDocente.Dedicacion == "HCH"){
+				temp.Titulo = "“Por la cual se " + motivo + " a Docentes para  el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " Periodo Académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de Docentes de " + dedicacion + " (Vinculación Especial) para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas (" + resolucion.ResolucionVinculacionDocente.NivelAcademico + ").”"
+
+			}else{
+			  temp.Titulo = "“Por la cual se " + motivo + "  Docentes para  el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " Periodo Académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de Docentes de " + dedicacion + " (Vinculación Especial) para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas ( " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ").”"
+
+			}
+
+		}
+
+	}
+ 	if temp.IdTipoResolucion.Id != 1 {
 		temp.VigenciaCarga = resVieja.VigenciaCarga
 		temp.PeriodoCarga = resVieja.PeriodoCarga
 		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+strconv.Itoa(resolucion.ResolucionVieja), &resVieja); err == nil {
