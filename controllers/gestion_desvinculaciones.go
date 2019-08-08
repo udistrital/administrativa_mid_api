@@ -198,7 +198,7 @@ func (c *GestionDesvinculacionesController) ActualizarVinculacionesCancelacion()
 func (c *GestionDesvinculacionesController) ValidarSaldoCDP() {
 
 	var validacion models.Objeto_Desvinculacion
-	var respuesta = "OK"
+	// var respuesta = "OK"
 	var respuestaApropiacion models.DatosApropiacion
 	var saldoDisponibilidad float64
 
@@ -225,12 +225,23 @@ func (c *GestionDesvinculacionesController) ValidarSaldoCDP() {
 		beego.Error(err)
 		c.Abort("400")
 	}
-
+	respuestaEviada := []models.ModeloRefactor{
+		{
+			Valor:       0,
+			Descripcion: "OK",
+		},
+	}
 	if saldoDisponibilidad-valorContrato < 0 {
-		respuesta = "Error CDP"
+		// respuesta = "Error CDP"
+		respuestaEviada = []models.ModeloRefactor{
+			{
+				Valor:       0,
+				Descripcion: "Error CDP",
+			},
+		}
 	}
 
-	c.Data["json"] = respuesta
+	c.Data["json"] = respuestaEviada
 	c.ServeJSON()
 }
 
