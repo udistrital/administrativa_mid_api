@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/astaxie/beego/logs"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -603,21 +604,35 @@ func (c *GestionDesvinculacionesController) ConsultarCategoria() {
 
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 	if err != nil {
-		beego.Error(err)
+		// beego.Error(err)
+		logs.Error(err)
 		c.Data["json"] = "Error al leer json para desvincular"
 	}
 
 	categoria, _, err := Buscar_Categoria_Docente(strconv.Itoa(v.VigenciaCarga), strconv.Itoa(v.PeriodoCarga), v.IdPersona)
 	if err != nil {
-		beego.Error(err)
-		c.Abort("403")
+		// beego.Error(err)
+		// c.Abort("403")
+		logs.Error(err)
+		c.Data["json"] = err.Error()
 	}
-
-	respuesta := "OK"
+	// respuesta := "OK"
+	respuestaEviada := []models.ModeloRefactor {
+		{
+			Valor: 0,
+			Descripcion: "OK"
+		}
+	}
 	if categoria == "" {
-		respuesta = "Sin categoría"
+		// respuesta = "Sin categoría"
+		respuestaEviada = []models.ModeloRefactor {
+			{
+				Valor: 0,
+				Descripcion: "Sin categoría"
+			}
+		}
 	}
 
-	c.Data["json"] = respuesta
+	c.Data["json"] = respuestaEviada
 	c.ServeJSON()
 }
