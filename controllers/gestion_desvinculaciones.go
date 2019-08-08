@@ -1,10 +1,11 @@
 package controllers
 
 import (
-	"github.com/astaxie/beego/logs"
 	"encoding/json"
 	"fmt"
 	"strconv"
+
+	"github.com/astaxie/beego/logs"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/administrativa_mid_api/models"
@@ -168,7 +169,7 @@ func (c *GestionDesvinculacionesController) ActualizarVinculacionesCancelacion()
 			ModificacionResolucion:       &models.ModificacionResolucion{Id: v.IdModificacionResolucion},
 			VinculacionDocenteCancelada:  &models.VinculacionDocente{Id: pos.Id},
 			VinculacionDocenteRegistrada: &models.VinculacionDocente{Id: vinculacion_nueva},
-			Horas: pos.NumeroHorasSemanales,
+			Horas:                        pos.NumeroHorasSemanales,
 		}
 		errorMod := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/", "POST", &respuesta_mod_vin, temp)
 
@@ -298,7 +299,7 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 				ModificacionResolucion:       &models.ModificacionResolucion{Id: v.IdModificacionResolucion},
 				VinculacionDocenteCancelada:  &models.VinculacionDocente{Id: pos.Id},
 				VinculacionDocenteRegistrada: &models.VinculacionDocente{Id: vinculacion_nueva},
-				Horas: pos.NumeroHorasNuevas,
+				Horas:                        pos.NumeroHorasNuevas,
 			}
 			err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/", "POST", &respuesta_mod_vin, temp)
 
@@ -617,19 +618,19 @@ func (c *GestionDesvinculacionesController) ConsultarCategoria() {
 		c.Data["json"] = err.Error()
 	}
 	// respuesta := "OK"
-	respuestaEviada := []models.ModeloRefactor {
+	respuestaEviada := []models.ModeloRefactor{
 		{
-			Valor: 0,
-			Descripcion: "OK"
-		}
+			Valor:       0,
+			Descripcion: "OK",
+		},
 	}
 	if categoria == "" {
 		// respuesta = "Sin categoría"
-		respuestaEviada = []models.ModeloRefactor {
+		respuestaEviada = []models.ModeloRefactor{
 			{
-				Valor: 0,
-				Descripcion: "Sin categoría"
-			}
+				Valor:       0,
+				Descripcion: "Sin categoría",
+			},
 		}
 	}
 
