@@ -652,26 +652,34 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 
 	err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+strconv.Itoa(idResolucion), &res)
 	if err != nil {
-		beego.Error(err)
-		c.Abort("400")
+		// beego.Error(err)
+		// c.Abort("400")
+		logs.Error(err)
+		c.Data["json"] = err.Error()
 	}
 
 	if res.IdTipoResolucion.Id == tipoVinculacion {
 		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &v)
 		if err != nil {
-			beego.Error(err)
-			c.Abort("400")
+			// beego.Error(err)
+			// c.Abort("400")
+			logs.Error(err)
+			c.Data["json"] = err.Error()
 		}
 	} else {
 		err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+strconv.Itoa(idResolucion), &modres)
 		if err != nil {
-			beego.Error(err)
-			c.Abort("400")
+			// beego.Error(err)
+			// c.Abort("400")
+			logs.Error(err)
+			c.Data["json"] = err.Error()
 		}
 		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/?query=ModificacionResolucion:"+strconv.Itoa(modres[0].Id), &modvin)
 		if err != nil {
-			beego.Error(err)
-			c.Abort("400")
+			// beego.Error(err)
+			// c.Abort("400")
+			logs.Error(err)
+			c.Data["json"] = err.Error()
 		}
 		if len(modvin) != 0 {
 			arreglo := make([]string, len(modvin))
@@ -707,10 +715,19 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 	if v == nil {
 		v = []models.VinculacionDocente{}
 		fmt.Println(v)
+		c.Data["json"] = v
+	} else {
+		logs.Error("el objeto parece estar vacio")
+		objetoNulo := []models.ModeloRefactor{
+			{
+				Valor:       0,
+				Descripcion: "objeto de valor nulo",
+			},
+		}
+		c.Data["json"] = objetoNulo
 	}
 	c.Ctx.Output.SetStatus(201)
 
-	c.Data["json"] = v
 	c.ServeJSON()
 
 }
