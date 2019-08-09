@@ -436,6 +436,7 @@ const (
 // @Failure 403 body is empty
 // @router /docentes_previnculados_all [get]
 func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
+	logs.Error("entro a ListarDocentesPrevinculadosAll")
 	idResolucion := c.GetString("id_resolucion")
 	var v = []models.VinculacionDocente{}
 	var res models.Resolucion
@@ -643,7 +644,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 		beego.Error(err)
 		c.Abort("403")
 	}
-
+	logs.Info("entro a ListarDocentesPrevinculados")
 	query := "?limit=-1&query=IdResolucion.Id:" + strconv.Itoa(idResolucion) + ",Estado:true"
 	var v = []models.VinculacionDocente{}
 	var res models.Resolucion
@@ -655,10 +656,12 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 		// beego.Error(err)
 		// c.Abort("400")
 		logs.Error(err)
+		logs.Info("trajo resolucion")
 		c.Data["json"] = err.Error()
 	}
 
 	if res.IdTipoResolucion.Id == tipoVinculacion {
+		logs.Info("res.IdTipoResolucion.Id == tipoVinculacion")
 		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &v)
 		if err != nil {
 			// beego.Error(err)
@@ -667,6 +670,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 			c.Data["json"] = err.Error()
 		}
 	} else {
+		logs.Info(" NOOO res.IdTipoResolucion.Id == tipoVinculacion")
 		err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+strconv.Itoa(idResolucion), &modres)
 		if err != nil {
 			// beego.Error(err)
@@ -715,6 +719,8 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 	if v == nil {
 		v = []models.VinculacionDocente{}
 		fmt.Println(v)
+		logs.Info("mandamos V")
+		c.Ctx.Output.SetStatus(201)
 		c.Data["json"] = v
 	} else {
 		logs.Error("el objeto parece estar vacio")
@@ -724,9 +730,9 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 				Descripcion: "objeto de valor nulo",
 			},
 		}
+		c.Ctx.Output.SetStatus(202)
 		c.Data["json"] = objetoNulo
 	}
-	c.Ctx.Output.SetStatus(201)
 
 	c.ServeJSON()
 
