@@ -656,7 +656,6 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 		// beego.Error(err)
 		// c.Abort("400")
 		logs.Error(err)
-		logs.Info("trajo resolucion")
 		c.Data["json"] = err.Error()
 	}
 
@@ -721,18 +720,8 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 		fmt.Println(v)
 		logs.Info("mandamos V")
 		c.Ctx.Output.SetStatus(201)
-		c.Data["json"] = v
-	} else {
-		logs.Error("el objeto parece estar vacio")
-		objetoNulo := []models.ModeloRefactor{
-			{
-				Valor:       0,
-				Descripcion: "objeto de valor nulo",
-			},
-		}
-		c.Ctx.Output.SetStatus(202)
-		c.Data["json"] = objetoNulo
 	}
+	c.Data["json"] = v
 
 	c.ServeJSON()
 
