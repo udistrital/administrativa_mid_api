@@ -256,7 +256,7 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 
 	var v models.Objeto_Desvinculacion
 	var respuesta_mod_vin models.ModificacionVinculacion
-	var respuesta string
+	var respuesta []models.VinculacionDocente
 	var vinculacion_nueva int
 	var temp_vinculacion [1]models.VinculacionDocente
 
