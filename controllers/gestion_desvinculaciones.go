@@ -259,6 +259,12 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 	var respuesta []models.VinculacionDocente
 	var vinculacion_nueva int
 	var temp_vinculacion [1]models.VinculacionDocente
+	respuestaEviada := []models.ModeloRefactor{
+		{
+			Valor:       0,
+			Descripcion: "OK",
+		},
+	}
 
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 	if err != nil {
@@ -313,18 +319,27 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 				Horas:                        pos.NumeroHorasNuevas,
 			}
 			err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/", "POST", &respuesta_mod_vin, temp)
-
 			if err != nil {
 				beego.Error("error en actualizacion de modificacion vinculacion de modificacion vinculacion", err)
-				respuesta = "error"
+				respuestaEviada = []models.ModeloRefactor{
+					{
+						Valor:       0,
+						Descripcion: "ERROR",
+					},
+				}
 			} else {
 				beego.Info("respuesta modificacion vin", respuesta_mod_vin)
-				respuesta = "OK"
+				respuestaEviada = []models.ModeloRefactor{
+					{
+						Valor:       0,
+						Descripcion: "OK",
+					},
+				}
 			}
 		}
 	}
 
-	c.Data["json"] = respuesta
+	c.Data["json"] = respuestaEviada
 
 	c.ServeJSON()
 
