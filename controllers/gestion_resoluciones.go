@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"time"
 
-	"github.com/udistrital/utils_oas/time_bogota"
-
-	"github.com/astaxie/beego/httplib"
+	"github.com/astaxie/beego/logs"
 
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/httplib"
 	"github.com/udistrital/administrativa_mid_api/models"
+	"github.com/udistrital/utils_oas/time_bogota"
 )
 
 //GestionResolucionesController operations for Preliquidacion
@@ -107,7 +108,7 @@ func (c *GestionResolucionesController) InsertarResolucionCompleta() {
 
 		//Se trae cuerpo de resolución según tipo
 		if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/contenido_resolucion/ResolucionTemplate/"+
-			v.ResolucionVinculacionDocente.Dedicacion+"/"+v.ResolucionVinculacionDocente.NivelAcademico+"/"+strconv.Itoa(v.Resolucion.Periodo)+"/"+strconv.Itoa(v.Resolucion.IdTipoResolucion.Id), &texto_resolucion); err2 == nil {
+			v.ResolucionVinculacionDocente.Dedicacion+"/"+v.ResolucionVinculacionDocente.NivelAcademico+"/"+strconv.Itoa(v.Resolucion.Periodo)+"/"+strconv.Itoa(v.Resolucion.IdTipoResolucion.Id)+"/"+v.Resolucion.NumeroResolucion, &texto_resolucion); err2 == nil {
 			v.Resolucion.ConsideracionResolucion = texto_resolucion.Consideracion
 		} else {
 			fmt.Println("Error de consulta en texto de resolucion", err2)
@@ -115,10 +116,13 @@ func (c *GestionResolucionesController) InsertarResolucionCompleta() {
 
 		//Primero se inserta la resolución, si eso se realiza correctamente
 		control, id_resolucion_creada = InsertarResolucion(v)
+		logs.Info("id de la resolucion creada: ", id_resolucion_creada)
 		if control {
 			//Si se inserta bien en resolución, se puede insertar en resolucion_vinculacion_docente y en resolucion_estado
 			control = InsertarResolucionVinDocente(id_resolucion_creada, v.ResolucionVinculacionDocente)
+			logs.Info("control docente: ", control)
 			control = InsertarResolucionEstado(id_resolucion_creada, v.Usuario)
+			logs.Info("control estado: ", control)
 			//Si todo sigue bien, se inserta en componente_resolucion
 			if control {
 				InsertarArticulos(id_resolucion_creada, texto_resolucion.Articulos)
@@ -135,10 +139,22 @@ func (c *GestionResolucionesController) InsertarResolucionCompleta() {
 
 	if control {
 		fmt.Println("okey")
-		c.Data["json"] = id_resolucion_creada
+		IDDesResolucion := []models.ModeloRefactor{
+			{
+				Valor:       id_resolucion_creada,
+				Descripcion: "ID de la resolucion creada",
+			},
+		}
+		c.Data["json"] = IDDesResolucion
 	} else {
 		fmt.Println("not okey")
-		c.Data["json"] = "Error"
+		objetoError := []models.ModeloRefactor{
+			{
+				Valor:       0,
+				Descripcion: "Error: not okey",
+			},
+		}
+		c.Data["json"] = objetoError
 	}
 	c.ServeJSON()
 }
@@ -156,7 +172,7 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 	var articulo string
 
 	temp.Vigencia, _, _ = time_bogota.Tiempo_bogota().Date()
-	temp.FechaRegistro = time_bogota.Tiempo_bogota()
+	temp.FechaRegistro = time_bogota.Tiempo_bogota().Format(time.RFC3339Nano)
 	temp.Estado = true
 	switch resolucion.ResolucionVinculacionDocente.Dedicacion {
 	case "HCH":
@@ -176,22 +192,22 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 	}
 
 	if temp.IdTipoResolucion.Id == 1 {
-    if (resolucion.ResolucionVinculacionDocente.NivelAcademico == "POSGRADO"  &&  resolucion.ResolucionVinculacionDocente.Dedicacion == "HCH"){
+		if resolucion.ResolucionVinculacionDocente.NivelAcademico == "POSGRADO" && resolucion.ResolucionVinculacionDocente.Dedicacion == "HCH" {
 			temp.Titulo = "“Por medio de la cual se " + motivo + " para el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " Periodo Académico de " + strconv.Itoa(temp.VigenciaCarga) + " a docentes de  Vinculación Especial " + dedicacion + " para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas en  " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ".”"
 
-		}	else{
-			if(resolucion.ResolucionVinculacionDocente.Dedicacion == "HCH"){
+		} else {
+			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCH" {
 				temp.Titulo = "“Por la cual se " + motivo + " a Docentes para  el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " Periodo Académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de Docentes de " + dedicacion + " (Vinculación Especial) para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas (" + resolucion.ResolucionVinculacionDocente.NivelAcademico + ").”"
 
-			}else{
-			  temp.Titulo = "“Por la cual se " + motivo + "  Docentes para  el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " Periodo Académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de Docentes de " + dedicacion + " (Vinculación Especial) para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas ( " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ").”"
+			} else {
+				temp.Titulo = "“Por la cual se " + motivo + "  Docentes para  el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " Periodo Académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de Docentes de " + dedicacion + " (Vinculación Especial) para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas ( " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ").”"
 
 			}
 
 		}
 
 	}
- 	if temp.IdTipoResolucion.Id != 1 {
+	if temp.IdTipoResolucion.Id != 1 {
 		temp.VigenciaCarga = resVieja.VigenciaCarga
 		temp.PeriodoCarga = resVieja.PeriodoCarga
 		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+strconv.Itoa(resolucion.ResolucionVieja), &resVieja); err == nil {
@@ -237,10 +253,14 @@ func InsertarResolucionEstado(id_res int, usuario string) (contr bool) {
 		Resolucion:    &models.Resolucion{Id: id_res},
 		Usuario:       usuario,
 	}
-
+	logs.Error("entro a estado")
 	if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_estado", "POST", &respuesta, &temp); err == nil {
+		logs.Error("Estado true")
+		logs.Warning(err)
 		cont = true
 	} else {
+		logs.Error("Estado false")
+		logs.Warning(err)
 		cont = false
 	}
 
@@ -253,12 +273,14 @@ func InsertarResolucionVinDocente(id_res int, resvindoc *models.ResolucionVincul
 
 	var cont bool
 	temp.Id = id_res
-
+	logs.Error("entro a vinculacion")
 	if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion_docente", "POST", &respuesta, &temp); err == nil {
-
+		logs.Error("vinculacion true")
+		logs.Warning(err)
 		cont = true
 	} else {
-
+		logs.Error("vinculacion false")
+		logs.Warning(err)
 		cont = false
 	}
 

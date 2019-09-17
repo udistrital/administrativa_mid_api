@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/astaxie/beego/logs"
+
 	"github.com/astaxie/beego"
 	"github.com/udistrital/administrativa_mid_api/models"
 )
@@ -167,7 +169,7 @@ func (c *GestionDesvinculacionesController) ActualizarVinculacionesCancelacion()
 			ModificacionResolucion:       &models.ModificacionResolucion{Id: v.IdModificacionResolucion},
 			VinculacionDocenteCancelada:  &models.VinculacionDocente{Id: pos.Id},
 			VinculacionDocenteRegistrada: &models.VinculacionDocente{Id: vinculacion_nueva},
-			Horas: pos.NumeroHorasSemanales,
+			Horas:                        pos.NumeroHorasSemanales,
 		}
 		errorMod := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/", "POST", &respuesta_mod_vin, temp)
 
@@ -196,7 +198,7 @@ func (c *GestionDesvinculacionesController) ActualizarVinculacionesCancelacion()
 func (c *GestionDesvinculacionesController) ValidarSaldoCDP() {
 
 	var validacion models.Objeto_Desvinculacion
-	var respuesta = "OK"
+	// var respuesta = "OK"
 	var respuestaApropiacion models.DatosApropiacion
 	var saldoDisponibilidad float64
 
@@ -223,12 +225,23 @@ func (c *GestionDesvinculacionesController) ValidarSaldoCDP() {
 		beego.Error(err)
 		c.Abort("400")
 	}
-
+	respuestaEviada := []models.ModeloRefactor{
+		{
+			Valor:       0,
+			Descripcion: "OK",
+		},
+	}
 	if saldoDisponibilidad-valorContrato < 0 {
-		respuesta = "Error CDP"
+		// respuesta = "Error CDP"
+		respuestaEviada = []models.ModeloRefactor{
+			{
+				Valor:       0,
+				Descripcion: "Error CDP",
+			},
+		}
 	}
 
-	c.Data["json"] = respuesta
+	c.Data["json"] = respuestaEviada
 	c.ServeJSON()
 }
 
@@ -243,9 +256,15 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 
 	var v models.Objeto_Desvinculacion
 	var respuesta_mod_vin models.ModificacionVinculacion
-	var respuesta string
+	var respuesta map[string]interface{}
 	var vinculacion_nueva int
 	var temp_vinculacion [1]models.VinculacionDocente
+	respuestaEviada := []models.ModeloRefactor{
+		{
+			Valor:       0,
+			Descripcion: "OK",
+		},
+	}
 
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 	if err != nil {
@@ -297,21 +316,30 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 				ModificacionResolucion:       &models.ModificacionResolucion{Id: v.IdModificacionResolucion},
 				VinculacionDocenteCancelada:  &models.VinculacionDocente{Id: pos.Id},
 				VinculacionDocenteRegistrada: &models.VinculacionDocente{Id: vinculacion_nueva},
-				Horas: pos.NumeroHorasNuevas,
+				Horas:                        pos.NumeroHorasNuevas,
 			}
 			err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/", "POST", &respuesta_mod_vin, temp)
-
 			if err != nil {
 				beego.Error("error en actualizacion de modificacion vinculacion de modificacion vinculacion", err)
-				respuesta = "error"
+				respuestaEviada = []models.ModeloRefactor{
+					{
+						Valor:       0,
+						Descripcion: "ERROR",
+					},
+				}
 			} else {
 				beego.Info("respuesta modificacion vin", respuesta_mod_vin)
-				respuesta = "OK"
+				respuestaEviada = []models.ModeloRefactor{
+					{
+						Valor:       0,
+						Descripcion: "OK",
+					},
+				}
 			}
 		}
 	}
 
-	c.Data["json"] = respuesta
+	c.Data["json"] = respuestaEviada
 
 	c.ServeJSON()
 
@@ -603,21 +631,35 @@ func (c *GestionDesvinculacionesController) ConsultarCategoria() {
 
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 	if err != nil {
-		beego.Error(err)
+		// beego.Error(err)
+		logs.Error(err)
 		c.Data["json"] = "Error al leer json para desvincular"
 	}
 
 	categoria, _, err := Buscar_Categoria_Docente(strconv.Itoa(v.VigenciaCarga), strconv.Itoa(v.PeriodoCarga), v.IdPersona)
 	if err != nil {
-		beego.Error(err)
-		c.Abort("403")
+		// beego.Error(err)
+		// c.Abort("403")
+		logs.Error(err)
+		c.Data["json"] = err.Error()
 	}
-
-	respuesta := "OK"
+	// respuesta := "OK"
+	respuestaEviada := []models.ModeloRefactor{
+		{
+			Valor:       0,
+			Descripcion: "OK",
+		},
+	}
 	if categoria == "" {
-		respuesta = "Sin categoría"
+		// respuesta = "Sin categoría"
+		respuestaEviada = []models.ModeloRefactor{
+			{
+				Valor:       0,
+				Descripcion: "Sin categoría",
+			},
+		}
 	}
 
-	c.Data["json"] = respuesta
+	c.Data["json"] = respuestaEviada
 	c.ServeJSON()
 }
