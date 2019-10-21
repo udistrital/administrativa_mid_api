@@ -252,21 +252,26 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 		predicados = predicados + "vinculacion(" + docente.IdPersona + "," + strings.ToLower(docente.Dedicacion) + ", " + vigencia + ")." + "\n"
 		predicados = predicados + "horas(" + docente.IdPersona + "," + strconv.Itoa(docente.NumeroHorasSemanales*docente.NumeroSemanas) + ", " + vigencia + ")." + "\n"
 		reglasbase, err := CargarReglasBase("CDVE")
+		beego.Info("predicados: ", predicados, "a ", a)
+
+
 		if err != nil {
 			return docentes_a_insertar, err
 		}
 		reglasbase = reglasbase + predicados
 		m := NewMachine().Consult(reglasbase)
-
+   	beego.Info("m: ", m)
 		contratos := m.ProveAll("valor_contrato(" + strings.ToLower(nivelAcademico) + "," + docente.IdPersona + "," + vigencia + ",X).")
 		for _, solution := range contratos {
 			a = fmt.Sprintf("%s", solution.ByName_("X"))
+				beego.Info("a: ", a)
 		}
 		f, err := strconv.ParseFloat(a, 64)
 		if err != nil {
 			return docentes_a_vincular, err
 		}
 		salario := f
+		beego.Info("f: ", f, "salario: ", salario)
 		docentes_a_vincular[x].ValorContrato = salario
 
 	}
