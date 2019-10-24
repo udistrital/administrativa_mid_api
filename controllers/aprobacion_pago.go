@@ -9,6 +9,7 @@ import (
 	"github.com/astaxie/beego/httplib"
 
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 	"github.com/udistrital/administrativa_mid_api/models"
 )
 
@@ -770,9 +771,12 @@ func (c *AprobacionPagoController) AprobarMultiplesPagos() {
 	var pagos_mensuales []*models.PagoMensual
 	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &v); err == nil {
 		var pago_mensual *models.PagoMensual
+		// var cambio_estado_pago []models.CambioEstadoPago
 		for _, pm := range v {
 
 			pago_mensual = pm.PagoMensual
+			// se añade seccion para la trazabilidad
+			Trazabilidad_pago(pago_mensual)
 
 			pagos_mensuales = append(pagos_mensuales, pago_mensual)
 		}
@@ -787,6 +791,31 @@ func (c *AprobacionPagoController) AprobarMultiplesPagos() {
 	}
 
 	c.ServeJSON()
+}
+
+func Trazabilidad_pago(pago_mensual *models.PagoMensual)  {
+	var response interface{}
+	// fmt.Println(pago_mensual)
+	cambio_estado_pago := []models.CambioEstadoPago{
+		{
+			FechaCreacion: "",
+			FechaModificacion: "",
+			EstadoPagoMensualId: pago_mensual.EstadoPagoMensual.Id,
+			DocumentoResponsableId: pago_mensual.Responsable,
+			CargoResponsable: pago_mensual.CargoResponsable,
+			Activo: true,
+			PagoMensualId: models.PagoMensual{
+				Id:     pago_mensual.Id,
+			},
+		},
+	}
+	fmt.Println(cambio_estado_pago)
+	if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/cambio_estado_pago", "POST", &response, cambio_estado_pago); err == nil {
+		logs.Info("Traza realizada exitosamente")
+	} else {
+		fmt.Println(err)
+	}
+
 }
 
 // AprobacionPagoController ...
