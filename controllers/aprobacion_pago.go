@@ -799,8 +799,8 @@ func Trazabilidad_pago(pago_mensual *models.PagoMensual) {
 			},
 		},
 	}
-	fmt.Println(cambio_estado_pago)
-	logs.Emergency(beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudAdmin") + "/" + beego.AppConfig.String("NscrudAdmin") + "/cambio_estado_pago")
+	// fmt.Println(cambio_estado_pago)
+	// logs.Emergency(beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudAdmin") + "/" + beego.AppConfig.String("NscrudAdmin") + "/cambio_estado_pago")
 	if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/cambio_estado_pago", "POST", &response, cambio_estado_pago[0]); err == nil {
 		// logs.Warning(response)
 		// logs.Warning(&response)
