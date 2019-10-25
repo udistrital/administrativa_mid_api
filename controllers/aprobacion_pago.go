@@ -1252,6 +1252,8 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistasDependenci
     var conteo_offset, conteo_limit =0,0
 	var contratos_disponibilidad []models.ContratoDisponibilidad
 
+	var alerta models.Alert
+
 	doc_ordenador := c.GetString(":docordenador")
 	cod_dependencia := c.GetString(":cod_dependencia")
 	limit, _ := c.GetInt("limit")
@@ -1341,11 +1343,9 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistasDependenci
 								 conteo_offset = conteo_offset + 1
 							}
 
-
-
-
-						}
+						}						
 					}
+							
 	    }else { //If pago_mensual get
 
 		fmt.Println("Mirenme, me morí en If pago_mensual get, solucioname!!! ", err)
@@ -1354,10 +1354,17 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistasDependenci
 
 	}
 
- 	c.Data["json"] = pagos_contratista_cdp_rp
+	if pagos_contratista_cdp_rp == nil {
+		c.Data["json"] = alerta
+		c.ServeJSON()
+						
+	}else{
+		c.Data["json"] = pagos_contratista_cdp_rp
+		c.ServeJSON()
 
-	c.ServeJSON()
+	}	
 
+ 	
 
 }
 
