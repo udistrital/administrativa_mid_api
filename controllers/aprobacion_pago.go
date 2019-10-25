@@ -57,11 +57,11 @@ func (c *AprobacionPagoController) ObtenerInfoCoordinador() {
 					var temp_info_coordinador models.InformacionCoordinador
 					if err:= json.Unmarshal(json_info_coordinador, &temp_info_coordinador); err==nil {
 
-					
+
 					fmt.Println(temp_info_coordinador)
 					info_coordinador = temp_info_coordinador
 					}else{
-					fmt.Println(err)	
+					fmt.Println(err)
 					}
 				} else {
 					fmt.Println(error_json.Error())
@@ -115,14 +115,15 @@ func (c *AprobacionPagoController) GetContratosDocente() {
 
 						if vinculacion.NumeroContrato.Valid == true {
 							if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/acta_inicio/?query=NumeroContrato:"+vinculacion.NumeroContrato.String+",Vigencia:"+strconv.FormatInt(vinculacion.Vigencia.Int64, 10), &actasInicio); err == nil {
-	
+
 								//If Estado = 4
 								for _, actaInicio := range actasInicio {
 									actaInicio.FechaInicio = actaInicio.FechaInicio.UTC()
 									actaInicio.FechaFin = actaInicio.FechaFin.UTC()
 
 									if (int(actaInicio.FechaInicio.Month()) <= int(time.Now().Month()) && actaInicio.FechaInicio.Year() == time.Now().Year() && int(actaInicio.FechaFin.Month()) >= int(time.Now().Month()) && actaInicio.FechaFin.Year() == time.Now().Year()) ||
-									 (int(actaInicio.FechaInicio.Month()) >= int(time.Now().Month()) && actaInicio.FechaInicio.Year() <= time.Now().Year() && int(actaInicio.FechaFin.Month()) <= int(time.Now().Month()) && actaInicio.FechaFin.Year() >= time.Now().Year() && actaInicio.FechaFin.Year()>actaInicio.FechaInicio.Year() ) {
+									 (int(actaInicio.FechaInicio.Month()) >= int(time.Now().Month()) && actaInicio.FechaInicio.Year() <= time.Now().Year() && int(actaInicio.FechaFin.Month()) <= int(time.Now().Month()) && actaInicio.FechaFin.Year() >= time.Now().Year() && actaInicio.FechaFin.Year()>actaInicio.FechaInicio.Year() )  ||
+									 (int(actaInicio.FechaInicio.Month()) <= int(time.Now().Month()) && actaInicio.FechaInicio.Year() <= time.Now().Year() && int(actaInicio.FechaFin.Month()) <= int(time.Now().Month()) && actaInicio.FechaFin.Year() >= time.Now().Year() && actaInicio.FechaFin.Year()>actaInicio.FechaInicio.Year() )  {
 
 										cd.NumeroVinculacion = vinculacion.NumeroContrato.String
 										cd.Vigencia = vinculacion.Vigencia.Int64
@@ -414,7 +415,7 @@ func (c *AprobacionPagoController) CertificacionDocumentosAprobados() {
 	var vinculaciones_docente []models.VinculacionDocente
 
 	var mes_cer, _ = strconv.Atoi(mes)
-	
+
 	if mes_cer<10 {
 
 		mes = "0"+mes
@@ -428,7 +429,7 @@ func (c *AprobacionPagoController) CertificacionDocumentosAprobados() {
 		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?limit=-1&query=NumeroContrato:"+contrato.NumeroContrato+",Vigencia:"+contrato.Vigencia, &vinculaciones_docente); err == nil {
 
 			for _, vinculacion_docente := range vinculaciones_docente {
-				if vinculacion_docente.NumeroContrato.Valid == true {	
+				if vinculacion_docente.NumeroContrato.Valid == true {
 
 					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?query=EstadoPagoMensual.CodigoAbreviacion:AP,NumeroContrato:"+contrato.NumeroContrato+",VigenciaContrato:"+contrato.Vigencia+",Mes:"+strconv.Itoa(mes_cer)+",Ano:"+anio, &pagos_mensuales); err == nil {
 
@@ -449,8 +450,8 @@ func (c *AprobacionPagoController) CertificacionDocumentosAprobados() {
 						fmt.Println("Mirenme, me morí en If pago_mensual get, solucioname!!! ", err)
 
 					}
-			
-			
+
+
 				}
 			}
 
@@ -806,12 +807,12 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 	if contratos_persona.ContratosPersonas.ContratoPersona == nil {// Si no tiene contrato
 
 		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+numero_documento,&informacion_proveedores); err == nil {
-			
+
 			for _,persona := range informacion_proveedores {
-				
+
 				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/novedad_postcontractual/?query=Contratista:"+ strconv.Itoa(persona.Id)+"&sortby=FechaInicio&order=desc&limit=1", &novedades_postcontractuales); err == nil {
 
-					
+
 
 					for _, novedad := range novedades_postcontractuales {
 
@@ -838,20 +839,20 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 
 								var cdprp models.InformacionCdpRp
 								cdprp = GetRP(strconv.Itoa(novedad_novedad.NumeroCdp),strconv.Itoa(novedad_novedad.VigenciaCdp))
-				
+
 								for _, rp := range cdprp.CdpXRp.CdpRp {
 								var contrato_disponibilidad_rp models.ContratoDisponibilidadRp
-				
+
 								contrato_disponibilidad_rp.NumeroContratoSuscrito = novedad_novedad.NumeroContrato
 								contrato_disponibilidad_rp.Vigencia = strconv.Itoa(novedad_novedad.Vigencia)
 								contrato_disponibilidad_rp.NumeroCdp = strconv.Itoa(novedad_novedad.NumeroCdp)
 								contrato_disponibilidad_rp.VigenciaCdp = strconv.Itoa(novedad_novedad.VigenciaCdp)
 								contrato_disponibilidad_rp.NumeroRp = rp.RpNumeroRegistro
 								contrato_disponibilidad_rp.VigenciaRp = rp.RpVigencia
-				
+
 								contrato_disponibilidad_rp.NombreDependencia = informacion_contrato_contratista.InformacionContratista.Dependencia
 								contrato_disponibilidad_rp.NumDocumentoSupervisor = contrato.Contrato.Supervisor.DocumentoIdentificacion
-				
+
 								contratos_disponibilidad_rp = append(contratos_disponibilidad_rp, contrato_disponibilidad_rp)
 								}
 
@@ -861,7 +862,7 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 						}
 
 						}else{
-						
+
 						if ( novedad.FechaInicio.Year() == time.Now().Year() && int(novedad.FechaFin.Month()) >= int(time.Now().Month()) && novedad.FechaFin.Year() == time.Now().Year()) ||
 									 ( novedad.FechaInicio.Year() <= time.Now().Year() && int(novedad.FechaFin.Month()) <= int(time.Now().Month()) && novedad.FechaFin.Year() >= time.Now().Year() && novedad.FechaFin.Year()>novedad.FechaInicio.Year() ){
 
@@ -877,7 +878,7 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 				cdprp = GetRP(strconv.Itoa(contrato_disponibilidad.NumeroCdp), strconv.Itoa(contrato_disponibilidad.VigenciaCdp))
 
 				for _, rp := range cdprp.CdpXRp.CdpRp {
-					
+
 					var contrato_disponibilidad_rp models.ContratoDisponibilidadRp
 
 					contrato_disponibilidad_rp.NumeroContratoSuscrito = novedad.NumeroContrato
@@ -897,10 +898,10 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 
 		} else { // If contrato_disponibilidad get
 			fmt.Println("Mirenme, me morí en If contrato_disponibilidad get, solucioname!!! ", err)
-		
+
 		}
 									 }
-	
+
 		}
 
 		}//fin for novedad novedad
@@ -912,7 +913,7 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 
 				}else{ // If novedad_postcontractual get
 					fmt.Println("Mirenme, me morí en If novedad_postcontractual get, solucioname!!! ", err.Error())
-				}	
+				}
 			}
 
 		}else{// If informacion_proveedor get
@@ -932,61 +933,61 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 		informacion_contrato_contratista = GetInformacionContratoContratista(contrato_persona.NumeroContrato, contrato_persona.Vigencia)
 
 		if novedades_postcontractuales != nil { // Si tiene novedades
-	
+
 		for _, novedad := range novedades_postcontractuales {
 			if novedad.TipoNovedad == 219 {// si es una cesión
 
 				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+numero_documento,&informacion_proveedores); err == nil {
-			
+
 					for _,persona := range informacion_proveedores {
-						
+
 						if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/novedad_postcontractual/?query=Contratista:"+ strconv.Itoa(persona.Id)+"&sortby=FechaInicio&order=desc&limit=1", &novedades_postcontractuales); err == nil {
-		
+
 							for _, novedad := range novedades_postcontractuales {
 								var contrato models.InformacionContrato
 								contrato = GetContrato(novedad.NumeroContrato, strconv.Itoa(novedad.Vigencia))
-		
+
 								var informacion_contrato_contratista models.InformacionContratoContratista
 				informacion_contrato_contratista = GetInformacionContratoContratista(novedad.NumeroContrato, strconv.Itoa(novedad.Vigencia))
 				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
-		
-		
+
+
 					for _, contrato_disponibilidad := range contratos_disponibilidad {
-		
-		
+
+
 						var cdprp models.InformacionCdpRp
 						cdprp = GetRP(strconv.Itoa(contrato_disponibilidad.NumeroCdp), strconv.Itoa(contrato_disponibilidad.VigenciaCdp))
-		
+
 						for _, rp := range cdprp.CdpXRp.CdpRp {
-							
+
 							var contrato_disponibilidad_rp models.ContratoDisponibilidadRp
-		
+
 							contrato_disponibilidad_rp.NumeroContratoSuscrito = novedad.NumeroContrato
 							contrato_disponibilidad_rp.Vigencia = strconv.Itoa(novedad.Vigencia)
 							contrato_disponibilidad_rp.NumeroCdp = strconv.Itoa(contrato_disponibilidad.NumeroCdp)
 							contrato_disponibilidad_rp.VigenciaCdp = strconv.Itoa(contrato_disponibilidad.VigenciaCdp)
 							contrato_disponibilidad_rp.NumeroRp = rp.RpNumeroRegistro
 							contrato_disponibilidad_rp.VigenciaRp = rp.RpVigencia
-		
+
 							contrato_disponibilidad_rp.NombreDependencia = informacion_contrato_contratista.InformacionContratista.Dependencia
 							contrato_disponibilidad_rp.NumDocumentoSupervisor = contrato.Contrato.Supervisor.DocumentoIdentificacion
-		
+
 							contratos_disponibilidad_rp = append(contratos_disponibilidad_rp, contrato_disponibilidad_rp)
 						}
-		
+
 					}
-		
+
 				} else { // If contrato_disponibilidad get
 					fmt.Println("Mirenme, me morí en If contrato_disponibilidad get, solucioname!!! ", err)
-				
+
 				}
 							}
-		
+
 						}else{ // If novedad_postcontractual get
 							fmt.Println("Mirenme, me morí en If novedad_postcontractual get, solucioname!!! ", err.Error())
-						}	
+						}
 					}
-		
+
 				}else{// If informacion_proveedor get
 					fmt.Println("Mirenme, me morí en If informacion_proveedor get, solucioname!!! ", err.Error())
 				}
@@ -1020,12 +1021,12 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 		}
 
 		}else{// si no tiene novedades
-	
-	
 
-		
 
-		
+
+
+
+
 		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
 
 			for _, contrato_disponibilidad := range contratos_disponibilidad {
@@ -1052,11 +1053,11 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 
 		} else { // If contrato_disponibilidad get
 			fmt.Println("Mirenme, me morí en If contrato_disponibilidad get, solucioname!!! ", err)
-		
-		}
-	
 
-	
+		}
+
+
+
 	}
 		} else { // If novedad_postcontractual get
 			fmt.Println("Mirenme, me morí en If novedad_postcontractual get, solucioname!!! ", err.Error())
@@ -1244,7 +1245,7 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistas() {
 func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistasDependencia() {
 
 	var contrato_dependencia models.ContratoDependencia
-    
+
     var contratistas []models.InformacionProveedor
     var pagos_contratista_cdp_rp []models.PagoContratistaCdpRp
 
@@ -1263,7 +1264,7 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistasDependenci
 	t2 := t.AddDate(0, -1, 0)
 	fecha_final := fmt.Sprintf("%d-%02d",
 		t2.Year(), t2.Month())
-	
+
 	contrato_dependencia = GetContratosDependenciaFiltro(cod_dependencia, fecha_inicio, fecha_final)
 
 
@@ -1271,7 +1272,7 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistasDependenci
 
 
 		var pagos_mensuales []models.PagoMensual
-		
+
 		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?query=NumeroContrato:"+cd.NumeroContrato+",VigenciaContrato:"+cd.Vigencia+ ",EstadoPagoMensual.CodigoAbreviacion:AS,Responsable:"+doc_ordenador, &pagos_mensuales); err == nil  {
 
 					for v , pm := range pagos_mensuales {
@@ -1325,33 +1326,33 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistasDependenci
 
 											} else { // If contrato_disponibilidad get
 												fmt.Println("Mirenme, me morí en If contrato_disponibilidad get, solucioname!!! ", err)
-											}	
+											}
 
 									 }
-									conteo_limit = conteo_limit + 1 	
+									conteo_limit = conteo_limit + 1
 								}else { //If informacion_proveedor get
 
 									fmt.Println("Mirenme, me morí en If informacion_proveedor get, solucioname!!! ", err)
 									return
-								}	
+								}
 
 
 							}else{
 								 conteo_offset = conteo_offset + 1
 							}
 
-						
-									
-							
-						}						
-					}			
+
+
+
+						}
+					}
 	    }else { //If pago_mensual get
 
 		fmt.Println("Mirenme, me morí en If pago_mensual get, solucioname!!! ", err)
 		return
-		} 
+		}
 
-	}	
+	}
 
  	c.Data["json"] = pagos_contratista_cdp_rp
 
@@ -1372,15 +1373,15 @@ func (c *AprobacionPagoController) GetDependencias()  {
 	var dependen models.DependenciasContrato
 	var dep models.DependenciasContrato
 	doc_ordenador := c.GetString(":docordenador")
-	
+
 	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"dependencias_sic/"+doc_ordenador, &temp); err == nil {
 		json_dependencias, error_json := json.Marshal(temp)
 		if error_json == nil {
 				if err:= json.Unmarshal(json_dependencias, &dependen); err == nil {
-					dep = dependen				
+					dep = dependen
 				} else {
-					fmt.Println(err)	
-				}	
+					fmt.Println(err)
+				}
 		} else {
 			fmt.Println(error_json.Error())
 		}
@@ -1489,7 +1490,7 @@ func (c *AprobacionPagoController) CertificacionCumplidosContratistas() {
 
 
 	var nmes,_ =strconv.Atoi(mes)
-	
+
 	contrato_dependencia = GetContratosDependencia(dependencia, anio + "-"+ mes)
 
 	for _,cd := range contrato_dependencia.Contratos.Contrato {
@@ -1549,7 +1550,7 @@ func GetRP(numero_cdp string, vigencia_cdp string) (rp models.InformacionCdpRp) 
 			rp = temp_cdp_rp
 			return rp
 			} else {
-			fmt.Println(err)	
+			fmt.Println(err)
 			}
 
 		} else {
@@ -1656,7 +1657,7 @@ func GetContratosDependencia(dependencia string, fecha string) (contratos_depend
 			if err:= json.Unmarshal(json_contrato, &contratos_dependencia); err == nil {
 			return contratos_dependencia
 			} else {
-			fmt.Println(err)	
+			fmt.Println(err)
 			}
 		} else {
 			fmt.Println(error_json.Error())
@@ -1681,7 +1682,7 @@ func GetContratosDependenciaFiltro(dependencia string, fecha_inicio string, fech
 			if err:= json.Unmarshal(json_contrato, &contratos_dependencia); err == nil {
 			return contratos_dependencia
 			} else {
-			fmt.Println(err)	
+			fmt.Println(err)
 			}
 		} else {
 			fmt.Println(error_json.Error())
@@ -1708,5 +1709,3 @@ func GetContratosOrdenadorDependencia(dependencia string, fechaInicio string, fe
 
 	return contratos_ordenador_dependencia
 }
-
-
