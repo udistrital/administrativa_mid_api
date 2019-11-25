@@ -29,7 +29,8 @@ func (c *CambioEstadoContratoValidoController) URLMapping() {
 func (this *CambioEstadoContratoValidoController) ValidarCambioEstado() {
 
 	var estados []models.EstadoContrato //0: actual y 1:siguiente
-
+	var alertErr models.Alert
+	alertas := append([]interface{}{"Response:"})
 	reglasbase, err := CargarReglasBase("AdministrativaContratacion")
 	if err != nil {
 		beego.Error(err)
@@ -41,16 +42,23 @@ func (this *CambioEstadoContratoValidoController) ValidarCambioEstado() {
 	if err := json.Unmarshal(this.Ctx.Input.RequestBody, &estados); err == nil {
 
 		if m.CanProve(`estado(` + strings.ToLower(estados[0].NombreEstado) + `,` + strings.ToLower(estados[1].NombreEstado) + `).`) {
-			this.Data["json"] = "true"
+			alertErr.Type = "OK"
+			alertErr.Code = "200"
+			alertErr.Body = "true"
 		} else {
-			this.Data["json"] = "false"
+			alertErr.Type = "OK"
+			alertErr.Code = "200"
+			alertErr.Body = "false"
 		}
 
 	} else {
-		this.Data["json"] = err.Error()
+		alertErr.Type = "Error"
+		alertErr.Code = "400"
+		alertas = append(alertas, err.Error())
 		fmt.Println("error1: ", err)
 	}
 
+	this.Data["json"] = alertErr
 	this.ServeJSON()
 
 }
