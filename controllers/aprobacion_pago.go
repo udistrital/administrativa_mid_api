@@ -1157,6 +1157,9 @@ func (c *AprobacionPagoController) GetSolicitudesSupervisorContratistas() {
 // @router /solicitudes_ordenador_contratistas/:docordenador [get]
 func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistas() {
 
+	var alertErr models.Alert
+	alertas := append([]interface{}{"Response:"})
+
 	doc_ordenador := c.GetString(":docordenador")
 	limit, _ := c.GetInt("limit")
 	offset, _ := c.GetInt("offset")
@@ -1211,7 +1214,11 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistas() {
 
 					} else { // If contrato_disponibilidad get
 						fmt.Println("Mirenme, me morí en If contrato_disponibilidad get, solucioname!!! ", err)
-						c.Data["json"] = "" + beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudAgora") + "/" + beego.AppConfig.String("NscrudAgora") + "/contrato_disponibilidad/?query=NumeroContrato:" + contrato.Contrato.NumeroContrato + ",Vigencia:" + contrato.Contrato.Vigencia
+						alertErr.Type = "error"
+						alertErr.Code = "404"
+						alertErr.Body = "" + beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudAgora") + "/" + beego.AppConfig.String("NscrudAgora") + "/contrato_disponibilidad/?query=NumeroContrato:" + contrato.Contrato.NumeroContrato + ",Vigencia:" + contrato.Contrato.Vigencia
+						c.Data["json"] = alertErr
+						c.ServeJSON()
 					}
 
 				}
