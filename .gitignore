@@ -7,3 +7,14 @@ coverage.xml
 eject_254.sh
 ./eject_254.sh
 administrativa_mid_api.exe
+swagger/*.png
+swagger/*.html
+swagger/*.js
+swagger/*.map
+swagger/*.css
+swagger/*.yml
+swagger/css/
+swagger/fonts/
+swagger/images/
+swagger/lang/
+swagger/lib/
