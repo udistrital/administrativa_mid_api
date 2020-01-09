@@ -1216,6 +1216,8 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistas() {
 						fmt.Println("Mirenme, me morí en If contrato_disponibilidad get, solucioname!!! ", err)
 						alertErr.Type = "error"
 						alertErr.Code = "404"
+						alertErr.NumContrato = pagos_mensuales[v].NumeroContrato
+						alertErr.Vigencia = strconv.FormatFloat(pagos_mensuales[v].VigenciaContrato, 'f', 0, 64)
 						alertErr.Body = "" + beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudAgora") + "/" + beego.AppConfig.String("NscrudAgora") + "/contrato_disponibilidad/?query=NumeroContrato:" + contrato.Contrato.NumeroContrato + ",Vigencia:" + contrato.Contrato.Vigencia
 						c.Data["json"] = alertErr
 						c.ServeJSON()
