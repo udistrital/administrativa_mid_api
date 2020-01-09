@@ -3,9 +3,8 @@ workspace:
   path: src/github.com/udistrital/${DRONE_REPO##udistrital/}
   when:
       branch:
-      - dev
-      - test
       - master
+      - test
 kind: pipeline
 name: API_deploy
 
@@ -17,11 +16,10 @@ steps:
      - GOOS=linux GOARCH=amd64 go build -o main
     when:
       branch:
-      - dev
-      - test
       - master
+      - test
       event:
-      - push
+      - push 
 
   - name: go_run_test
     image: golang:1.9
@@ -64,7 +62,6 @@ steps:
       - master
       event:
       - push
-
 
   - name: publish_dockerhub  
     image: plugins/docker
@@ -115,7 +112,7 @@ steps:
       - test
       - master
       event:
-      - push  
+      - push      
   
   - name: NotifyTelegram
     image: appleboy/drone-telegram
@@ -128,10 +125,10 @@ steps:
       message: >
         {{#success build.status}}
           <code>{{repo.owner}}/{{repo.name}}</code> <a href="{{build.link}}">SUCCESS</a> 
-          <code>{{commit.branch}}</code>@<a href="{{commit.link}}">{{truncate commit.sha 7}}</a><code> By:{{commit.author}}</code>
+          <code>{{commit.branch}}</code>@<a href="{{commit.link}}">{{truncate commit.sha 7}}</a><code> By:{{commit.author}} &#128526 </code>
         {{else}}
           <code>{{repo.owner}}/{{repo.name}}</code> <a href="{{build.link}}">FAILURE</a>
-          <code>{{commit.branch}}</code>@<a href="{{commit.link}}">{{truncate commit.sha 7}}</a><code> By:{{commit.author}}</code>
+          <code>{{commit.branch}}</code>@<a href="{{commit.link}}">{{truncate commit.sha 7}}</a><code> By:{{commit.author}} &#128549 </code>
         {{/success}}
     when:
       branch:
@@ -140,3 +137,4 @@ steps:
       status:
       - failure
       - success
+
