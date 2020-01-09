@@ -1158,7 +1158,7 @@ func (c *AprobacionPagoController) GetSolicitudesSupervisorContratistas() {
 func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistas() {
 
 	var alertErr models.Alert
-	alertas := append([]interface{}{"Response:"})
+	// alertas := append([]interface{}{"Response:"})
 
 	doc_ordenador := c.GetString(":docordenador")
 	limit, _ := c.GetInt("limit")
