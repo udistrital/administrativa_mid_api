@@ -1211,6 +1211,7 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistas() {
 
 					} else { // If contrato_disponibilidad get
 						fmt.Println("Mirenme, me morí en If contrato_disponibilidad get, solucioname!!! ", err)
+						c.Data["json"] = "" + beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudAgora") + "/" + beego.AppConfig.String("NscrudAgora") + "/contrato_disponibilidad/?query=NumeroContrato:" + contrato.Contrato.NumeroContrato + ",Vigencia:" + contrato.Contrato.Vigencia
 					}
 
 				}
