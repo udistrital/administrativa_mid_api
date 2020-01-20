@@ -125,6 +125,8 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 	var idRespuesta int
 
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &v)
+	fmt.Println("Aqui se imprime los datos que llegan")
+	fmt.Println(v)
 	if err != nil {
 		// beego.Error("Error al hacer unmarshal", err)
 		logs.Error("Error al hacer unmarshal", err)
@@ -138,6 +140,11 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 		c.Data["json"] = err.Error()
 	}
 
+	fmt.Println("Aqui se imprime los datos de vinculación docente")
+	fmt.Println(v)
+	fmt.Println("Aqui se muestra la URL a donde realiza el POST")
+	fmt.Println(beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudAdmin") + "/" + beego.AppConfig.String("NscrudAdmin") + "/vinculacion_docente/InsertarVinculaciones/")
+
 	err = sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &idRespuesta, &v)
 	IdDeRespuesta := []models.ModeloRefactor{
 		{
@@ -146,6 +153,9 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 		},
 	}
 	c.Data["json"] = IdDeRespuesta
+	fmt.Println("Y aquí la respuesta")
+	fmt.Println(idRespuesta)
+
 	logs.Info(IdDeRespuesta)
 	logs.Info(c.Data["json"])
 
@@ -283,10 +293,12 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDocente) (docentes_a_insertar []models.VinculacionDocente, err error) {
 	nivelAcademico := docentes_a_vincular[0].NivelAcademico
 	vigencia := strconv.Itoa(int(docentes_a_vincular[0].Vigencia.Int64))
+	fmt.Println("vigemgia ", strconv.Itoa(int(docentes_a_vincular[0].Vigencia.Int64)))
 	var a string
 	var categoria string
 
 	salarioMinimo, err := CargarSalarioMinimo(vigencia)
+	fmt.Println("salario minimo", salarioMinimo, "error de salrio", err)
 	if err != nil {
 		return docentes_a_insertar, err
 	}
@@ -294,11 +306,14 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 	for x, docente := range docentes_a_vincular {
 		p, err := EsDocentePlanta(docente.IdPersona)
 		if err != nil {
+			fmt.Println("error docente planta")
 			return docentes_a_insertar, err
 		}
 		if p && strings.ToLower(nivelAcademico) == "posgrado" {
+			fmt.Println("posgrado")
 			categoria = strings.TrimSpace(docente.Categoria) + "ud"
 		} else {
+			fmt.Println("else posgrado")
 			categoria = strings.TrimSpace(docente.Categoria)
 		}
 
@@ -308,6 +323,7 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 			docente.NumeroSemanas = 1
 		} else if strings.ToLower(nivelAcademico) == "pregrado" {
 			a, err := CargarPuntoSalarial()
+			fmt.Println("punto salarial", a, "error punto,", err)
 			if err != nil {
 				return docentes_a_insertar, err
 			}
@@ -318,6 +334,7 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 		predicados = predicados + "vinculacion(" + docente.IdPersona + "," + strings.ToLower(docente.Dedicacion) + ", " + vigencia + ")." + "\n"
 		predicados = predicados + "horas(" + docente.IdPersona + "," + strconv.Itoa(docente.NumeroHorasSemanales*docente.NumeroSemanas) + ", " + vigencia + ")." + "\n"
 		reglasbase, err := CargarReglasBase("CDVE")
+		fmt.Println("regla base ", reglasbase, "err regla ", err)
 		if err != nil {
 			return docentes_a_insertar, err
 		}
@@ -329,6 +346,7 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 			a = fmt.Sprintf("%s", solution.ByName_("X"))
 		}
 		f, err := strconv.ParseFloat(a, 64)
+		fmt.Println("valor f", f, "err f", err)
 		if err != nil {
 			return docentes_a_vincular, err
 		}
@@ -336,7 +354,7 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 		docentes_a_vincular[x].ValorContrato = salario
 
 	}
-
+	fmt.Println("return final", docentes_a_vincular)
 	return docentes_a_vincular, nil
 
 }
@@ -353,7 +371,7 @@ func CargarPuntoSalarial() (p models.PuntoSalarial, err error) {
 
 func CargarSalarioMinimo(vigencia string) (p models.SalarioMinimo, err error) {
 	var v []models.SalarioMinimo
-
+	logs.Info(beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudCore") + "/" + beego.AppConfig.String("NscrudCore") + "/salario_minimo/?limit=1&query=Vigencia:" + vigencia)
 	err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/salario_minimo/?limit=1&query=Vigencia:"+vigencia, &v)
 	if err != nil {
 		err = fmt.Errorf("He fallado en salario_minimo (get) función CargarSalarioMinimo, %s", err)
@@ -959,6 +977,7 @@ func BuscarNombreProveedor(DocumentoIdentidad int) (nombre_prov string) {
 	var nom_proveedor string
 	queryInformacionProveedor := "?query=NumDocumento:" + strconv.Itoa(DocumentoIdentidad)
 	var informacion_proveedor []models.InformacionProveedor
+	fmt.Println(beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudAgora") + "/" + beego.AppConfig.String("NscrudAgora") + "/informacion_proveedor/" + queryInformacionProveedor)
 	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/"+queryInformacionProveedor, &informacion_proveedor); err2 == nil {
 		if informacion_proveedor != nil {
 			nom_proveedor = informacion_proveedor[0].NomProveedor

@@ -171,7 +171,12 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 	var dedicacion string
 	var articulo string
 
-	temp.Vigencia, _, _ = time_bogota.Tiempo_bogota().Date()
+	// temp.Vigencia, _, _ = time_bogota.Tiempo_bogota().Date()
+
+	temp.Vigencia = 2019
+
+	fmt.Println(temp.Vigencia)
+
 	temp.FechaRegistro = time_bogota.Tiempo_bogota().Format(time.RFC3339Nano)
 	temp.Estado = true
 	switch resolucion.ResolucionVinculacionDocente.Dedicacion {

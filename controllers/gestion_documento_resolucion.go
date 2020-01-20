@@ -3,9 +3,10 @@ package controllers
 import (
 	"fmt"
 
+	"github.com/astaxie/beego/logs"
+
 	"github.com/astaxie/beego"
 	"github.com/udistrital/administrativa_mid_api/models"
-	"github.com/udistrital/utils_oas/time_bogota"
 )
 
 //GestionDocumentoResolucionController operations for Preliquidacion
@@ -57,13 +58,17 @@ func (c *GestionDocumentoResolucionController) GetContenidoResolucion() {
 		fmt.Println("Error al consultar contenido", err2)
 	}
 
-	fecha_actual := time_bogota.Tiempo_bogota().Format("2006-01-02")
-	query = "?query=DependenciaId:" + id_facultad + ",FechaFin__gte:" + fecha_actual + ",FechaInicio__lte:" + fecha_actual
+	// fecha_actual := time_bogota.Tiempo_bogota().Format("2006-01-02")
+	// query = "?query=DependenciaId:" + id_facultad + ",FechaFin__gte:" + fecha_actual + ",FechaInicio__lte:" + fecha_actual
+	query = "?query=DependenciaId:" + id_facultad + "&sortby=Id&order=desc&limit=1"
+	logs.Info(beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudCore") + "/" + beego.AppConfig.String("NscrudCore") + "/jefe_dependencia/" + query)
 	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/jefe_dependencia/"+query, &jefe_dependencia); err == nil {
+		logs.Info("no error en peticion")
+
 		contenidoResolucion.OrdenadorGasto.NombreOrdenador = BuscarNombreProveedor(jefe_dependencia[0].TerceroId)
 
 	} else {
-
+		logs.Info("el de peticion")
 	}
 
 	c.Ctx.Output.SetStatus(201)
