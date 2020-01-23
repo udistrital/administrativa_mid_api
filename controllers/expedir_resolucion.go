@@ -376,15 +376,17 @@ func SupervisorActual(id_resolucion int) (id_supervisor_actual int) {
 	var j []models.JefeDependencia
 	var s []models.SupervisorContrato
 	var fecha = time_bogota.Tiempo_bogota().Format("2006-01-02")
+	fmt.Println(fecha)
 	//If Resolucion (GET)
 	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+strconv.Itoa(id_resolucion), &r); err == nil {
 		//If Jefe_dependencia (GET)
 		// if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/jefe_dependencia/?query=DependenciaId:"+strconv.Itoa(r.IdDependencia)+",FechaFin__gte:"+fecha+",FechaInicio__lte:"+fecha, &j); err == nil {
 		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/jefe_dependencia/?query=DependenciaId:"+strconv.Itoa(r.IdDependencia)+"&sortby=Id&order=desc&limit=1", &j); err == nil {
 			//If Supervisor (GET)
-			fmt.Println(beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudCore") + "/" + beego.AppConfig.String("NscrudCore") + "/jefe_dependencia/?query=DependenciaId:" + strconv.Itoa(r.IdDependencia) + "&sortby=Id&order=desc&limit=1")
+			//fmt.Println(beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudCore") + "/" + beego.AppConfig.String("NscrudCore") + "/jefe_dependencia/?query=DependenciaId:" + strconv.Itoa(r.IdDependencia) + "&sortby=Id&order=desc&limit=1")
 			// if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/supervisor_contrato/?query=Documento:"+strconv.Itoa(j[0].TerceroId)+",FechaFin__gte:"+fecha+",FechaInicio__lte:"+fecha+"&CargoId.Cargo__startswith:DECANO|VICE", &s); err == nil {
-			if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/supervisor_contrato/?query=Documento:"+strconv.Itoa(j[0].TerceroId)+",FechaFin__gte:"+fecha+",FechaInicio__lte:"+fecha+"&CargoId.Cargo__startswith:DECANO|VICE", &s); err == nil {
+			if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/supervisor_contrato/?query=Documento:"+strconv.Itoa(j[0].TerceroId)+"&CargoId.Cargo__startswith:DECANO|VICE"+"&limit=1&sortby=Id&order=desc", &s); err == nil {
+				fmt.Println(beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudAgora") + "/" + beego.AppConfig.String("NscrudAgora") + "/supervisor_contrato/?query=Documento:" + strconv.Itoa(j[0].TerceroId) + "&CargoId.Cargo__startswith:DECANO|VICE" + "&limit=1&sortby=Id&order=desc")
 				return s[0].Id
 			} else { //If Jefe_dependencia (GET)
 				fmt.Println("He fallado un poquito en If Supervisor (GET) en el método SupervisorActual, solucioname!!! ", err)
