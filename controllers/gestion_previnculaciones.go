@@ -146,6 +146,7 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 		},
 	}
 	c.Data["json"] = IdDeRespuesta
+
 	logs.Info(IdDeRespuesta)
 	logs.Info(c.Data["json"])
 
@@ -341,7 +342,6 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 		docentes_a_vincular[x].ValorContrato = salario
 
 	}
-
 	return docentes_a_vincular, nil
 
 }
@@ -358,7 +358,6 @@ func CargarPuntoSalarial() (p models.PuntoSalarial, err error) {
 
 func CargarSalarioMinimo(vigencia string) (p models.SalarioMinimo, err error) {
 	var v []models.SalarioMinimo
-
 	err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/salario_minimo/?limit=1&query=Vigencia:"+vigencia, &v)
 	if err != nil {
 		err = fmt.Errorf("He fallado en salario_minimo (get) función CargarSalarioMinimo, %s", err)
