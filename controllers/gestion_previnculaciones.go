@@ -125,8 +125,6 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 	var idRespuesta int
 
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &v)
-	fmt.Println("Aqui se imprime los datos que llegan")
-	fmt.Println(v)
 	if err != nil {
 		// beego.Error("Error al hacer unmarshal", err)
 		logs.Error("Error al hacer unmarshal", err)
@@ -355,7 +353,6 @@ func CargarPuntoSalarial() (p models.PuntoSalarial, err error) {
 
 func CargarSalarioMinimo(vigencia string) (p models.SalarioMinimo, err error) {
 	var v []models.SalarioMinimo
-	logs.Info(beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudCore") + "/" + beego.AppConfig.String("NscrudCore") + "/salario_minimo/?limit=1&query=Vigencia:" + vigencia)
 	err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/salario_minimo/?limit=1&query=Vigencia:"+vigencia, &v)
 	if err != nil {
 		err = fmt.Errorf("He fallado en salario_minimo (get) función CargarSalarioMinimo, %s", err)
@@ -961,7 +958,6 @@ func BuscarNombreProveedor(DocumentoIdentidad int) (nombre_prov string) {
 	var nom_proveedor string
 	queryInformacionProveedor := "?query=NumDocumento:" + strconv.Itoa(DocumentoIdentidad)
 	var informacion_proveedor []models.InformacionProveedor
-	fmt.Println(beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudAgora") + "/" + beego.AppConfig.String("NscrudAgora") + "/informacion_proveedor/" + queryInformacionProveedor)
 	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/"+queryInformacionProveedor, &informacion_proveedor); err2 == nil {
 		if informacion_proveedor != nil {
 			nom_proveedor = informacion_proveedor[0].NomProveedor
