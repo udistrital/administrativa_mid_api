@@ -376,6 +376,7 @@ func SupervisorActual(id_resolucion int) (id_supervisor_actual int) {
 	var j []models.JefeDependencia
 	var s []models.SupervisorContrato
 	var fecha = time_bogota.Tiempo_bogota().Format("2006-01-02")
+	fmt.Println(fecha)
 	//If Resolucion (GET)
 	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+strconv.Itoa(id_resolucion), &r); err == nil {
 		//If Jefe_dependencia (GET)
