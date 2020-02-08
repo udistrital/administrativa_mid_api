@@ -159,7 +159,7 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 	temp.Estado = true
 	switch resolucion.ResolucionVinculacionDocente.Dedicacion {
 	case "HCH":
-		motivo = "RECONOCEN HONORARIOS "
+		motivo = " RECONOCEN HONORARIOS "
 		dedicacion = "hora catedra honorarios"
 		articulo = "tercero"
 		break
@@ -179,7 +179,7 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 			temp.Titulo = "“Por la cual se " + motivo + " a docentes " + " para el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " Periodo Académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de docentes de " + dedicacion + " para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas (" + resolucion.ResolucionVinculacionDocente.NivelAcademico + ").”"
 
 		} else {
-			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCH" {
+			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCH" && resolucion.ResolucionVinculacionDocente.NivelAcademico == "PREGRADO" {
 				temp.Titulo = "“Por la cual se " + motivo + " a docentes para finalizar el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " PERIODO académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de docentes de " + dedicacion + " para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas (" + resolucion.ResolucionVinculacionDocente.NivelAcademico + ").”"
 
 			}
