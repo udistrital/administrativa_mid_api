@@ -863,7 +863,7 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 
 						}else{
 
-						if ( novedad.FechaInicio.Year() == time.Now().Year() && int(novedad.FechaFin.Month()) >= int(time.Now().Month()) && novedad.FechaFin.Year() == time.Now().Year()) ||
+						if ( novedad.FechaInicio.Year() == time.Now().Year() && int(novedad.FechaFin.Month()) >= int(time.Now().Month())-2 && novedad.FechaFin.Year() == time.Now().Year()) ||
 									 ( novedad.FechaInicio.Year() <= time.Now().Year() && int(novedad.FechaFin.Month()) <= int(time.Now().Month()) && novedad.FechaFin.Year() >= time.Now().Year() && novedad.FechaFin.Year()>novedad.FechaInicio.Year() ){
 
 
