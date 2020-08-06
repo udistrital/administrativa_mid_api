@@ -184,7 +184,7 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 
 			}
 			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCP" && resolucion.ResolucionVinculacionDocente.NivelAcademico == "POSGRADO" {
-				temp.Titulo = "“Por la cual se " + motivo + "  docentes para  el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " PERIODO académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de " + dedicacion + " (vinculación especial) para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas ( " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ").”"
+				temp.Titulo = "“Por la cual se " + motivo + "  docentes para  el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " PERIODO académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de docentes de " + dedicacion + " (vinculación especial) para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas ( " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ").”"
 
 			}
 			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCP" && resolucion.ResolucionVinculacionDocente.NivelAcademico == "PREGRADO" {
