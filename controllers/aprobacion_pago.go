@@ -804,7 +804,7 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 	var novedades_novedad []models.NovedadPostcontractual
 	var informacion_proveedores []models.InformacionProveedor
 	contratos_persona := GetContratosPersona(numero_documento)
-	if contratos_persona.ContratosPersonas.ContratoPersona == nil {// Si no tiene contrato
+	//if contratos_persona.ContratosPersonas.ContratoPersona == nil {// Si no tiene contrato
 
 		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+numero_documento,&informacion_proveedores); err == nil {
 
@@ -920,7 +920,7 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 			fmt.Println("Mirenme, me morí en If informacion_proveedor get, solucioname!!! ", err.Error())
 		}
 
-	}else{// si tiene contrato
+	//}else{// si tiene contrato
 	for _, contrato_persona := range contratos_persona.ContratosPersonas.ContratoPersona {
 		var contrato models.InformacionContrato
 		contrato = GetContrato(contrato_persona.NumeroContrato, contrato_persona.Vigencia)
@@ -1065,7 +1065,7 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 
 	}
 
-}
+//}
 
 	c.Data["json"] = contratos_disponibilidad_rp
 
