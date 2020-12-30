@@ -180,7 +180,7 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 
 		} else {
 			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCH" && resolucion.ResolucionVinculacionDocente.NivelAcademico == "PREGRADO" {
-				temp.Titulo = "“Por la cual se " + motivo + " a docentes para el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " PERIODO académico del " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de docentes de " + dedicacion + " para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas (" + resolucion.ResolucionVinculacionDocente.NivelAcademico + ").”"
+				temp.Titulo = "“Por la cual se " + motivo + " a docentes para finalizar el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " PERIODO académico del " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de docentes de " + dedicacion + " para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas (" + resolucion.ResolucionVinculacionDocente.NivelAcademico + ").”"
 
 			}
 			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCP" && resolucion.ResolucionVinculacionDocente.NivelAcademico == "POSGRADO" {
@@ -188,11 +188,11 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 
 			}
 			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCP" && resolucion.ResolucionVinculacionDocente.NivelAcademico == "PREGRADO" {
-				temp.Titulo = "“Por la cual se " + motivo + "  docentes para el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " PERIODO académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de " + dedicacion + " (vinculación especial) para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas ( " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ").”"
+				temp.Titulo = "“Por la cual se " + motivo + "  docentes para finalizar el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " PERIODO académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de docentes de" + dedicacion + " (vinculación especial) para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas ( " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ").”"
 
 			} else {
 				if resolucion.ResolucionVinculacionDocente.Dedicacion == "TCO-MTO" {
-					temp.Titulo = "“Por la cual se " + motivo + "  docentes para  el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " PERIODO académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de docentes de " + dedicacion + " (vinculación especial) para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas ( " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ").”"
+					temp.Titulo = "“Por la cual se " + motivo + "  docentes para finalizar el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " PERIODO académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de docentes de " + dedicacion + " (vinculación especial) para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas ( " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ").”"
 				}
 			}
 
@@ -208,7 +208,7 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 			fmt.Println("Error al consultar resolución vieja", err)
 		}
 	}
-	temp.PreambuloResolucion = "El Decano de la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas, en uso de sus facultades legales y estatutarias, en particular, de las conferidas por el artículo " + articulo + "  de la Resolución de Rectoría Nro. 09 de enero 15 de 2020, y"
+	temp.PreambuloResolucion = "El Decano de la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas, en uso de sus facultades legales y estatutarias, en particular, de las conferidas por el artículo " + articulo + "  de la Resolución de Rectoría Nro. xxx de enero xxx de 2021, y"
 	if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion", "POST", &respuesta, &temp); err == nil {
 		id_creada = respuesta.Id
 		cont = true
