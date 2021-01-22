@@ -817,11 +817,10 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/novedad_postcontractual/?query=NumeroContrato:"+novedad.NumeroContrato+",Vigencia:"+strconv.Itoa(novedad.Vigencia)+"&sortby=FechaInicio&order=desc&limit=1", &novedades_novedad); err == nil {
 
 						for _, novedad_novedad := range novedades_novedad {
-
 							if novedad_novedad != novedad {
 
-								if (novedad_novedad.FechaInicio.Year() == time.Now().Year() && int(novedad_novedad.FechaFin.Month()) >= int(time.Now().Month()) && novedad_novedad.FechaFin.Year() == time.Now().Year()) ||
-									(novedad_novedad.FechaInicio.Year() <= time.Now().Year() && int(novedad_novedad.FechaFin.Month()) <= int(time.Now().Month()) && novedad_novedad.FechaFin.Year() >= time.Now().Year() && novedad_novedad.FechaFin.Year() > novedad_novedad.FechaInicio.Year()) {
+								if (novedad_novedad.FechaInicio.Year() == time.Now().Year() && int(novedad_novedad.FechaFin.Month()) >= int(time.Now().Month())-2 && novedad_novedad.FechaFin.Year() == time.Now().Year()) ||
+									(novedad_novedad.FechaInicio.Year() <= time.Now().Year() && int(novedad_novedad.FechaFin.Month()) >= int(time.Now().Month())-2 && novedad_novedad.FechaFin.Year() >= time.Now().Year() && novedad_novedad.FechaFin.Year() > novedad_novedad.FechaInicio.Year()) {
 
 									if novedad_novedad.TipoNovedad == 219 { // si es una cesión
 
