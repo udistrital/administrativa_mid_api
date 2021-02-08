@@ -1231,7 +1231,7 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistasDependenci
 	fecha_inicio := fmt.Sprintf("%d-%02d",
 		t.Year(), t.Month())
 
-	t2 := t.AddDate(0, -1, 0)
+	t2 := t.AddDate(-1, 0, 0)
 	fecha_final := fmt.Sprintf("%d-%02d",
 		t2.Year(), t2.Month())
 
