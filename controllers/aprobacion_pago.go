@@ -107,7 +107,6 @@ func (c *AprobacionPagoController) GetContratosDocente() {
 			//for vinculaciones
 			for _, vinculacion := range vinculaciones {
 				//If dependencia get
-
 				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudOikos")+"/"+beego.AppConfig.String("NscrudOikos")+"/dependencia/"+strconv.Itoa(vinculacion.IdProyectoCurricular), &dep); err == nil {
 					//If resolucion get
 					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+strconv.Itoa(vinculacion.IdResolucion.Id), &res); err == nil {
@@ -122,8 +121,8 @@ func (c *AprobacionPagoController) GetContratosDocente() {
 									actaInicio.FechaFin = actaInicio.FechaFin.UTC()
 
 									if (int(actaInicio.FechaInicio.Month()) <= int(time.Now().Month()) && actaInicio.FechaInicio.Year() == time.Now().Year() && int(actaInicio.FechaFin.Month()) >= int(time.Now().Month()) && actaInicio.FechaFin.Year() == time.Now().Year()) ||
-										(int(actaInicio.FechaInicio.Month()) >= int(time.Now().Month()) && actaInicio.FechaInicio.Year() <= time.Now().Year() && int(actaInicio.FechaFin.Month()) <= int(time.Now().Month()) && actaInicio.FechaFin.Year() >= time.Now().Year() && actaInicio.FechaFin.Year() > actaInicio.FechaInicio.Year()) ||
-										(int(actaInicio.FechaInicio.Month()) <= int(time.Now().Month()) && actaInicio.FechaInicio.Year() <= time.Now().Year() && int(actaInicio.FechaFin.Month()) <= int(time.Now().Month()) && actaInicio.FechaFin.Year() >= time.Now().Year() && actaInicio.FechaFin.Year() > actaInicio.FechaInicio.Year()) {
+										(int(actaInicio.FechaInicio.Month()) >= int(time.Now().Month()) && actaInicio.FechaInicio.Year() <= time.Now().Year() && int(actaInicio.FechaFin.Month()) >= int(time.Now().Month()) && actaInicio.FechaFin.Year() >= time.Now().Year() && actaInicio.FechaFin.Year() > actaInicio.FechaInicio.Year()) ||
+										(int(actaInicio.FechaInicio.Month()) <= int(time.Now().Month()) && actaInicio.FechaInicio.Year() <= time.Now().Year() && int(actaInicio.FechaFin.Month()) >= int(time.Now().Month()) && actaInicio.FechaFin.Year() >= time.Now().Year() && actaInicio.FechaFin.Year() > actaInicio.FechaInicio.Year()) {
 
 										cd.NumeroVinculacion = vinculacion.NumeroContrato.String
 										cd.Vigencia = vinculacion.Vigencia.Int64
