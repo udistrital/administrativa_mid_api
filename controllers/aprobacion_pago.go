@@ -817,9 +817,7 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 						for _, novedad_novedad := range novedades_novedad {
 							if novedad_novedad != novedad {
 
-								if (novedad_novedad.FechaInicio.Year() == time.Now().Year() && int(novedad_novedad.FechaFin.Month()) >= int(time.Now().Month())-2 && novedad_novedad.FechaFin.Year() == time.Now().Year()) ||
-									(novedad_novedad.FechaInicio.Year() <= time.Now().Year() && int(novedad_novedad.FechaFin.Month()) >= int(time.Now().Month())-2 && novedad_novedad.FechaFin.Year() >= time.Now().Year() && novedad_novedad.FechaFin.Year() > novedad_novedad.FechaInicio.Year()) {
-
+								if(novedad_novedad.FechaInicio.Before(novedad_novedad.FechaFin) && time.Now().After(novedad_novedad.FechaInicio) &&  time.Now().Before(novedad_novedad.FechaFin.AddDate(0, 2, 0))){
 									if novedad_novedad.TipoNovedad == 219 { // si es una cesión
 
 									} else {
@@ -848,8 +846,7 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 
 							} else {
 
-								if (novedad.FechaInicio.Year() == time.Now().Year() && int(novedad.FechaFin.Month()) >= int(time.Now().Month())-2 && novedad.FechaFin.Year() == time.Now().Year()) ||
-									(novedad.FechaInicio.Year() <= time.Now().Year() && int(novedad.FechaFin.Month()) >= int(time.Now().Month())-2 && novedad.FechaFin.Year() >= time.Now().Year() && novedad.FechaFin.Year() > novedad.FechaInicio.Year()) {
+								if(novedad.FechaInicio.Before(novedad.FechaFin) && time.Now().After(novedad.FechaInicio) &&  time.Now().Before(novedad.FechaFin.AddDate(0, 2, 0))){
 
 									if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
 
