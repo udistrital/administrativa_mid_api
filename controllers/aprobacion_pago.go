@@ -817,7 +817,7 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 						for _, novedad_novedad := range novedades_novedad {
 							if novedad_novedad != novedad {
 
-								if(novedad_novedad.FechaInicio.Before(novedad.FechaFin) && time.Now().After(novedad_novedad.FechaInicio) &&  time.Now().Before(novedad_novedad.FechaFin.AddDate(0, 2, 0))){
+								if(novedad_novedad.FechaInicio.Before(novedad_novedad.FechaFin) && time.Now().After(novedad_novedad.FechaInicio) &&  time.Now().Before(novedad_novedad.FechaFin.AddDate(0, 2, 0))){
 									if novedad_novedad.TipoNovedad == 219 { // si es una cesión
 
 									} else {
