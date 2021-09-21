@@ -22,4 +22,5 @@ type Resolucion struct {
 	IdDependenciaFirma      int
 	PeriodoCarga            int
 	VigenciaCarga           int
+	CuadroResponsabilidades string
 }
