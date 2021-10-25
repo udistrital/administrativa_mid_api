@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
-	"time"
 	"strings"
+	"time"
+
 	"github.com/astaxie/beego/httplib"
 
 	"github.com/astaxie/beego"
@@ -159,7 +160,7 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 	temp.Estado = true
 	switch resolucion.ResolucionVinculacionDocente.Dedicacion {
 	case "HCH":
-		motivo = " RECONOCEN HONORARIOS "
+		motivo = "reconocen honorarios"
 		dedicacion = "hora cátedra honorarios"
 		articulo = "tercero"
 		break
@@ -170,7 +171,7 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 		break
 	case "TCO-MTO":
 		motivo = "vinculan"
-		dedicacion = "Tiempo Completo Ocasional y Medio Tiempo Ocasional"
+		dedicacion = "Tiempo Completo Ocasional o Medio Tiempo Ocasional"
 		articulo = "tercero"
 	}
 
@@ -180,7 +181,7 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 
 		} else {
 			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCH" && resolucion.ResolucionVinculacionDocente.NivelAcademico == "PREGRADO" {
-				temp.Titulo = "“Por la cual se " + motivo + " a docentes para finalizar el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " PERIODO académico del " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de docentes de " + dedicacion + " para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas (" + resolucion.ResolucionVinculacionDocente.NivelAcademico + ").”"
+				temp.Titulo = "“Por la cual se " + motivo + " a los docentes vinculados en pregrado en la modalidad de " + dedicacion + " para el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " periodo académico del " + strconv.Itoa(temp.VigenciaCarga) + " en la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas (" + resolucion.ResolucionVinculacionDocente.NivelAcademico + ").”"
 
 			}
 			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCP" && resolucion.ResolucionVinculacionDocente.NivelAcademico == "POSGRADO" {
@@ -188,11 +189,11 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 
 			}
 			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCP" && resolucion.ResolucionVinculacionDocente.NivelAcademico == "PREGRADO" {
-				temp.Titulo = "“Por la cual se " + motivo + "  docentes para finalizar el " + strings.ToUpper(cambiarString(strconv.Itoa(temp.PeriodoCarga))) + " PERIODO académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de docentes de" + dedicacion + " (vinculación especial) para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas ( " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ").”"
+				temp.Titulo = "“Por la cual se " + motivo + " docentes de pregrado para el " + strings.ToUpper(cambiarString(strconv.Itoa(temp.PeriodoCarga))) + " periodo académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de docentes de" + dedicacion + " (vinculación especial) para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas ( " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ").”"
 
 			} else {
 				if resolucion.ResolucionVinculacionDocente.Dedicacion == "TCO-MTO" {
-					temp.Titulo = "“Por la cual se " + motivo + "  docentes para finalizar el " + strings.ToUpper(cambiarString(strconv.Itoa(temp.PeriodoCarga))) + " PERIODO académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de docentes de " + dedicacion + " (vinculación especial) para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas ( " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ").”"
+					temp.Titulo = "“Por la cual se " + motivo + " docentes en pregrado en la modalidad de " + dedicacion + "  (vinculación especial) para el " + strings.ToUpper(cambiarString(strconv.Itoa(temp.PeriodoCarga))) + " periodo académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas ( " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ").”"
 				}
 			}
 
