@@ -36,7 +36,7 @@ func (c *GestionDocumentoResolucionController) GetContenidoResolucion() {
 
 	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/contenido_resolucion/"+id_resolucion, &contenidoResolucion); err2 == nil {
 		query = "?limit=-1&query=DependenciaId:" + id_facultad
-
+		fmt.Println(contenidoResolucion.CuadroResponsabilidades)
 		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ordenador_gasto/"+query, &ordenador_gasto); err == nil {
 			if ordenador_gasto == nil {
 				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ordenador_gasto/1", &ordenador_gasto); err == nil {
