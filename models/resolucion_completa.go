@@ -7,8 +7,8 @@ type ResolucionCompleta struct {
 	Vigencia                int
 	Numero                  string
 	Id                      int
-	CuadroResponsabilidades string
 	Articulos               []Articulo
 	OrdenadorGasto          OrdenadorGasto
 	Titulo                  string
+	CuadroResponsabilidades string
 }
