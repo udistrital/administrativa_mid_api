@@ -36,7 +36,6 @@ func (c *GestionDocumentoResolucionController) GetContenidoResolucion() {
 
 	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/contenido_resolucion/"+id_resolucion, &contenidoResolucion); err2 == nil {
 		query = "?limit=-1&query=DependenciaId:" + id_facultad
-		fmt.Printf("%+v\n", contenidoResolucion)
 		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ordenador_gasto/"+query, &ordenador_gasto); err == nil {
 			if ordenador_gasto == nil {
 				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ordenador_gasto/1", &ordenador_gasto); err == nil {
@@ -49,9 +48,7 @@ func (c *GestionDocumentoResolucionController) GetContenidoResolucion() {
 			}
 
 		} else {
-			fmt.Println(beego.AppConfig.String("UrlcrudAdmin"), err)
-
-			fmt.Println("Error al consultar ordenador del gasto 3333", err)
+			fmt.Println("Error al consultar ordenador del gasto", err)
 		}
 
 	} else {
