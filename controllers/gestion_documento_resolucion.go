@@ -49,9 +49,9 @@ func (c *GestionDocumentoResolucionController) GetContenidoResolucion() {
 			}
 
 		} else {
-			fmt.Println(beego.AppConfig.String("UrlcrudAdmin"))
+			fmt.Println(beego.AppConfig.String("UrlcrudAdmin"), err)
 
-			fmt.Println("Error al consultar ordenador del gasto", err)
+			fmt.Println("Error al consultar ordenador del gasto 3333", err)
 		}
 
 	} else {
