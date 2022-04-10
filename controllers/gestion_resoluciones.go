@@ -160,17 +160,17 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 	switch resolucion.ResolucionVinculacionDocente.Dedicacion {
 	case "HCH":
 		motivo = "reconocen honorarios"
-		dedicacion = "Hora Cátedra Honorarios"
+		dedicacion = "hora cátedra honorarios (HCH)"
 		articulo = "tercero"
 		break
 	case "HCP":
 		motivo = "vinculan"
-		dedicacion = "Hora Cátedra Prestaciones"
+		dedicacion = "hora cátedra (vinculación especial)"
 		articulo = "tercero"
 		break
 	case "TCO-MTO":
 		motivo = "vinculan"
-		dedicacion = "Tiempo Completo Ocasional (TCO) y Medio Tiempo Ocasional (MTO)"
+		dedicacion = "Tiempo Completo Ocasional o Medio Tiempo Ocasional (vinculación especial)"
 		articulo = "tercero"
 	}
 
@@ -180,7 +180,7 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 
 		} else {
 			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCH" && resolucion.ResolucionVinculacionDocente.NivelAcademico == "PREGRADO" {
-				temp.Titulo = "“Por la cual se " + motivo + " a los docentes vinculados en pregrado en la modalidad de " + dedicacion + " para la finalización del periodo académico " + strconv.Itoa(temp.VigenciaCarga) + "-" + strconv.Itoa(temp.PeriodoCarga) + " en la " + resolucion.NomDependencia + ".”"
+				temp.Titulo = "“Por la cual se " + motivo + " a los docentes vinculados en programas de pregrado en la modalidad de " + dedicacion + " para el periodo académico " + strconv.Itoa(temp.VigenciaCarga) + "-" + strconv.Itoa(temp.PeriodoCarga) + " en la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas.”"
 
 			}
 			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCP" && resolucion.ResolucionVinculacionDocente.NivelAcademico == "POSGRADO" {
@@ -188,11 +188,11 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 
 			}
 			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCP" && resolucion.ResolucionVinculacionDocente.NivelAcademico == "PREGRADO" {
-				temp.Titulo = "“Por la cual se " + motivo + " docentes en la modalidad de " + dedicacion + " para finalizar del periodo académico " + strconv.Itoa(temp.VigenciaCarga) + "-" + strconv.Itoa(temp.PeriodoCarga) + " en los pregrados de la " + resolucion.NomDependencia + ".”"
+				temp.Titulo = "“Por la cual se " + motivo + " docentes para el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " Periodo Académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de docentes de " + dedicacion + " para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas (pregrado).”"
 
 			} else {
 				if resolucion.ResolucionVinculacionDocente.Dedicacion == "TCO-MTO" {
-					temp.Titulo = "“Por la cual se " + motivo + " docentes de pregrado en la modalidad de " + dedicacion + " para finalizar el periodo académico" + strconv.Itoa(temp.VigenciaCarga) + "-" + strconv.Itoa(temp.PeriodoCarga) + " en la " + resolucion.NomDependencia + ".”"
+					temp.Titulo = "“Por la cual se " + motivo + " docentes en pregrado en la modalidad de " + dedicacion + " para el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " Periodo Académico de " + strconv.Itoa(temp.VigenciaCarga) + "-" + strconv.Itoa(temp.PeriodoCarga) + " en la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas.”"
 				}
 			}
 
@@ -208,7 +208,7 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 			fmt.Println("Error al consultar resolución vieja", err)
 		}
 	}
-	temp.PreambuloResolucion = "El Decano(a) de la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas, en uso de sus facultades legales y estatutarias, en particular, de las conferidas por el artículo " + articulo + "  de la Resolución de Rectoría xxx de xx enero de 2022, y"
+	temp.PreambuloResolucion = "El Decano(a) de la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas, en uso de sus facultades legales y estatutarias, en particular, de las conferidas por el artículo " + articulo + "  de la Resolución de Rectoría 016 de 7 de enero de 2022, y"
 	if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion", "POST", &respuesta, &temp); err == nil {
 		id_creada = respuesta.Id
 		cont = true
