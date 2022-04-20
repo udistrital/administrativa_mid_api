@@ -180,7 +180,7 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 
 		} else {
 			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCH" && resolucion.ResolucionVinculacionDocente.NivelAcademico == "PREGRADO" {
-				temp.Titulo = "“Por la cual se " + motivo + " a los docentes vinculados en programas de pregrado en la modalidad de " + dedicacion + " para el periodo académico " + strconv.Itoa(temp.VigenciaCarga) + "-" + strconv.Itoa(temp.PeriodoCarga) + " en la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas.”"
+				temp.Titulo = "Por la cual se reconocen honorarios a los docentes vinculados a los programas académicos de pregrado en la modalidad de Hora Cátedra Honorarios (vinculación especial) para los periodos académicos 2022-I y 2022-III en la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas”"
 
 			}
 			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCP" && resolucion.ResolucionVinculacionDocente.NivelAcademico == "POSGRADO" {
@@ -188,11 +188,11 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 
 			}
 			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCP" && resolucion.ResolucionVinculacionDocente.NivelAcademico == "PREGRADO" {
-				temp.Titulo = "“Por la cual se " + motivo + " docentes para el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " Periodo Académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de docentes de " + dedicacion + " para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas (pregrado).”"
+				temp.Titulo = "Por la cual se vinculan docentes a los programas académicos de pregrado en la modalidad de Hora Cátedra (vinculación especial) para los periodos académicos 2022-I y 2022-III en la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas”"
 
 			} else {
 				if resolucion.ResolucionVinculacionDocente.Dedicacion == "TCO-MTO" {
-					temp.Titulo = "“Por la cual se " + motivo + " docentes en pregrado en la modalidad de " + dedicacion + " para el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " Periodo Académico de " + strconv.Itoa(temp.VigenciaCarga) + "-" + strconv.Itoa(temp.PeriodoCarga) + " en la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas.”"
+					temp.Titulo = "“Por la cual se vinculan docentes a los programas académicos de pregrado en la modalidad de Tiempo Completo Ocasional y Medio Tiempo Ocasional (vinculación especial) para los periodos académicos 2022-I y 2022-III en la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas”"
 				}
 			}
 
