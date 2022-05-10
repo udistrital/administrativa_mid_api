@@ -332,7 +332,7 @@ func (c *AprobacionPagoController) CertificacionVistoBueno() {
 	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?limit=-1&query=IdProyectoCurricular:"+dependencia, &vinculaciones_docente); err == nil {
 
 		for _, vinculacion_docente := range vinculaciones_docente {
-			if vinculacion_docente.NumeroContrato.Valid == true {
+			if vinculacion_docente.NumeroContrato.Valid == true && vinculacion_docente.Estado == true {
 
 				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/acta_inicio/?query=NumeroContrato:"+vinculacion_docente.NumeroContrato.String+",Vigencia:"+strconv.FormatInt(vinculacion_docente.Vigencia.Int64, 10), &actasInicio); err == nil {
 
