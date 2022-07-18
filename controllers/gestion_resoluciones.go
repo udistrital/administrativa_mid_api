@@ -176,7 +176,7 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 
 	if temp.IdTipoResolucion.Id == 1 {
 		if resolucion.ResolucionVinculacionDocente.NivelAcademico == "POSGRADO" && resolucion.ResolucionVinculacionDocente.Dedicacion == "HCH" {
-			temp.Titulo = "“Por la cual se " + motivo + " a docentes vinculados en la modalidad de " + dedicacion + " en los posgrados de la " + resolucion.NomDependencia + " para el periodo académico de " + strconv.Itoa(temp.VigenciaCarga) + "-" + strconv.Itoa(temp.PeriodoCarga) + ".”"
+			temp.Titulo = "“Por la cual se " + motivo + " a docentes para el" + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " Periodo Académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de Docentes de " + cambiarString(resolucion.ResolucionVinculacionDocente.Dedicacion) + "  para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas (" + resolucion.ResolucionVinculacionDocente.NivelAcademico + ")”"
 
 		} else {
 			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCH" && resolucion.ResolucionVinculacionDocente.NivelAcademico == "PREGRADO" {
@@ -184,7 +184,7 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 
 			}
 			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCP" && resolucion.ResolucionVinculacionDocente.NivelAcademico == "POSGRADO" {
-				temp.Titulo = "“Por la cual se " + motivo + " docentes en la modalidad de " + dedicacion + " en los posgrados de la " + resolucion.NomDependencia + " para el periodo académico " + strconv.Itoa(temp.VigenciaCarga) + "-" + strconv.Itoa(temp.PeriodoCarga) + ".”"
+				temp.Titulo = "“Por la cual se " + motivo + " docentes para el" + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " Periodo Académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de docentes de " + dedicacion + " para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas (" + resolucion.ResolucionVinculacionDocente.NivelAcademico + ")”"
 
 			}
 			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCP" && resolucion.ResolucionVinculacionDocente.NivelAcademico == "PREGRADO" {
