@@ -261,7 +261,7 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 		reglasbase = reglasbase + predicados
 		m := NewMachine().Consult(reglasbase)
 		beego.Info("m: ", m)
-		contratos := m.ProveAll("valor_contrato(" + strings.ToLower(nivelAcademico) + "," + docente.IdPersona + "," + vigencia + "," + semanas + ",X).")
+		contratos := m.ProveAll("valor_contrato(" + strings.ToLower(nivelAcademico) + "," + docente.IdPersona + "," + vigencia + ",X).")
 		for _, solution := range contratos {
 			a = fmt.Sprintf("%s", solution.ByName_("X"))
 			beego.Info("a: ", a)
