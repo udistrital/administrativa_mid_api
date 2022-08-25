@@ -217,7 +217,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDocente) (docentes_a_insertar []models.VinculacionDocente, err error) {
 	nivelAcademico := docentes_a_vincular[0].NivelAcademico
 	vigencia := strconv.Itoa(int(docentes_a_vincular[0].Vigencia.Int64))
-	semanas := strconv.Itoa(int(docentes_a_vincular[0].NumeroSemanas))
+
 	var a string
 	var categoria string
 
