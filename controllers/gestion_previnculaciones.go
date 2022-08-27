@@ -272,11 +272,7 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 		}
 		salario := f
 		beego.Info("f: ", f, "salario: ", salario)
-		if docentes_a_vincular[x].NumeroSemanas > 24 && (docentes_a_vincular[0].IdDedicacion.Id == 3 || docentes_a_vincular[x].IdDedicacion.Id == 4) {
-			docentes_a_vincular[x].ValorContrato = docentes_a_vincular[x].ValorContrato + salario
-		} else {
-			docentes_a_vincular[x].ValorContrato = salario
-		}
+		docentes_a_vincular[x].ValorContrato = salario
 
 	}
 
