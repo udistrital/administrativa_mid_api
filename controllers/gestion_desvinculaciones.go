@@ -155,7 +155,7 @@ func (c *GestionDesvinculacionesController) ActualizarVinculacionesCancelacion()
 			DependenciaAcademica: pos.DependenciaAcademica,
 		}
 		fmt.Println("RP: ", temp_vinculacion[0].NumeroRp)
-		if temp_vinculacion[0].NumeroSemanas > 24 && (temp_vinculacion[0].IdDedicacion.Id == 3 || temp_vinculacion[0].IdDedicacion.Id == 4) {
+		if pos.NumeroSemanas > 24 && (pos.IdDedicacion.Id == 3 || pos.IdDedicacion.Id == 4) {
 			var p = []models.VinculacionDocente{}
 			p = append(p, pos)
 			p, err = CalcularSalarioPrecontratacion(p)
@@ -169,14 +169,20 @@ func (c *GestionDesvinculacionesController) ActualizarVinculacionesCancelacion()
 			valorContratoSinprima = p[0].ValorContrato
 			primaServicios = pos.ValorContrato - valorContratoSinprima
 			temp_vinculacion[0].ValorContrato = primaServicios
+			vinculacion_nueva, err = InsertarDesvinculacionesPrimaServicios(primaServicios, temp_vinculacion)
+			//CREAR NUEVA Vinculacion
+			if err != nil {
+				beego.Error("error al realizar vinculacion nueva", err)
+				c.Abort("400")
+			}
+		} else {
+			//CREAR NUEVA Vinculacion
+			vinculacion_nueva, err = InsertarDesvinculaciones(temp_vinculacion)
+			if err != nil {
+				beego.Error("error al realizar vinculacion nueva", err)
+				c.Abort("400")
+			}
 		}
-		//CREAR NUEVA Vinculacion
-		vinculacion_nueva, err = InsertarDesvinculaciones(temp_vinculacion)
-		if err != nil {
-			beego.Error("error al realizar vinculacion nueva", err)
-			c.Abort("400")
-		}
-
 		//INSERCION  TABLA  DE TRAZA MODIFICACION VINCULACION
 		temp := models.ModificacionVinculacion{
 			ModificacionResolucion:       &models.ModificacionResolucion{Id: v.IdModificacionResolucion},
@@ -530,6 +536,37 @@ func (c *GestionDesvinculacionesController) AnularModificaciones() {
 
 	c.Data["json"] = respuesta_total
 	c.ServeJSON()
+}
+
+//Se agrega funcion para corregir calculo de valor a reversar en cancelaciones de contratos que poseen prima de servicios
+func InsertarDesvinculacionesPrimaServicios(primaServicios float64, v [1]models.VinculacionDocente) (id int, err error) {
+	var d []models.VinculacionDocente
+	json_ejemplo, err := json.Marshal(v)
+	if err != nil {
+		beego.Error(err)
+		return id, err
+	}
+	err = json.Unmarshal(json_ejemplo, &d)
+
+	if err != nil {
+		beego.Error(err)
+		return id, err
+	}
+
+	//TODO: unificar cont con error
+	d, err = CalcularSalarioPrecontratacion(d)
+	d[0].ValorContrato = d[0].ValorContrato + primaServicios
+
+	if err != nil {
+		return id, err
+	}
+
+	err = sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &id, &d)
+	if err != nil {
+		beego.Error(err)
+		return 0, err
+	}
+	return id, err
 }
 
 func InsertarDesvinculaciones(v [1]models.VinculacionDocente) (id int, err error) {
