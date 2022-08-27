@@ -155,6 +155,21 @@ func (c *GestionDesvinculacionesController) ActualizarVinculacionesCancelacion()
 			DependenciaAcademica: pos.DependenciaAcademica,
 		}
 		fmt.Println("RP: ", temp_vinculacion[0].NumeroRp)
+		if temp_vinculacion[0].NumeroSemanas > 24 && (temp_vinculacion[0].IdDedicacion.Id == 3 || temp_vinculacion[0].IdDedicacion.Id == 4) {
+			var p = []models.VinculacionDocente{}
+			p = append(p, pos)
+			p, err = CalcularSalarioPrecontratacion(p)
+			if err != nil {
+				beego.Error(err)
+				c.Abort("400")
+			}
+			var valorContratoSinprima float64
+			var primaServicios float64
+
+			valorContratoSinprima = p[0].ValorContrato
+			primaServicios = pos.ValorContrato - valorContratoSinprima
+			temp_vinculacion[0].ValorContrato = primaServicios
+		}
 		//CREAR NUEVA Vinculacion
 		vinculacion_nueva, err = InsertarDesvinculaciones(temp_vinculacion)
 		if err != nil {
@@ -167,7 +182,7 @@ func (c *GestionDesvinculacionesController) ActualizarVinculacionesCancelacion()
 			ModificacionResolucion:       &models.ModificacionResolucion{Id: v.IdModificacionResolucion},
 			VinculacionDocenteCancelada:  &models.VinculacionDocente{Id: pos.Id},
 			VinculacionDocenteRegistrada: &models.VinculacionDocente{Id: vinculacion_nueva},
-			Horas: pos.NumeroHorasSemanales,
+			Horas:                        pos.NumeroHorasSemanales,
 		}
 		errorMod := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/", "POST", &respuesta_mod_vin, temp)
 
@@ -297,7 +312,7 @@ func (c *GestionDesvinculacionesController) AdicionarHoras() {
 				ModificacionResolucion:       &models.ModificacionResolucion{Id: v.IdModificacionResolucion},
 				VinculacionDocenteCancelada:  &models.VinculacionDocente{Id: pos.Id},
 				VinculacionDocenteRegistrada: &models.VinculacionDocente{Id: vinculacion_nueva},
-				Horas: pos.NumeroHorasNuevas,
+				Horas:                        pos.NumeroHorasNuevas,
 			}
 			err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/", "POST", &respuesta_mod_vin, temp)
 
