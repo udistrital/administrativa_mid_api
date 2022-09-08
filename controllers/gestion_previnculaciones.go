@@ -608,7 +608,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 			beego.Error(err)
 			c.Abort("400")
 		}
-		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/?query=ModificacionResolucion:"+strconv.Itoa(modres[0].Id), &modvin)
+		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/?limit=-1&query=ModificacionResolucion:"+strconv.Itoa(modres[0].Id), &modvin)
 		if err != nil {
 			beego.Error(err)
 			c.Abort("400")
@@ -1060,7 +1060,7 @@ func (c *GestionDesvinculacionesController) GetVinculacionesAgrupadasCanceladas(
 	//If 1 modificacion_resolucion (get)
 	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+id_resolucion, &modRes); err == nil {
 		//If 2 modificacion_vinculacion (get)
-		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/?query=ModificacionResolucion:"+strconv.Itoa(modRes[0].Id), &modVin); err == nil {
+		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/?limit=-1&query=ModificacionResolucion:"+strconv.Itoa(modRes[0].Id), &modVin); err == nil {
 
 			//for vinculaciones
 			for _, pos := range modVin {
