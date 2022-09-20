@@ -119,11 +119,10 @@ func (c *AprobacionPagoController) GetContratosDocente() {
 								for _, actaInicio := range actasInicio {
 									actaInicio.FechaInicio = actaInicio.FechaInicio.UTC()
 									actaInicio.FechaFin = actaInicio.FechaFin.UTC()
-
-									if (int(actaInicio.FechaInicio.Month()) <= int(time.Now().Month()) && actaInicio.FechaInicio.Year() == time.Now().Year() && int(actaInicio.FechaFin.Month()) >= int(time.Now().Month()) && actaInicio.FechaFin.Year() == time.Now().Year()) ||
-										(int(actaInicio.FechaInicio.Month()) >= int(time.Now().Month()) && actaInicio.FechaInicio.Year() <= time.Now().Year() && int(actaInicio.FechaFin.Month()) >= int(time.Now().Month()) && actaInicio.FechaFin.Year() >= time.Now().Year() && actaInicio.FechaFin.Year() > actaInicio.FechaInicio.Year()) ||
-										(int(actaInicio.FechaInicio.Month()) <= int(time.Now().Month()) && actaInicio.FechaInicio.Year() <= time.Now().Year() && int(actaInicio.FechaFin.Month()) >= int(time.Now().Month()) && actaInicio.FechaFin.Year() >= time.Now().Year() && actaInicio.FechaFin.Year() > actaInicio.FechaInicio.Year()) {
-
+									
+									//fechaInicio<fechaActual<(fechaFin+2 meses) Se da holgura de 2 meses luego de fechaFin para subir cumplidos 
+									if time.Now().After(actaInicio.FechaInicio) && time.Now().Before(actaInicio.FechaFin.AddDate(0, 2, 0)) {
+									
 										cd.NumeroVinculacion = vinculacion.NumeroContrato.String
 										cd.Vigencia = vinculacion.Vigencia.Int64
 										cd.Resolucion = res.NumeroResolucion
