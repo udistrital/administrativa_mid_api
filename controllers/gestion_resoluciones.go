@@ -176,23 +176,23 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 
 	if temp.IdTipoResolucion.Id == 1 {
 		if resolucion.ResolucionVinculacionDocente.NivelAcademico == "POSGRADO" && resolucion.ResolucionVinculacionDocente.Dedicacion == "HCH" {
-			temp.Titulo = "“Por la cual se " + motivo + " a docentes para el" + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " Periodo Académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de Docentes de " + cambiarString(resolucion.ResolucionVinculacionDocente.Dedicacion) + "  para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas (" + resolucion.ResolucionVinculacionDocente.NivelAcademico + ")”"
+			temp.Titulo = "“Por la cual se " + motivo + " a docentes para el periodo académico 2023-I en la modalidad de Docentes de " + cambiarString(resolucion.ResolucionVinculacionDocente.Dedicacion) + " para los posgrados de la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas”"
 
 		} else {
 			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCH" && resolucion.ResolucionVinculacionDocente.NivelAcademico == "PREGRADO" {
-				temp.Titulo = "Por la cual se reconocen honorarios a los docentes vinculados en programas de pregrado en la modalidad de Hora Cátedra Honorarios (HCH) para el periodo académico 2022-3 en la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas”"
+				temp.Titulo = "“Por la cual se reconocen honorarios a docentes en la modalidad de Hora Cátedra Honorarios para el periodo académico 2023-I en la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas”"
 
 			}
 			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCP" && resolucion.ResolucionVinculacionDocente.NivelAcademico == "POSGRADO" {
-				temp.Titulo = "“Por la cual se " + motivo + " docentes para el" + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " Periodo Académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de docentes de " + dedicacion + " para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas (" + resolucion.ResolucionVinculacionDocente.NivelAcademico + ")”"
+				temp.Titulo = "“Por la cual se " + motivo + " docentes para el Periodo Académico 2023-I en la modalidad de docentes de " + dedicacion + " para los posgrados de la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas”"
 
 			}
 			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCP" && resolucion.ResolucionVinculacionDocente.NivelAcademico == "PREGRADO" {
-				temp.Titulo = "Por la cual se vinculan docentes en pregrado en la modalidad Hora Cátedra (vinculación especial) para el período académico 2022-3 en la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas”"
+				temp.Titulo = "“Por la cual se vinculan docentes de pregrado para el período académico 2023-I en la modalidad de docentes de hora cátedra (vinculación especial) para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas”"
 
 			} else {
 				if resolucion.ResolucionVinculacionDocente.Dedicacion == "TCO-MTO" {
-					temp.Titulo = "“Por la cual se vinculan docentes en pregrado en la modalidad de Tiempo Completo Ocasional o Medio Tiempo Ocasional (vinculación especial) para el periodo académico 2022-3 en la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas”"
+					temp.Titulo = "“Por la cual se vinculan docentes de pregrado para el periodo académico 2023-I en la modalidad de docentes de Tiempo Completo o Medio Tiempo Ocasional (vinculación especial) para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas”"
 				}
 			}
 
@@ -208,7 +208,7 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 			fmt.Println("Error al consultar resolución vieja", err)
 		}
 	}
-	temp.PreambuloResolucion = "El Decano(a) de la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas, en uso de sus facultades legales y estatutarias, en particular, de las conferidas por el artículo " + articulo + "  de la Resolución de Rectoría 016 de 7 de enero de 2022, y"
+	temp.PreambuloResolucion = "El Decano(a) de la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas, en uso de sus facultades legales y estatutarias, en particular, de las conferidas por el artículo " + articulo + " de la Resolución de Rectoría 004 de 6 de enero de 2023, y"
 	if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion", "POST", &respuesta, &temp); err == nil {
 		id_creada = respuesta.Id
 		cont = true
