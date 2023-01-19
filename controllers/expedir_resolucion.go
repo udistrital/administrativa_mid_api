@@ -359,14 +359,15 @@ func (c *ExpedirResolucionController) Expedir() {
 }
 
 func CalcularFechaFin(fecha_inicio time.Time, numero_semanas int) (fecha_fin time.Time) {
-	var entero int
+	var entero, dias int
 	var decimal float32
-	meses := float32(numero_semanas) / 4
+	dias = numero_semanas * 7
+	meses := float32(dias) / 30
 	entero = int(meses)
 	decimal = meses - float32(entero)
-	numero_dias := ((decimal * 4) * 7)
+	numero_dias := decimal * 30
 	f_i := fecha_inicio
-	after := f_i.AddDate(0, entero, int(numero_dias))
+	after := f_i.AddDate(0, entero, int(numero_dias-1))
 	return after
 }
 
