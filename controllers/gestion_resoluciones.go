@@ -176,23 +176,23 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 
 	if temp.IdTipoResolucion.Id == 1 {
 		if resolucion.ResolucionVinculacionDocente.NivelAcademico == "POSGRADO" && resolucion.ResolucionVinculacionDocente.Dedicacion == "HCH" {
-			temp.Titulo = "“Por la cual se " + motivo + " a docentes para el periodo académico 2023-I en la modalidad de Docentes de " + cambiarString(resolucion.ResolucionVinculacionDocente.Dedicacion) + " para los posgrados de la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas”"
+			temp.Titulo = "“Por la cual se " + motivo + " a docentes para el periodo académico 2023-III en la modalidad de Docentes de " + cambiarString(resolucion.ResolucionVinculacionDocente.Dedicacion) + " para los posgrados de la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas”"
 
 		} else {
 			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCH" && resolucion.ResolucionVinculacionDocente.NivelAcademico == "PREGRADO" {
-				temp.Titulo = "“Por la cual se reconocen honorarios a docentes en la modalidad de Hora Cátedra Honorarios para el periodo académico 2023-I en la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas”"
+				temp.Titulo = "“Por la cual se reconocen honorarios a docentes para el periodo académico 2023-III en la modalidad de docentes de Hora Cátedra Honorarios para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas”"
 
 			}
 			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCP" && resolucion.ResolucionVinculacionDocente.NivelAcademico == "POSGRADO" {
-				temp.Titulo = "“Por la cual se " + motivo + " docentes para el Periodo Académico 2023-I en la modalidad de docentes de " + dedicacion + " para los posgrados de la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas”"
+				temp.Titulo = "“Por la cual se " + motivo + " docentes para el Periodo Académico 2023-III en la modalidad de docentes de " + dedicacion + " para los posgrados de la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas”"
 
 			}
 			if resolucion.ResolucionVinculacionDocente.Dedicacion == "HCP" && resolucion.ResolucionVinculacionDocente.NivelAcademico == "PREGRADO" {
-				temp.Titulo = "“Por la cual se vinculan docentes de pregrado para el período académico 2023-I en la modalidad de docentes de hora cátedra (vinculación especial) para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas”"
+				temp.Titulo = "“Por la cual se vinculan docentes de pregrado para el período académico 2023-III en la modalidad de docentes de hora cátedra (vinculación especial) para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas”"
 
 			} else {
 				if resolucion.ResolucionVinculacionDocente.Dedicacion == "TCO-MTO" {
-					temp.Titulo = "“Por la cual se vinculan docentes de pregrado para el periodo académico 2023-I en la modalidad de docentes de Tiempo Completo o Medio Tiempo Ocasional (vinculación especial) para la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas”"
+					temp.Titulo = "“Por la cual se vinculan docentes de pregrado para el periodo académico 2023-III en la modalidad de docentes de Tiempo Completo o Medio Tiempo Ocasional (vinculación especial) para el periodo académico 2023-III en la Facultad de  " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas”"
 				}
 			}
 
