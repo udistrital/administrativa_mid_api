@@ -7,6 +7,7 @@ import (
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/administrativa_mid_api/models"
+	"github.com/udistrital/utils_oas/request"
 )
 
 // PreliquidacionController operations for Preliquidacion
@@ -38,7 +39,7 @@ func (c *GestionDisponibilidadController) ListarApropiaciones() {
 				fuente = "fuente=" + pos.FuenteFinanciamiento.Codigo
 			}
 			query := strconv.Itoa(pos.Disponibilidad.Id) + "/" + pos.Apropiacion.Rubro.Codigo + "/?" + fuente
-			if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlmidFinanciera")+"/"+beego.AppConfig.String("NsmidFinanciera")+"/disponibilidad/SaldoCdp/"+query, &respuesta); err2 == nil {
+			if err2 := request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlmidFinanciera")+"/"+beego.AppConfig.String("NsmidFinanciera")+"/disponibilidad/SaldoCdp/"+query, &respuesta); err2 == nil {
 				v[x].Apropiacion.Saldo = int(respuesta.Saldo)
 				fmt.Println("respuesta", respuesta)
 

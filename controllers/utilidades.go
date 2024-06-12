@@ -4,15 +4,17 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/xml"
+	
 	"fmt"
 	"math/big"
 	"net/http"
 	"reflect"
 	"strings"
 	"time"
-
+	
 	"github.com/astaxie/beego"
 	"github.com/udistrital/administrativa_mid_api/models"
+	"github.com/udistrital/utils_oas/request"
 )
 
 func sendJson(url string, trequest string, target interface{}, datajson interface{}) error {
@@ -123,7 +125,7 @@ func CargarReglasBase(dominio string) (reglas string, err error) {
 	//carga de reglas desde el ruler
 	var reglasbase string = ``
 	var v []models.Predicado
-	err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("Urlruler")+"/"+beego.AppConfig.String("Nsruler")+"/predicado/?query=Dominio.Nombre:"+dominio+"&limit=-1", &v)
+	err = request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("Urlruler")+"/"+beego.AppConfig.String("Nsruler")+"/predicado/?query=Dominio.Nombre:"+dominio+"&limit=-1", &v)
 	if err != nil {
 		return
 	}

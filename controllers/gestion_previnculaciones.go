@@ -10,6 +10,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/udistrital/administrativa_mid_api/models"
 	. "github.com/udistrital/golog"
+	"github.com/udistrital/utils_oas/request"
 )
 
 // PreliquidacionController operations for Preliquidacion
@@ -78,7 +79,7 @@ func (c *GestionPrevinculacionesController) CalcularTotalSalarios() {
 	periodo := strconv.Itoa(v[0].Periodo)
 	disponibilidad := strconv.Itoa(v[0].Disponibilidad)
 
-	err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_valores_totales_x_disponibilidad/"+vigencia+"/"+periodo+"/"+disponibilidad+"", &totalesDisponibilidad)
+	err = request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_valores_totales_x_disponibilidad/"+vigencia+"/"+periodo+"/"+disponibilidad+"", &totalesDisponibilidad)
 	if err != nil {
 		beego.Error("ERROR al calcular total de contratos", err)
 		c.Abort("403")
@@ -283,7 +284,7 @@ func CalcularSalarioPrecontratacion(docentes_a_vincular []models.VinculacionDoce
 func CargarPuntoSalarial() (p models.PuntoSalarial, err error) {
 	var v []models.PuntoSalarial
 
-	err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/punto_salarial/?sortby=Vigencia&order=desc&limit=1", &v)
+	err = request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/punto_salarial/?sortby=Vigencia&order=desc&limit=1", &v)
 	if err != nil {
 		err = fmt.Errorf("He fallado en punto_salarial (get) función CargarPuntoSalarial, %s", err)
 	}
@@ -293,7 +294,7 @@ func CargarPuntoSalarial() (p models.PuntoSalarial, err error) {
 func CargarSalarioMinimo(vigencia string) (p models.SalarioMinimo, err error) {
 	var v []models.SalarioMinimo
 
-	err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/salario_minimo/?limit=1&query=Vigencia:"+vigencia, &v)
+	err = request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/salario_minimo/?limit=1&query=Vigencia:"+vigencia, &v)
 	if err != nil {
 		err = fmt.Errorf("He fallado en salario_minimo (get) función CargarSalarioMinimo, %s", err)
 	}
@@ -336,7 +337,7 @@ func BuscarIdProveedor(DocumentoIdentidad int) (id_proveedor_docente int) {
 	var Idproveedor int
 	queryInformacionProveedor := "?query=NumDocumento:" + strconv.Itoa(DocumentoIdentidad)
 	var informacionProveedor []models.InformacionProveedor
-	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/"+queryInformacionProveedor, &informacionProveedor); err2 == nil {
+	if err2 := request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/"+queryInformacionProveedor, &informacionProveedor); err2 == nil {
 		if informacionProveedor != nil {
 			Idproveedor = informacionProveedor[0].Id
 		} else {
@@ -386,14 +387,14 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 	var ValorModificacionContrato float64
 
 	//Devuelve el nivel académico, la dedicación y la facultad de la resolución
-	err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion_docente/"+idResolucion, &resvinc)
+	err := request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion_docente/"+idResolucion, &resvinc)
 	if err != nil {
 		beego.Error(err)
 		c.Abort("400")
 	}
 
 	//Devuelve la información básica de la resolución que se está consultando
-	err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+idResolucion, &res)
+	err = request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+idResolucion, &res)
 	if err != nil {
 		beego.Error(err)
 		c.Abort("400")
@@ -401,7 +402,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 
 	if res.IdTipoResolucion.Id != tipoVinculacion {
 		//Busca el id de la modificación donde se relacionan la resolución original y la de modificación asociada
-		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+idResolucion, &modres)
+		err = request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+idResolucion, &modres)
 		if err != nil {
 			beego.Error(err)
 			c.Abort("400")
@@ -410,10 +411,10 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 
 	//Devuelve las vinculaciones presentes en la resolución consultada, agrupadas o no, según el nivel académico
 	if resvinc.NivelAcademico == "POSGRADO" {
-		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente?limit=-1&query=IdResolucion.Id:"+idResolucion, &vinc)
+		err = request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente?limit=-1&query=IdResolucion.Id:"+idResolucion, &vinc)
 	}
 	if resvinc.NivelAcademico == "PREGRADO" {
-		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_vinculaciones_agrupadas/"+idResolucion, &vinc)
+		err = request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/get_vinculaciones_agrupadas/"+idResolucion, &vinc)
 	}
 	if err != nil {
 		beego.Error(err)
@@ -463,7 +464,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 				ValorModificacionContrato = pos.ValorContrato
 
 				//Busca la vinculación original a la que está asociada la modificación
-				err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+
+				err = request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+
 					"/modificacion_vinculacion/?query=VinculacionDocenteRegistrada:"+strconv.Itoa(pos.Id), &modvin)
 				if err != nil {
 					beego.Error(err)
@@ -501,7 +502,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 				pos.NumeroMesesNuevos = strconv.FormatFloat(float64(pos.NumeroSemanas)/4, 'f', 2, 64) + " meses"
 				ValorModificacionContrato = pos.ValorContrato
 				//Busca la vinculación original a la que está asociada la modificación
-				err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+
+				err = request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+
 					"/modificacion_vinculacion/?query=ModificacionResolucion:"+strconv.Itoa(modres[0].Id)+",VinculacionDocenteRegistrada:"+strconv.Itoa(pos.Id), &modvin)
 				if err != nil {
 					beego.Error(err)
@@ -540,7 +541,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculadosAll() {
 				pos.NumeroMesesNuevos = strconv.FormatFloat(float64(pos.NumeroSemanas)/4, 'f', 2, 64) + " meses"
 				ValorModificacionContrato = pos.ValorContrato
 				//Busca la vinculación original a la que está asociada la modificación
-				err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+
+				err = request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+
 					"/modificacion_vinculacion/?query=VinculacionDocenteRegistrada:"+strconv.Itoa(pos.Id), &modvin)
 				if err != nil {
 					beego.Error(err)
@@ -590,25 +591,25 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 	var modres []models.ModificacionResolucion
 	var modvin []models.ModificacionVinculacion
 
-	err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+strconv.Itoa(idResolucion), &res)
+	err = request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+strconv.Itoa(idResolucion), &res)
 	if err != nil {
 		beego.Error(err)
 		c.Abort("400")
 	}
 
 	if res.IdTipoResolucion.Id == tipoVinculacion {
-		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &v)
+		err = request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &v)
 		if err != nil {
 			beego.Error(err)
 			c.Abort("400")
 		}
 	} else {
-		err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+strconv.Itoa(idResolucion), &modres)
+		err := request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+strconv.Itoa(idResolucion), &modres)
 		if err != nil {
 			beego.Error(err)
 			c.Abort("400")
 		}
-		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/?limit=-1&query=ModificacionResolucion:"+strconv.Itoa(modres[0].Id), &modvin)
+		err = request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/?limit=-1&query=ModificacionResolucion:"+strconv.Itoa(modres[0].Id), &modvin)
 		if err != nil {
 			beego.Error(err)
 			c.Abort("400")
@@ -619,7 +620,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesPrevinculados() {
 				arreglo[x] = strconv.Itoa(pos.VinculacionDocenteRegistrada.Id)
 			}
 			identificadoresvinc := strings.Join(arreglo, "|")
-			err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?query=Estado:True,Id__in:"+identificadoresvinc+"&limit=-1", &v)
+			err = request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?query=Estado:True,Id__in:"+identificadoresvinc+"&limit=-1", &v)
 			if err != nil {
 				beego.Error(err)
 				c.Abort("400")
@@ -885,7 +886,7 @@ func BuscarNombreProveedor(DocumentoIdentidad int) (nombre_prov string) {
 	var nom_proveedor string
 	queryInformacionProveedor := "?query=NumDocumento:" + strconv.Itoa(DocumentoIdentidad)
 	var informacion_proveedor []models.InformacionProveedor
-	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/"+queryInformacionProveedor, &informacion_proveedor); err2 == nil {
+	if err2 := request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/"+queryInformacionProveedor, &informacion_proveedor); err2 == nil {
 		if informacion_proveedor != nil {
 			nom_proveedor = informacion_proveedor[0].NomProveedor
 		} else {
@@ -901,7 +902,7 @@ func BuscarNombreProveedor(DocumentoIdentidad int) (nombre_prov string) {
 func BuscarTipoDocumento(Cedula string) (nombre_tipo_doc string) {
 	var tipo_documento string
 	var temp []models.InformacionPersonaNatural
-	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_persona_natural/?limit=-1&query=Id:"+Cedula, &temp); err2 == nil {
+	if err2 := request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_persona_natural/?limit=-1&query=Id:"+Cedula, &temp); err2 == nil {
 		if temp != nil {
 			tipo_documento = temp[0].TipoDocumento.ValorParametro
 		} else {
@@ -920,7 +921,7 @@ func BuscarNombreDedicacion(id_dedicacion int) (nombre_dedicacion string) {
 	var nom_dedicacion string
 	query := "?limit=-1&query=Id:" + strconv.Itoa(id_dedicacion)
 	var dedicaciones []models.Dedicacion
-	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/dedicacion"+query, &dedicaciones); err2 == nil {
+	if err2 := request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/dedicacion"+query, &dedicaciones); err2 == nil {
 		if dedicaciones != nil {
 			nom_dedicacion = dedicaciones[0].Descripcion
 		} else {
@@ -936,7 +937,7 @@ func BuscarNumeroDisponibilidad(IdCDP int) (numero_disp int) {
 
 	var temp []models.Disponibilidad
 	var numero_disponibilidad int
-	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad?limit=-1&query=DisponibilidadApropiacion.Id:"+strconv.Itoa(IdCDP), &temp); err == nil {
+	if err := request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/disponibilidad?limit=-1&query=DisponibilidadApropiacion.Id:"+strconv.Itoa(IdCDP), &temp); err == nil {
 		if temp != nil {
 			numero_disponibilidad = int(temp[0].NumeroDisponibilidad)
 
@@ -957,10 +958,10 @@ func BuscarLugarExpedicion(Cedula string) (nombre_lugar_exp string) {
 	var temp []models.InformacionPersonaNatural
 	var temp2 []models.Ciudad
 
-	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_persona_natural/?limit=-1&query=Id:"+Cedula, &temp); err2 == nil {
+	if err2 := request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_persona_natural/?limit=-1&query=Id:"+Cedula, &temp); err2 == nil {
 		if temp != nil {
 			id_ciudad := temp[0].IdCiudadExpedicionDocumento
-			if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ciudad/?limit=-1&query=Id:"+strconv.Itoa(int(id_ciudad)), &temp2); err2 == nil {
+			if err := request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ciudad/?limit=-1&query=Id:"+strconv.Itoa(int(id_ciudad)), &temp2); err2 == nil {
 				if temp2 != nil {
 					nombre_ciudad = temp2[0].Nombre
 
@@ -992,7 +993,7 @@ func Calcular_totales_vinculacion_pdf(cedula, id_resolucion string, IdDedicacion
 	var total_horas int
 
 	// Busca las vinculaciones del docente en la misma resolución (aplica para diferentes proyectos curriculares en vinculaciones y las de modificación)
-	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &temp); err2 == nil {
+	if err2 := request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &temp); err2 == nil {
 
 		if IdDedicacion != 3 && IdDedicacion != 4 {
 			for _, pos := range temp {
@@ -1021,7 +1022,7 @@ func Calcular_totales_vinculacion_pdf_nueva(cedula, id_resolucion string, IdDedi
 	var total_horas int
 
 	// Busca las vinculaciones del docente en la misma resolución (aplica para diferentes proyectos curriculares en vinculaciones y las de modificación)
-	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &temp); err2 == nil {
+	if err2 := request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente"+query, &temp); err2 == nil {
 
 		if IdDedicacion != 3 && IdDedicacion != 4 {
 			for _, pos := range temp {
@@ -1058,14 +1059,14 @@ func (c *GestionDesvinculacionesController) GetVinculacionesAgrupadasCanceladas(
 	var vinc models.VinculacionDocente
 
 	//If 1 modificacion_resolucion (get)
-	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+id_resolucion, &modRes); err == nil {
+	if err := request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion/?query=ResolucionNueva:"+id_resolucion, &modRes); err == nil {
 		//If 2 modificacion_vinculacion (get)
-		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/?limit=-1&query=ModificacionResolucion:"+strconv.Itoa(modRes[0].Id), &modVin); err == nil {
+		if err := request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_vinculacion/?limit=-1&query=ModificacionResolucion:"+strconv.Itoa(modRes[0].Id), &modVin); err == nil {
 
 			//for vinculaciones
 			for _, pos := range modVin {
 				//If 3 vinculacion_docente para el join (get)
-				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.VinculacionDocenteCancelada.Id), &vinc); err == nil {
+				if err := request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/"+strconv.Itoa(pos.VinculacionDocenteCancelada.Id), &vinc); err == nil {
 					v = append(v, vinc)
 				} else { //If 3 vinculacion_docente para el join (get)
 					fmt.Println("He fallado en If 3 vinculacion_docente para el join (get), solucioname!!!", err)
@@ -1131,7 +1132,7 @@ func (c *GestionPrevinculacionesController) GetCdpRpDocente() {
 	var rpdocente models.RpDocente
 
 	//If 1 contrato_disponibilidad (get)
-	if err := getJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+num_vinculacion+",Vigencia:"+vigencia, &contratoDisponibilidad); err == nil { //If 2  (get)
+	if err := request.GetJson("http://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+num_vinculacion+",Vigencia:"+vigencia, &contratoDisponibilidad); err == nil { //If 2  (get)
 		//for contrato_disponibilidad
 		for _, pos := range contratoDisponibilidad {
 			rpdocente = GetInformacionRpDocente(strconv.Itoa(pos.NumeroCdp), strconv.Itoa(pos.VigenciaCdp), identificacion)

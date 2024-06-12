@@ -11,6 +11,7 @@ import (
 	"github.com/astaxie/beego/plugins/cors"
 	_ "github.com/lib/pq"
 	"github.com/udistrital/utils_oas/apiStatusLib"
+	"github.com/udistrital/utils_oas/xray"
 )
 
 func init() {
@@ -59,7 +60,7 @@ func main() {
 	if err := logs.SetLogger(logs.AdapterFile, `{"filename":"/var/log/beego/administrativa_mid_api.log"}`); err != nil {
 		beego.Info(err)
 	}
-
+	xray.InitXRay()
 	apistatus.Init()
 	beego.Run()
 }
