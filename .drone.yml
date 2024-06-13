@@ -12,7 +12,7 @@ name: oas_api_ci
 
 steps:
 - name: go_build
-  image: golang:1.14
+  image: golang:1.18
   commands:
   - go mod init
   - go get -t
@@ -64,7 +64,7 @@ steps:
     - push
 
 - name: update_aws_ecs
-  image: golang:1.14
+  image: golang:1.18
   environment:
     AWS_ACCESS_KEY_ID:
       from_secret: AWS_ACCESS_KEY_ID
