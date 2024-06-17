@@ -623,12 +623,13 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenador() {
 	var pagos_personas_proyecto []models.PagoPersonaProyecto
 	var pago_personas_proyecto models.PagoPersonaProyecto
 	var vinculaciones_docente []models.VinculacionDocente
-	r := httplib.Get(beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudAdmin") + "/" + beego.AppConfig.String("NscrudAdmin") + "/pago_mensual/")
-	r.Param("offset", strconv.Itoa(offset))
-	r.Param("limit", strconv.Itoa(limit))
-	r.Param("query", "EstadoPagoMensual.CodigoAbreviacion:AD,Responsable:"+doc_ordenador)
+	// r := httplib.Get(beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudAdmin") + "/" + beego.AppConfig.String("NscrudAdmin") + "/pago_mensual/")
+	// r.Param("offset", strconv.Itoa(offset))
+	// r.Param("limit", strconv.Itoa(limit))
+	// r.Param("query", "EstadoPagoMensual.CodigoAbreviacion:AD,Responsable:"+doc_ordenador)
+	if err := request.GetJson(beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudAdmin") + "/" + beego.AppConfig.String("NscrudAdmin") + "/pago_mensual?offset="+strconv.Itoa(offset)+"&limit="+strconv.Itoa(limit)+"&query=EstadoPagoMensual.CodigoAbreviacion:AD,Responsable:"+doc_ordenador,&pagos_mensuales); err == nil {
+	// if err := r.ToJSON(&pagos_mensuales); err == nil {
 
-	if err := r.ToJSON(&pagos_mensuales); err == nil {
 		for x, pago_mensual := range pagos_mensuales {
 
 			if err := request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pago_mensual.Persona, &contratistas); err == nil {

@@ -39,20 +39,20 @@ func sendJson(url string, trequest string, target interface{}, datajson interfac
 
 	return json.NewDecoder(r.Body).Decode(target)
 }
+// GetJson anterior
+// func getJson(url string, target interface{}) error {
+// 	r, err := http.Get(url)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	defer func() {
+// 		if err := r.Body.Close(); err != nil {
+// 			beego.Error(err)
+// 		}
+// 	}()
 
-func getJson(url string, target interface{}) error {
-	r, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if err := r.Body.Close(); err != nil {
-			beego.Error(err)
-		}
-	}()
-
-	return json.NewDecoder(r.Body).Decode(target)
-}
+// 	return json.NewDecoder(r.Body).Decode(target)
+// }
 
 func getXml(url string, target interface{}) error {
 	r, err := http.Get(url)
