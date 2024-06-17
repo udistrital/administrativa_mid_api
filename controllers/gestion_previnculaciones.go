@@ -140,7 +140,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 	tipoVinculacion := c.GetString("tipo_vinculacion")
 	facultad := c.GetString("facultad")
 	nivelAcademico := c.GetString("nivel_academico")
-
+	
 	docentesXcargaHoraria, err := ListarDocentesHorasLectivas(vigencia, periodo, tipoVinculacion, facultad, nivelAcademico)
 	if err != nil {
 		beego.Error(err)
@@ -154,7 +154,7 @@ func (c *GestionPrevinculacionesController) ListarDocentesCargaHoraria() {
 		emptyCatDocente := models.ObjetoCategoriaDocente{}
 		//TODO: quitar el hardconding para WSO2 cuando ya soporte https:
 		q := "http://" + beego.AppConfig.String("UrlcrudWSO2") + "/" + beego.AppConfig.String("NscrudUrano") + "/categoria_docente/" + vigencia + "/" + periodo + "/" + pos.DocDocente
-		err = getXml(q, &catDocente.CategoriaDocente)
+		err = request.GetXml(q, &catDocente.CategoriaDocente)
 		if err != nil {
 			beego.Error(err)
 			c.Abort("403")
@@ -306,7 +306,7 @@ func EsDocentePlanta(idPersona string) (docentePlanta bool, err error) {
 	var temp map[string]interface{}
 	var esDePlanta bool
 
-	err = getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAcademica")+"/"+"consultar_datos_docente/"+idPersona, &temp)
+	err = request.GetJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAcademica")+"/"+"consultar_datos_docente/"+idPersona, &temp)
 	if err != nil {
 		esDePlanta = false
 		return false, err
@@ -669,7 +669,7 @@ func ListarDocentesHorasLectivas(vigencia, periodo, tipo_vinculacion, facultad, 
 	for _, pos := range tipoVinculacionOld {
 		t := "http://" + beego.AppConfig.String("UrlcrudWSO2") + "/" + beego.AppConfig.String("NscrudAcademica") + "/" + "carga_lectiva/" + vigencia + "/" + periodo + "/" + pos + "/" + facultadOld + "/" + nivel_academico
 
-		err = getJsonWSO2(t, &temp)
+		err = request.GetJsonWSO2(t, &temp)
 		if err != nil {
 			return docentesXCarga, err
 		}
@@ -697,7 +697,7 @@ func Buscar_Categoria_Docente(vigencia, periodo, documento_ident string) (catego
 	var idCategoriaOld string
 
 	//TODO: quitar el hardconding para WSO2 cuando ya soporte https:
-	err = getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudUrano")+"/"+"categoria_docente/"+vigencia+"/"+periodo+"/"+documento_ident, &temp)
+	err = request.GetJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudUrano")+"/"+"categoria_docente/"+vigencia+"/"+periodo+"/"+documento_ident, &temp)
 	if err != nil {
 		return categoria_nombre, categoria_id_old, err
 	}
@@ -729,7 +729,7 @@ func HomologarProyectoCurricular(proyecto_old string) (proyecto string, err erro
 	var id_proyecto string
 	var temp map[string]interface{}
 
-	err = getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudHomologacion")+"/"+"proyecto_curricular_cod_proyecto/"+proyecto_old, &temp)
+	err = request.GetJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudHomologacion")+"/"+"proyecto_curricular_cod_proyecto/"+proyecto_old, &temp)
 	if err != nil {
 		return proyecto, err
 	}
@@ -760,7 +760,7 @@ func HomologarFacultad(tipo, facultad string) (facultad_old string, err error) {
 		string_consulta_servicio = "facultad_oikos_gedep"
 	}
 
-	err = getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudHomologacion")+"/"+string_consulta_servicio+"/"+facultad, &temp)
+	err = request.GetJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudHomologacion")+"/"+string_consulta_servicio+"/"+facultad, &temp)
 	if err != nil {
 		return facultad_old, err
 	}
@@ -1090,7 +1090,7 @@ func GetInformacionRpDocente(numero_cdp string, vigencia_cdp string, identificac
 
 	var temp map[string]interface{}
 	fmt.Println(numero_cdp + " " + vigencia_cdp + " " + identificacion)
-	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudFinanciera")+"/"+"cdprpdocente/"+numero_cdp+"/"+vigencia_cdp+"/"+identificacion, &temp); err == nil {
+	if err := request.GetJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudFinanciera")+"/"+"cdprpdocente/"+numero_cdp+"/"+vigencia_cdp+"/"+identificacion, &temp); err == nil {
 		json_cdp_rp, error_json := json.Marshal(temp)
 
 		if error_json == nil {

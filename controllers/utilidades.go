@@ -3,7 +3,7 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
-	"encoding/xml"
+	// "encoding/xml"
 	
 	"fmt"
 	"math/big"
@@ -54,38 +54,38 @@ func sendJson(url string, trequest string, target interface{}, datajson interfac
 // 	return json.NewDecoder(r.Body).Decode(target)
 // }
 
-func getXml(url string, target interface{}) error {
-	r, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if err := r.Body.Close(); err != nil {
-			beego.Error(err)
-		}
-	}()
+// func getXml(url string, target interface{}) error {
+// 	r, err := http.Get(url)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	defer func() {
+// 		if err := r.Body.Close(); err != nil {
+// 			beego.Error(err)
+// 		}
+// 	}()
 
-	return xml.NewDecoder(r.Body).Decode(target)
-}
+// 	return xml.NewDecoder(r.Body).Decode(target)
+// }
 
-func getJsonWSO2(urlp string, target interface{}) error {
-	b := new(bytes.Buffer)
-	client := &http.Client{}
-	req, err := http.NewRequest("GET", urlp, b)
-	req.Header.Set("Accept", "application/json")
-	r, err := client.Do(req)
-	if err != nil {
-		beego.Error("error", err)
-		return err
-	}
-	defer func() {
-		if err := r.Body.Close(); err != nil {
-			beego.Error(err)
-		}
-	}()
+// func getJsonWSO2(urlp string, target interface{}) error {
+// 	b := new(bytes.Buffer)
+// 	client := &http.Client{}
+// 	req, err := http.NewRequest("GET", urlp, b)
+// 	req.Header.Set("Accept", "application/json")
+// 	r, err := client.Do(req)
+// 	if err != nil {
+// 		beego.Error("error", err)
+// 		return err
+// 	}
+// 	defer func() {
+// 		if err := r.Body.Close(); err != nil {
+// 			beego.Error(err)
+// 		}
+// 	}()
 
-	return json.NewDecoder(r.Body).Decode(target)
-}
+// 	return json.NewDecoder(r.Body).Decode(target)
+// }
 
 func diff(a, b time.Time) (year, month, day int) {
 	if a.Location() != b.Location() {

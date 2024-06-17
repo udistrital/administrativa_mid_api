@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/astaxie/beego/httplib"
+	// "github.com/astaxie/beego/httplib"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/administrativa_mid_api/models"
@@ -37,14 +37,24 @@ func (c *GestionResolucionesController) GetResolucionesInscritas() {
 	query := c.GetStrings("query")
 	limit, _ := c.GetInt("limit")
 	offset, _ := c.GetInt("offset")
-	r := httplib.Get(beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudAdmin") + "/" + beego.AppConfig.String("NscrudAdmin") + "/resolucion_vinculacion")
-	r.Param("offset", strconv.Itoa(offset))
-	r.Param("limit", strconv.Itoa(limit))
-	for _, v := range query {
-		r.Param("query", v)
+	// r := httplib.Get(beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudAdmin") + "/" + beego.AppConfig.String("NscrudAdmin") + "/resolucion_vinculacion")
+	// r.Param("offset", strconv.Itoa(offset))
+	// r.Param("limit", strconv.Itoa(limit))
+	// for _, v := range query {
+	// 	r.Param("query", v)
 
+	// }
+	url_base := beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudAdmin") + "/" + beego.AppConfig.String("NscrudAdmin") + "/resolucion_vinculacion"
+	parametros := "offset=" + strconv.Itoa(offset) + "&limit=" + strconv.Itoa(limit)
+	for _, v := range query {
+		parametros += "&query=" + v
 	}
-	if err := r.ToJSON(&resolucion_vinculacion); err == nil {
+	url := url_base + "?" + parametros
+	// if err := r.ToJSON(&resolucion_vinculacion); err == nil {
+	if err := request.GetJson(url,&resolucion_vinculacion); err == nil {
+		for x := range resolucion_vinculacion {
+			fmt.Println(x)
+		}
 		for x, pos := range resolucion_vinculacion {
 			resolucion_vinculacion[x].FacultadNombre = BuscarNombreFacultad(pos.Facultad)
 			resolucion_vinculacion[x].FacultadFirmaNombre = BuscarNombreFacultad(pos.IdDependenciaFirma)

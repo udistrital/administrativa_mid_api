@@ -7,7 +7,7 @@ import (
 	"time"
 
 	//"net/http"
-	"github.com/astaxie/beego/httplib"
+	// "github.com/astaxie/beego/httplib"
 
 	"github.com/astaxie/beego"
 	"github.com/udistrital/administrativa_mid_api/models"
@@ -44,7 +44,7 @@ func (c *AprobacionPagoController) ObtenerInfoCoordinador() {
 	var temp_snies map[string]interface{}
 	var info_coordinador models.InformacionCoordinador
 
-	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudHomologacion")+"/"+"proyecto_curricular_oikos/"+id_oikos, &temp); err == nil && temp != nil {
+	if err := request.GetJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudHomologacion")+"/"+"proyecto_curricular_oikos/"+id_oikos, &temp); err == nil && temp != nil {
 		json_proyecto_curricular, error_json := json.Marshal(temp)
 
 		if error_json == nil {
@@ -52,7 +52,7 @@ func (c *AprobacionPagoController) ObtenerInfoCoordinador() {
 			if err := json.Unmarshal(json_proyecto_curricular, &temp_homologacion); err == nil {
 				id_proyecto_snies := temp_homologacion.Homologacion.IDSnies
 
-				if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAcademica")+"/"+"carrera_snies/"+id_proyecto_snies, &temp_snies); err == nil && temp_snies != nil {
+				if err := request.GetJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAcademica")+"/"+"carrera_snies/"+id_proyecto_snies, &temp_snies); err == nil && temp_snies != nil {
 					json_info_coordinador, error_json := json.Marshal(temp_snies)
 
 					if error_json == nil {
@@ -181,7 +181,7 @@ func (c *AprobacionPagoController) ObtenerInfoOrdenador() {
 	var informacion_ordenador models.InformacionOrdenador
 	var ordenadores []models.Ordenador
 
-	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contrato_elaborado/"+numero_contrato+"/"+vigencia, &temp); err == nil && temp != nil {
+	if err := request.GetJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contrato_elaborado/"+numero_contrato+"/"+vigencia, &temp); err == nil && temp != nil {
 		json_contrato_elaborado, error_json := json.Marshal(temp)
 
 		if error_json == nil {
@@ -1133,15 +1133,14 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistas() {
 	var pagos_contratista_cdp_rp []models.PagoContratistaCdpRp
 	var contratos_disponibilidad []models.ContratoDisponibilidad
 
-	r := httplib.Get(beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudAdmin") + "/" + beego.AppConfig.String("NscrudAdmin") + "/pago_mensual/")
-	r.Param("offset", strconv.Itoa(offset))
-	r.Param("limit", strconv.Itoa(limit))
-	r.Param("query", "EstadoPagoMensual.CodigoAbreviacion:AS,Responsable:"+doc_ordenador)
+	// r := httplib.Get(beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudAdmin") + "/" + beego.AppConfig.String("NscrudAdmin") + "/pago_mensual/")
+	// r.Param("offset", strconv.Itoa(offset))
+	// r.Param("limit", strconv.Itoa(limit))
+	// r.Param("query", "EstadoPagoMensual.CodigoAbreviacion:AS,Responsable:"+doc_ordenador)
 
-	if err := r.ToJSON(&pagos_mensuales); err == nil {
-
+	if err := request.GetJson(beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudAdmin") + "/" + beego.AppConfig.String("NscrudAdmin") + "/pago_mensual/?offset="+strconv.Itoa(offset)+"&limit"+strconv.Itoa(limit)+"&query="+"EstadoPagoMensual.CodigoAbreviacion:AS,Responsable:"+doc_ordenador,&pagos_mensuales); err == nil {
+	// if err := r.ToJSON(&pagos_mensuales); err == nil {
 		for v, _ := range pagos_mensuales {
-
 			if err := request.GetJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pagos_mensuales[v].Persona, &contratistas); err == nil {
 
 				for _, contratista := range contratistas {
@@ -1339,7 +1338,7 @@ func (c *AprobacionPagoController) GetDependencias() {
 	var dep models.DependenciasContrato
 	doc_ordenador := c.GetString(":docordenador")
 
-	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"dependencias_sic/"+doc_ordenador, &temp); err == nil {
+	if err := request.GetJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"dependencias_sic/"+doc_ordenador, &temp); err == nil {
 		json_dependencias, error_json := json.Marshal(temp)
 		if error_json == nil {
 			if err := json.Unmarshal(json_dependencias, &dependen); err == nil {
@@ -1501,7 +1500,7 @@ func GetRP(numero_cdp string, vigencia_cdp string) (rp models.InformacionCdpRp) 
 	var temp map[string]interface{}
 	var temp_cdp_rp models.InformacionCdpRp
 
-	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudFinanciera")+"/"+"cdprp/"+numero_cdp+"/"+vigencia_cdp+"/01", &temp); err == nil {
+	if err := request.GetJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudFinanciera")+"/"+"cdprp/"+numero_cdp+"/"+vigencia_cdp+"/01", &temp); err == nil {
 		json_cdp_rp, error_json := json.Marshal(temp)
 
 		if error_json == nil {
@@ -1528,7 +1527,7 @@ func GetContratosPersona(num_documento string) (contratos_persona models.Informa
 	var temp map[string]interface{}
 	var contratos models.InformacionContratosPersona
 
-	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contratos_persona/"+num_documento, &temp); err == nil {
+	if err := request.GetJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contratos_persona/"+num_documento, &temp); err == nil {
 		json_contratos, error_json := json.Marshal(temp)
 
 		if error_json == nil {
@@ -1556,7 +1555,7 @@ func GetContrato(num_contrato_suscrito string, vigencia string) (informacion_con
 
 	var temp map[string]interface{}
 
-	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contrato/"+num_contrato_suscrito+"/"+vigencia, &temp); err == nil {
+	if err := request.GetJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contrato/"+num_contrato_suscrito+"/"+vigencia, &temp); err == nil {
 		json_contrato, error_json := json.Marshal(temp)
 
 		if error_json == nil {
@@ -1583,7 +1582,7 @@ func GetInformacionContratoContratista(num_contrato_suscrito string, vigencia st
 
 	var temp map[string]interface{}
 
-	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"informacion_contrato_contratista/"+num_contrato_suscrito+"/"+vigencia, &temp); err == nil {
+	if err := request.GetJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"informacion_contrato_contratista/"+num_contrato_suscrito+"/"+vigencia, &temp); err == nil {
 		json_contrato, error_json := json.Marshal(temp)
 
 		if error_json == nil {
@@ -1610,7 +1609,7 @@ func GetContratosDependencia(dependencia string, fecha string) (contratos_depend
 
 	var temp map[string]interface{}
 
-	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contratos_dependencia/"+dependencia+"/"+fecha+"/"+fecha, &temp); err == nil {
+	if err := request.GetJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contratos_dependencia/"+dependencia+"/"+fecha+"/"+fecha, &temp); err == nil {
 		json_contrato, error_json := json.Marshal(temp)
 		if error_json == nil {
 			if err := json.Unmarshal(json_contrato, &contratos_dependencia); err == nil {
@@ -1634,7 +1633,7 @@ func GetContratosDependenciaFiltro(dependencia string, fecha_inicio string, fech
 
 	var temp map[string]interface{}
 
-	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contratos_dependencia/"+dependencia+"/"+fecha_fin+"/"+fecha_inicio, &temp); err == nil {
+	if err := request.GetJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contratos_dependencia/"+dependencia+"/"+fecha_fin+"/"+fecha_inicio, &temp); err == nil {
 		json_contrato, error_json := json.Marshal(temp)
 		if error_json == nil {
 			if err := json.Unmarshal(json_contrato, &contratos_dependencia); err == nil {
@@ -1656,10 +1655,13 @@ func GetContratosDependenciaFiltro(dependencia string, fecha_inicio string, fech
 
 func GetContratosOrdenadorDependencia(dependencia string, fechaInicio string, fechaFin string) (contratos_ordenador_dependencia models.ContratoOrdenadorDependencia) {
 
-	r := httplib.Get("http://" + beego.AppConfig.String("UrlcrudWSO2") + "/" + beego.AppConfig.String("NscrudAdministrativa") + "/" + "contratos_ordenador_dependencia/" + dependencia + "/" + fechaInicio + "/" + fechaFin)
-	r.Header("Accept", "application/json")
-	if err := r.ToJSON(&contratos_ordenador_dependencia); err == nil {
+	// r := httplib.Get("http://" + beego.AppConfig.String("UrlcrudWSO2") + "/" + beego.AppConfig.String("NscrudAdministrativa") + "/" + "contratos_ordenador_dependencia/" + dependencia + "/" + fechaInicio + "/" + fechaFin)
+	// r.Header("Accept", "application/json")
+	err := request.GetJsonWSO2("http://" + beego.AppConfig.String("UrlcrudWSO2") + "/" + beego.AppConfig.String("NscrudAdministrativa") + "/" + "contratos_ordenador_dependencia/" + dependencia + "/" + fechaInicio + "/" + fechaFin,&contratos_ordenador_dependencia)
+	if err == nil{
+		// if err := r.ToJSON(&contratos_ordenador_dependencia); err == nil {
 	} else {
+
 
 		fmt.Println(err)
 	}
