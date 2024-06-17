@@ -5,3 +5,6 @@ coverage.xml
 sonar-project.properties
 .scannerwork/.sonar_lock
 .scannerwork/report-task.txt
+
+go.mod
+go.sum
