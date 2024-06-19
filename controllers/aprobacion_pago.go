@@ -737,7 +737,7 @@ func (c *AprobacionPagoController) AprobarMultiplesSolicitudes() {
 
 			pagos_mensuales = append(pagos_mensuales, pago_mensual)
 		}
-		if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/tr_aprobacion_masiva_documentos", "POST", &response, pagos_mensuales); err == nil {
+		if err := request.SendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/tr_aprobacion_masiva_documentos", "POST", &response, pagos_mensuales); err == nil {
 			c.Data["json"] = "OK"
 		} else {
 			fmt.Println(err)
@@ -770,7 +770,7 @@ func (c *AprobacionPagoController) AprobarMultiplesPagos() {
 
 			pagos_mensuales = append(pagos_mensuales, pago_mensual)
 		}
-		if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/tr_aprobacion_masiva_pagos", "POST", &response, pagos_mensuales); err == nil {
+		if err := request.SendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/tr_aprobacion_masiva_pagos", "POST", &response, pagos_mensuales); err == nil {
 			c.Data["json"] = "OK"
 		} else {
 			fmt.Println(err)
@@ -1380,7 +1380,7 @@ func (c *AprobacionPagoController) AprobarMultiplesSolicitudesContratistas() {
 
 			pagos_mensuales = append(pagos_mensuales, pago_mensual)
 		}
-		if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/tr_aprobacion_masiva_soportes_contratistas", "POST", &response, pagos_mensuales); err == nil {
+		if err := request.SendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/tr_aprobacion_masiva_soportes_contratistas", "POST", &response, pagos_mensuales); err == nil {
 			c.Data["json"] = "OK"
 		} else {
 			fmt.Println(err)
@@ -1413,7 +1413,7 @@ func (c *AprobacionPagoController) AprobarMultiplesPagosContratistas() {
 
 			pagos_mensuales = append(pagos_mensuales, pago_mensual)
 		}
-		if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/tr_aprobacion_masiva_pagos", "POST", &response, pagos_mensuales); err == nil {
+		if err := request.SendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/tr_aprobacion_masiva_pagos", "POST", &response, pagos_mensuales); err == nil {
 			c.Data["json"] = "OK"
 		} else {
 			fmt.Println(err)

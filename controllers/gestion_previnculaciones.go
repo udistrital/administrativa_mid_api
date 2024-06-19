@@ -112,7 +112,7 @@ func (c *GestionPrevinculacionesController) InsertarPrevinculaciones() {
 		c.Abort("403")
 	}
 
-	err = sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &idRespuesta, &v)
+	err = request.SendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/InsertarVinculaciones/", "POST", &idRespuesta, &v)
 	c.Data["json"] = idRespuesta
 	if err != nil {
 		beego.Error("Error al insertar docentes", err)
