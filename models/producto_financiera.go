@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-//ProductoFinanciera modelo de los productos en financiera
+// ProductoFinanciera modelo de los productos en financiera
 type ProductoFinanciera struct {
 	Id            int
 	Nombre        string

@@ -6,10 +6,8 @@ import (
 	"strconv"
 	"time"
 
-	//"net/http"
-	"github.com/astaxie/beego/httplib"
-
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/httplib"
 	"github.com/udistrital/administrativa_mid_api/models"
 )
 
@@ -43,7 +41,7 @@ func (c *AprobacionPagoController) ObtenerInfoCoordinador() {
 	var temp_snies map[string]interface{}
 	var info_coordinador models.InformacionCoordinador
 
-	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudHomologacion")+"/"+"proyecto_curricular_oikos/"+id_oikos, &temp); err == nil && temp != nil {
+	if err := getJsonWSO2(beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudHomologacion")+"/"+"proyecto_curricular_oikos/"+id_oikos, &temp); err == nil && temp != nil {
 		json_proyecto_curricular, error_json := json.Marshal(temp)
 
 		if error_json == nil {
@@ -51,7 +49,7 @@ func (c *AprobacionPagoController) ObtenerInfoCoordinador() {
 			if err := json.Unmarshal(json_proyecto_curricular, &temp_homologacion); err == nil {
 				id_proyecto_snies := temp_homologacion.Homologacion.IDSnies
 
-				if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAcademica")+"/"+"carrera_snies/"+id_proyecto_snies, &temp_snies); err == nil && temp_snies != nil {
+				if err := getJsonWSO2(beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAcademica")+"/"+"carrera_snies/"+id_proyecto_snies, &temp_snies); err == nil && temp_snies != nil {
 					json_info_coordinador, error_json := json.Marshal(temp_snies)
 
 					if error_json == nil {
@@ -101,28 +99,28 @@ func (c *AprobacionPagoController) GetContratosDocente() {
 	var res models.Resolucion
 	var dep models.Dependencia
 	//If informacion_proveedor get
-	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=num_documento:"+numDocumento, &proveedor); err == nil {
+	if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/informacion_proveedor/?query=num_documento:"+numDocumento, &proveedor); err == nil {
 		//If vinculacion_docente get
-		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?query=IdPersona:"+numDocumento+"&limit=-1", &vinculaciones); err == nil {
+		if err := getJson(beego.AppConfig.String("UrlcrudAdmin")+"/vinculacion_docente/?query=IdPersona:"+numDocumento+"&limit=-1", &vinculaciones); err == nil {
 			//for vinculaciones
 			for _, vinculacion := range vinculaciones {
 				//If dependencia get
-				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudOikos")+"/"+beego.AppConfig.String("NscrudOikos")+"/dependencia/"+strconv.Itoa(vinculacion.IdProyectoCurricular), &dep); err == nil {
+				if err := getJson(beego.AppConfig.String("UrlcrudOikos")+"/dependencia/"+strconv.Itoa(vinculacion.IdProyectoCurricular), &dep); err == nil {
 					//If resolucion get
-					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+strconv.Itoa(vinculacion.IdResolucion.Id), &res); err == nil {
+					if err := getJson(beego.AppConfig.String("UrlcrudAdmin")+"/resolucion/"+strconv.Itoa(vinculacion.IdResolucion.Id), &res); err == nil {
 						//If nulo
 
 						if vinculacion.NumeroContrato.Valid == true {
-							if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/acta_inicio/?query=NumeroContrato:"+vinculacion.NumeroContrato.String+",Vigencia:"+strconv.FormatInt(vinculacion.Vigencia.Int64, 10), &actasInicio); err == nil {
+							if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/acta_inicio/?query=NumeroContrato:"+vinculacion.NumeroContrato.String+",Vigencia:"+strconv.FormatInt(vinculacion.Vigencia.Int64, 10), &actasInicio); err == nil {
 
 								//If Estado = 4
 								for _, actaInicio := range actasInicio {
 									actaInicio.FechaInicio = actaInicio.FechaInicio.UTC()
 									actaInicio.FechaFin = actaInicio.FechaFin.UTC()
-									
-									//fechaInicio<fechaActual<(fechaFin+2 meses) Se da holgura de 2 meses luego de fechaFin para subir cumplidos 
+
+									//fechaInicio<fechaActual<(fechaFin+2 meses) Se da holgura de 2 meses luego de fechaFin para subir cumplidos
 									if time.Now().After(actaInicio.FechaInicio) && time.Now().Before(actaInicio.FechaFin.AddDate(0, 2, 0)) {
-									
+
 										cd.NumeroVinculacion = vinculacion.NumeroContrato.String
 										cd.Vigencia = vinculacion.Vigencia.Int64
 										cd.Resolucion = res.NumeroResolucion
@@ -180,21 +178,21 @@ func (c *AprobacionPagoController) ObtenerInfoOrdenador() {
 	var informacion_ordenador models.InformacionOrdenador
 	var ordenadores []models.Ordenador
 
-	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contrato_elaborado/"+numero_contrato+"/"+vigencia, &temp); err == nil && temp != nil {
+	if err := getJsonWSO2(beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contrato_elaborado/"+numero_contrato+"/"+vigencia, &temp); err == nil && temp != nil {
 		json_contrato_elaborado, error_json := json.Marshal(temp)
 
 		if error_json == nil {
 			if err := json.Unmarshal(json_contrato_elaborado, &contrato_elaborado); err == nil {
 				if contrato_elaborado.Contrato.TipoContrato == "2" || contrato_elaborado.Contrato.TipoContrato == "3" || contrato_elaborado.Contrato.TipoContrato == "18" {
-					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ordenador_gasto/?query=Id:"+contrato_elaborado.Contrato.OrdenadorGasto, &ordenadores_gasto); err == nil {
+					if err := getJson(beego.AppConfig.String("UrlcrudCore")+"/ordenador_gasto/?query=Id:"+contrato_elaborado.Contrato.OrdenadorGasto, &ordenadores_gasto); err == nil {
 
 						for _, ordenador_gasto := range ordenadores_gasto {
 
-							if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/jefe_dependencia/?query=DependenciaId:"+strconv.Itoa(ordenador_gasto.DependenciaId)+"&sortby=FechaInicio&order=desc&limit=1", &jefes_dependencia); err == nil {
+							if err := getJson(beego.AppConfig.String("UrlcrudCore")+"/jefe_dependencia/?query=DependenciaId:"+strconv.Itoa(ordenador_gasto.DependenciaId)+"&sortby=FechaInicio&order=desc&limit=1", &jefes_dependencia); err == nil {
 
 								for _, jefe_dependencia := range jefes_dependencia {
 
-									if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+strconv.Itoa(jefe_dependencia.TerceroId), &informacion_proveedores); err == nil {
+									if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+strconv.Itoa(jefe_dependencia.TerceroId), &informacion_proveedores); err == nil {
 
 										for _, informacion_proveedor := range informacion_proveedores {
 
@@ -225,7 +223,7 @@ func (c *AprobacionPagoController) ObtenerInfoOrdenador() {
 
 				} else { //si no son docentes
 					fmt.Println(contrato_elaborado.Contrato.OrdenadorGasto)
-					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/ordenadores/?query=IdOrdenador:"+contrato_elaborado.Contrato.OrdenadorGasto+"&sortby=FechaInicio&order=desc&limit=1", &ordenadores); err == nil {
+					if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/ordenadores/?query=IdOrdenador:"+contrato_elaborado.Contrato.OrdenadorGasto+"&sortby=FechaInicio&order=desc&limit=1", &ordenadores); err == nil {
 						for _, ordenador := range ordenadores {
 							informacion_ordenador.NumeroDocumento = ordenador.Documento
 							informacion_ordenador.Cargo = ordenador.RolOrdenador
@@ -277,7 +275,7 @@ func (c *AprobacionPagoController) PagoAprobado() {
 
 	var pagos_mensuales []models.PagoMensual
 
-	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?query=NumeroContrato:"+numero_contrato+",VigenciaContrato:"+vigencia+",Mes:"+mes+",Ano:"+anio, &pagos_mensuales); err == nil {
+	if err := getJson(beego.AppConfig.String("UrlcrudAdmin")+"/pago_mensual/?query=NumeroContrato:"+numero_contrato+",VigenciaContrato:"+vigencia+",Mes:"+mes+",Ano:"+anio, &pagos_mensuales); err == nil {
 
 		if pagos_mensuales != nil {
 
@@ -328,12 +326,12 @@ func (c *AprobacionPagoController) CertificacionVistoBueno() {
 	var mes_cer, _ = strconv.Atoi(mes)
 	var anio_cer, _ = strconv.Atoi(anio)
 
-	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?limit=-1&query=IdProyectoCurricular:"+dependencia, &vinculaciones_docente); err == nil {
+	if err := getJson(beego.AppConfig.String("UrlcrudAdmin")+"/vinculacion_docente/?limit=-1&query=IdProyectoCurricular:"+dependencia, &vinculaciones_docente); err == nil {
 
 		for _, vinculacion_docente := range vinculaciones_docente {
 			if vinculacion_docente.NumeroContrato.Valid == true && vinculacion_docente.Estado == true {
 
-				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/acta_inicio/?query=NumeroContrato:"+vinculacion_docente.NumeroContrato.String+",Vigencia:"+strconv.FormatInt(vinculacion_docente.Vigencia.Int64, 10), &actasInicio); err == nil {
+				if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/acta_inicio/?query=NumeroContrato:"+vinculacion_docente.NumeroContrato.String+",Vigencia:"+strconv.FormatInt(vinculacion_docente.Vigencia.Int64, 10), &actasInicio); err == nil {
 
 					for _, actaInicio := range actasInicio {
 						//If Estado = 4
@@ -341,11 +339,11 @@ func (c *AprobacionPagoController) CertificacionVistoBueno() {
 							(actaInicio.FechaInicio.Year() < actaInicio.FechaFin.Year() && int(actaInicio.FechaInicio.Month()) <= mes_cer && actaInicio.FechaInicio.Year() <= anio_cer && int(actaInicio.FechaFin.Month()) <= mes_cer && actaInicio.FechaFin.Year() > anio_cer) ||
 							(actaInicio.FechaInicio.Year() < actaInicio.FechaFin.Year() && int(actaInicio.FechaInicio.Month()) >= mes_cer && actaInicio.FechaInicio.Year() < anio_cer && int(actaInicio.FechaFin.Month()) >= mes_cer && actaInicio.FechaFin.Year() >= anio_cer) {
 
-							if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?query=EstadoPagoMensual.CodigoAbreviacion.in:PAD|AD|AP,NumeroContrato:"+vinculacion_docente.NumeroContrato.String+",VigenciaContrato:"+strconv.FormatInt(vinculacion_docente.Vigencia.Int64, 10)+",Mes:"+mes+",Ano:"+anio, &pagos_mensuales); err == nil {
+							if err := getJson(beego.AppConfig.String("UrlcrudAdmin")+"/pago_mensual/?query=EstadoPagoMensual.CodigoAbreviacion.in:PAD|AD|AP,NumeroContrato:"+vinculacion_docente.NumeroContrato.String+",VigenciaContrato:"+strconv.FormatInt(vinculacion_docente.Vigencia.Int64, 10)+",Mes:"+mes+",Ano:"+anio, &pagos_mensuales); err == nil {
 
 								if pagos_mensuales == nil {
 
-									if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+vinculacion_docente.IdPersona, &contratistas); err == nil {
+									if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+vinculacion_docente.IdPersona, &contratistas); err == nil {
 
 										for _, contratista := range contratistas {
 
@@ -424,12 +422,12 @@ func (c *AprobacionPagoController) CertificacionDocumentosAprobados() {
 
 	for _, contrato := range contrato_ordenador_dependencia.ContratosOrdenadorDependencia.InformacionContratos {
 
-		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?limit=-1&query=NumeroContrato:"+contrato.NumeroContrato+",Vigencia:"+contrato.Vigencia, &vinculaciones_docente); err == nil {
+		if err := getJson(beego.AppConfig.String("UrlcrudAdmin")+"/vinculacion_docente/?limit=-1&query=NumeroContrato:"+contrato.NumeroContrato+",Vigencia:"+contrato.Vigencia, &vinculaciones_docente); err == nil {
 
 			for _, vinculacion_docente := range vinculaciones_docente {
 				if vinculacion_docente.NumeroContrato.Valid == true {
 
-					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?query=EstadoPagoMensual.CodigoAbreviacion:AP,NumeroContrato:"+contrato.NumeroContrato+",VigenciaContrato:"+contrato.Vigencia+",Mes:"+strconv.Itoa(mes_cer)+",Ano:"+anio, &pagos_mensuales); err == nil {
+					if err := getJson(beego.AppConfig.String("UrlcrudAdmin")+"/pago_mensual/?query=EstadoPagoMensual.CodigoAbreviacion:AP,NumeroContrato:"+contrato.NumeroContrato+",VigenciaContrato:"+contrato.Vigencia+",Mes:"+strconv.Itoa(mes_cer)+",Ano:"+anio, &pagos_mensuales); err == nil {
 
 						if pagos_mensuales == nil {
 
@@ -480,19 +478,19 @@ func (c *AprobacionPagoController) GetSolicitudesSupervisor() {
 	var pagos_personas_proyecto []models.PagoPersonaProyecto
 
 	var vinculaciones_docente []models.VinculacionDocente
-	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?limit=-1&query=EstadoPagoMensual.CodigoAbreviacion:PAD,Responsable:"+doc_supervisor, &pagos_mensuales); err == nil {
+	if err := getJson(beego.AppConfig.String("UrlcrudAdmin")+"/pago_mensual/?limit=-1&query=EstadoPagoMensual.CodigoAbreviacion:PAD,Responsable:"+doc_supervisor, &pagos_mensuales); err == nil {
 
 		for x, pago_mensual := range pagos_mensuales {
 
-			if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pago_mensual.Persona, &contratistas); err == nil {
+			if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pago_mensual.Persona, &contratistas); err == nil {
 
 				for _, contratista := range contratistas {
 
-					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?limit=-1&query=NumeroContrato:"+pago_mensual.NumeroContrato+",Vigencia:"+strconv.FormatFloat(pago_mensual.VigenciaContrato, 'f', 0, 64), &vinculaciones_docente); err == nil {
+					if err := getJson(beego.AppConfig.String("UrlcrudAdmin")+"/vinculacion_docente/?limit=-1&query=NumeroContrato:"+pago_mensual.NumeroContrato+",Vigencia:"+strconv.FormatFloat(pago_mensual.VigenciaContrato, 'f', 0, 64), &vinculaciones_docente); err == nil {
 
 						for _, vinculacion := range vinculaciones_docente {
 							var dep models.Dependencia
-							if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudOikos")+"/"+beego.AppConfig.String("NscrudOikos")+"/dependencia/"+strconv.Itoa(vinculacion.IdProyectoCurricular), &dep); err == nil {
+							if err := getJson(beego.AppConfig.String("UrlcrudOikos")+"/dependencia/"+strconv.Itoa(vinculacion.IdProyectoCurricular), &dep); err == nil {
 								var pago_personas_proyecto models.PagoPersonaProyecto
 
 								pago_personas_proyecto.PagoMensual = &pagos_mensuales[x]
@@ -550,20 +548,20 @@ func (c *AprobacionPagoController) GetSolicitudesCoordinador() {
 	var pago_personas_proyecto models.PagoPersonaProyecto
 	var vinculaciones_docente []models.VinculacionDocente
 
-	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?limit=-1&query=EstadoPagoMensual.CodigoAbreviacion:PRC,Responsable:"+doc_coordinador, &pagos_mensuales); err == nil {
+	if err := getJson(beego.AppConfig.String("UrlcrudAdmin")+"/pago_mensual/?limit=-1&query=EstadoPagoMensual.CodigoAbreviacion:PRC,Responsable:"+doc_coordinador, &pagos_mensuales); err == nil {
 
 		for x, _ := range pagos_mensuales {
 
-			if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pagos_mensuales[x].Persona, &contratistas); err == nil {
+			if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pagos_mensuales[x].Persona, &contratistas); err == nil {
 
 				for _, contratista := range contratistas {
 
-					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?limit=-1&query=NumeroContrato:"+pagos_mensuales[x].NumeroContrato+",Vigencia:"+strconv.FormatFloat(pagos_mensuales[x].VigenciaContrato, 'f', 0, 64), &vinculaciones_docente); err == nil {
+					if err := getJson(beego.AppConfig.String("UrlcrudAdmin")+"/vinculacion_docente/?limit=-1&query=NumeroContrato:"+pagos_mensuales[x].NumeroContrato+",Vigencia:"+strconv.FormatFloat(pagos_mensuales[x].VigenciaContrato, 'f', 0, 64), &vinculaciones_docente); err == nil {
 
 						for y, _ := range vinculaciones_docente {
 							var dep []models.Dependencia
 
-							if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudOikos")+"/"+beego.AppConfig.String("NscrudOikos")+"/dependencia/?query=Id:"+strconv.Itoa(vinculaciones_docente[y].IdProyectoCurricular), &dep); err == nil {
+							if err := getJson(beego.AppConfig.String("UrlcrudOikos")+"/dependencia/?query=Id:"+strconv.Itoa(vinculaciones_docente[y].IdProyectoCurricular), &dep); err == nil {
 
 								for z, _ := range dep {
 									pago_personas_proyecto.PagoMensual = &pagos_mensuales[x]
@@ -622,7 +620,7 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenador() {
 	var pagos_personas_proyecto []models.PagoPersonaProyecto
 	var pago_personas_proyecto models.PagoPersonaProyecto
 	var vinculaciones_docente []models.VinculacionDocente
-	r := httplib.Get(beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudAdmin") + "/" + beego.AppConfig.String("NscrudAdmin") + "/pago_mensual/")
+	r := httplib.Get(beego.AppConfig.String("UrlcrudAdmin") + "/pago_mensual/")
 	r.Param("offset", strconv.Itoa(offset))
 	r.Param("limit", strconv.Itoa(limit))
 	r.Param("query", "EstadoPagoMensual.CodigoAbreviacion:AD,Responsable:"+doc_ordenador)
@@ -630,16 +628,16 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenador() {
 	if err := r.ToJSON(&pagos_mensuales); err == nil {
 		for x, pago_mensual := range pagos_mensuales {
 
-			if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pago_mensual.Persona, &contratistas); err == nil {
+			if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pago_mensual.Persona, &contratistas); err == nil {
 
 				for _, contratista := range contratistas {
 
-					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/vinculacion_docente/?limit=-1&query=NumeroContrato:"+pago_mensual.NumeroContrato+",Vigencia:"+strconv.FormatFloat(pago_mensual.VigenciaContrato, 'f', 0, 64), &vinculaciones_docente); err == nil {
+					if err := getJson(beego.AppConfig.String("UrlcrudAdmin")+"/vinculacion_docente/?limit=-1&query=NumeroContrato:"+pago_mensual.NumeroContrato+",Vigencia:"+strconv.FormatFloat(pago_mensual.VigenciaContrato, 'f', 0, 64), &vinculaciones_docente); err == nil {
 
 						for _, vinculacion := range vinculaciones_docente {
 							var dep models.Dependencia
 
-							if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudOikos")+"/"+beego.AppConfig.String("NscrudOikos")+"/dependencia/"+strconv.Itoa(vinculacion.IdProyectoCurricular), &dep); err == nil {
+							if err := getJson(beego.AppConfig.String("UrlcrudOikos")+"/dependencia/"+strconv.Itoa(vinculacion.IdProyectoCurricular), &dep); err == nil {
 
 								pago_personas_proyecto.PagoMensual = &pagos_mensuales[x]
 								pago_personas_proyecto.NombrePersona = contratista.NomProveedor
@@ -692,10 +690,10 @@ func (c *AprobacionPagoController) ObtenerDependenciaOrdenador() {
 	var ordenadores_gasto []models.OrdenadorGasto
 	var jefes_dependencia []models.JefeDependencia
 
-	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/jefe_dependencia/?query=TerceroId:"+doc_ordenador+"&sortby=FechaFin&order=desc&limit=1", &jefes_dependencia); err == nil {
+	if err := getJson(beego.AppConfig.String("UrlcrudCore")+"/jefe_dependencia/?query=TerceroId:"+doc_ordenador+"&sortby=FechaFin&order=desc&limit=1", &jefes_dependencia); err == nil {
 		for _, jefe := range jefes_dependencia {
 
-			if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudCore")+"/"+beego.AppConfig.String("NscrudCore")+"/ordenador_gasto/?query=DependenciaId:"+strconv.Itoa(jefe.DependenciaId), &ordenadores_gasto); err == nil {
+			if err := getJson(beego.AppConfig.String("UrlcrudCore")+"/ordenador_gasto/?query=DependenciaId:"+strconv.Itoa(jefe.DependenciaId), &ordenadores_gasto); err == nil {
 				for _, ordenador := range ordenadores_gasto {
 
 					c.Data["json"] = ordenador.DependenciaId
@@ -735,7 +733,7 @@ func (c *AprobacionPagoController) AprobarMultiplesSolicitudes() {
 
 			pagos_mensuales = append(pagos_mensuales, pago_mensual)
 		}
-		if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/tr_aprobacion_masiva_documentos", "POST", &response, pagos_mensuales); err == nil {
+		if err := sendJson(beego.AppConfig.String("UrlcrudAdmin")+"/tr_aprobacion_masiva_documentos", "POST", &response, pagos_mensuales); err == nil {
 			c.Data["json"] = "OK"
 		} else {
 			fmt.Println(err)
@@ -768,7 +766,7 @@ func (c *AprobacionPagoController) AprobarMultiplesPagos() {
 
 			pagos_mensuales = append(pagos_mensuales, pago_mensual)
 		}
-		if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/tr_aprobacion_masiva_pagos", "POST", &response, pagos_mensuales); err == nil {
+		if err := sendJson(beego.AppConfig.String("UrlcrudAdmin")+"/tr_aprobacion_masiva_pagos", "POST", &response, pagos_mensuales); err == nil {
 			c.Data["json"] = "OK"
 		} else {
 			fmt.Println(err)
@@ -797,11 +795,11 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 	contratos_persona := GetContratosPersona(numero_documento)
 	//if contratos_persona.ContratosPersonas.ContratoPersona == nil {// Si no tiene contrato
 
-	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+numero_documento, &informacion_proveedores); err == nil {
+	if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+numero_documento, &informacion_proveedores); err == nil {
 
 		for _, persona := range informacion_proveedores {
 
-			if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/novedad_postcontractual/?query=Contratista:"+strconv.Itoa(persona.Id)+"&sortby=FechaInicio&order=desc&limit=1", &novedades_postcontractuales); err == nil {
+			if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/novedad_postcontractual/?query=Contratista:"+strconv.Itoa(persona.Id)+"&sortby=FechaInicio&order=desc&limit=1", &novedades_postcontractuales); err == nil {
 
 				for _, novedad := range novedades_postcontractuales {
 
@@ -811,12 +809,12 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 					var informacion_contrato_contratista models.InformacionContratoContratista
 					informacion_contrato_contratista = GetInformacionContratoContratista(novedad.NumeroContrato, strconv.Itoa(novedad.Vigencia))
 
-					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/novedad_postcontractual/?query=NumeroContrato:"+novedad.NumeroContrato+",Vigencia:"+strconv.Itoa(novedad.Vigencia)+"&sortby=FechaInicio&order=desc&limit=1", &novedades_novedad); err == nil {
+					if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/novedad_postcontractual/?query=NumeroContrato:"+novedad.NumeroContrato+",Vigencia:"+strconv.Itoa(novedad.Vigencia)+"&sortby=FechaInicio&order=desc&limit=1", &novedades_novedad); err == nil {
 
 						for _, novedad_novedad := range novedades_novedad {
 							if novedad_novedad != novedad {
 
-								if(novedad_novedad.FechaInicio.Before(novedad_novedad.FechaFin) && time.Now().After(novedad_novedad.FechaInicio) &&  time.Now().Before(novedad_novedad.FechaFin.AddDate(0, 2, 0))){
+								if novedad_novedad.FechaInicio.Before(novedad_novedad.FechaFin) && time.Now().After(novedad_novedad.FechaInicio) && time.Now().Before(novedad_novedad.FechaFin.AddDate(0, 2, 0)) {
 									if novedad_novedad.TipoNovedad == 219 { // si es una cesión
 
 									} else {
@@ -845,9 +843,9 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 
 							} else {
 
-								if(novedad.FechaInicio.Before(novedad.FechaFin) && time.Now().After(novedad.FechaInicio) &&  time.Now().Before(novedad.FechaFin.AddDate(0, 2, 0))){
+								if novedad.FechaInicio.Before(novedad.FechaFin) && time.Now().After(novedad.FechaInicio) && time.Now().Before(novedad.FechaFin.AddDate(0, 2, 0)) {
 
-									if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
+									if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
 
 										for _, contrato_disponibilidad := range contratos_disponibilidad {
 
@@ -902,7 +900,7 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 		var contrato models.InformacionContrato
 		contrato = GetContrato(contrato_persona.NumeroContrato, contrato_persona.Vigencia)
 		//var novedad_postcontractual models.NovedadPostcontractual
-		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/novedad_postcontractual/?query=NumeroContrato:"+contrato_persona.NumeroContrato+",Vigencia:"+contrato_persona.Vigencia+"&sortby=FechaInicio&order=desc&limit=1", &novedades_postcontractuales); err == nil {
+		if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/novedad_postcontractual/?query=NumeroContrato:"+contrato_persona.NumeroContrato+",Vigencia:"+contrato_persona.Vigencia+"&sortby=FechaInicio&order=desc&limit=1", &novedades_postcontractuales); err == nil {
 			//var	prueba []models.NovedadPostcontractual
 
 			//	json.NewDecoder(r.Body).Decode(prueba)
@@ -914,11 +912,11 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 				for _, novedad := range novedades_postcontractuales {
 					if novedad.TipoNovedad == 219 { // si es una cesión
 
-						if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+numero_documento, &informacion_proveedores); err == nil {
+						if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+numero_documento, &informacion_proveedores); err == nil {
 
 							for _, persona := range informacion_proveedores {
 
-								if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/novedad_postcontractual/?query=Contratista:"+strconv.Itoa(persona.Id)+"&sortby=FechaInicio&order=desc&limit=1", &novedades_postcontractuales); err == nil {
+								if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/novedad_postcontractual/?query=Contratista:"+strconv.Itoa(persona.Id)+"&sortby=FechaInicio&order=desc&limit=1", &novedades_postcontractuales); err == nil {
 
 									for _, novedad := range novedades_postcontractuales {
 										var contrato models.InformacionContrato
@@ -926,7 +924,7 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 
 										var informacion_contrato_contratista models.InformacionContratoContratista
 										informacion_contrato_contratista = GetInformacionContratoContratista(novedad.NumeroContrato, strconv.Itoa(novedad.Vigencia))
-										if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
+										if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
 
 											for _, contrato_disponibilidad := range contratos_disponibilidad {
 
@@ -993,7 +991,7 @@ func (c *AprobacionPagoController) GetContratosContratista() {
 
 			} else { // si no tiene novedades
 
-				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
+				if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
 
 					for _, contrato_disponibilidad := range contratos_disponibilidad {
 						var cdprp models.InformacionCdpRp
@@ -1052,11 +1050,11 @@ func (c *AprobacionPagoController) GetSolicitudesSupervisorContratistas() {
 	var contratistas []models.InformacionProveedor
 	var pagos_contratista_cdp_rp []models.PagoContratistaCdpRp
 	var contratos_disponibilidad []models.ContratoDisponibilidad
-	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?limit=-1&query=EstadoPagoMensual.CodigoAbreviacion:PRS,Responsable:"+doc_supervisor, &pagos_mensuales); err == nil {
+	if err := getJson(beego.AppConfig.String("UrlcrudAdmin")+"/pago_mensual/?limit=-1&query=EstadoPagoMensual.CodigoAbreviacion:PRS,Responsable:"+doc_supervisor, &pagos_mensuales); err == nil {
 
 		for v, _ := range pagos_mensuales {
 
-			if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pagos_mensuales[v].Persona, &contratistas); err == nil {
+			if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pagos_mensuales[v].Persona, &contratistas); err == nil {
 
 				for _, contratista := range contratistas {
 
@@ -1065,7 +1063,7 @@ func (c *AprobacionPagoController) GetSolicitudesSupervisorContratistas() {
 					var contrato models.InformacionContrato
 					contrato = GetContrato(pagos_mensuales[v].NumeroContrato, strconv.FormatFloat(pagos_mensuales[v].VigenciaContrato, 'f', 0, 64))
 
-					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
+					if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
 
 						for _, contrato_disponibilidad := range contratos_disponibilidad {
 
@@ -1131,7 +1129,7 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistas() {
 	var pagos_contratista_cdp_rp []models.PagoContratistaCdpRp
 	var contratos_disponibilidad []models.ContratoDisponibilidad
 
-	r := httplib.Get(beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudAdmin") + "/" + beego.AppConfig.String("NscrudAdmin") + "/pago_mensual/")
+	r := httplib.Get(beego.AppConfig.String("UrlcrudAdmin") + "/pago_mensual/")
 	r.Param("offset", strconv.Itoa(offset))
 	r.Param("limit", strconv.Itoa(limit))
 	r.Param("query", "EstadoPagoMensual.CodigoAbreviacion:AS,Responsable:"+doc_ordenador)
@@ -1140,7 +1138,7 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistas() {
 
 		for v, _ := range pagos_mensuales {
 
-			if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pagos_mensuales[v].Persona, &contratistas); err == nil {
+			if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pagos_mensuales[v].Persona, &contratistas); err == nil {
 
 				for _, contratista := range contratistas {
 
@@ -1149,7 +1147,7 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistas() {
 					var contrato models.InformacionContrato
 					contrato = GetContrato(pagos_mensuales[v].NumeroContrato, strconv.FormatFloat(pagos_mensuales[v].VigenciaContrato, 'f', 0, 64))
 
-					if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
+					if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
 
 						for _, contrato_disponibilidad := range contratos_disponibilidad {
 
@@ -1235,7 +1233,7 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistasDependenci
 
 		var pagos_mensuales []models.PagoMensual
 
-		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?query=NumeroContrato:"+cd.NumeroContrato+",VigenciaContrato:"+cd.Vigencia+",EstadoPagoMensual.CodigoAbreviacion:AS,Responsable:"+doc_ordenador, &pagos_mensuales); err == nil {
+		if err := getJson(beego.AppConfig.String("UrlcrudAdmin")+"/pago_mensual/?query=NumeroContrato:"+cd.NumeroContrato+",VigenciaContrato:"+cd.Vigencia+",EstadoPagoMensual.CodigoAbreviacion:AS,Responsable:"+doc_ordenador, &pagos_mensuales); err == nil {
 
 			for v, pm := range pagos_mensuales {
 
@@ -1252,7 +1250,7 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistasDependenci
 						pago_mensual.VigenciaContrato = pm.VigenciaContrato
 						pago_mensual.NumeroContrato = pm.NumeroContrato
 
-						if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pago_mensual.Persona, &contratistas); err == nil {
+						if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pago_mensual.Persona, &contratistas); err == nil {
 
 							for _, contratista := range contratistas {
 
@@ -1261,7 +1259,7 @@ func (c *AprobacionPagoController) GetSolicitudesOrdenadorContratistasDependenci
 								var contrato models.InformacionContrato
 								contrato = GetContrato(pago_mensual.NumeroContrato, strconv.FormatFloat(pago_mensual.VigenciaContrato, 'f', 0, 64))
 
-								if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
+								if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/contrato_disponibilidad/?query=NumeroContrato:"+contrato.Contrato.NumeroContrato+",Vigencia:"+contrato.Contrato.Vigencia, &contratos_disponibilidad); err == nil {
 
 									for _, contrato_disponibilidad := range contratos_disponibilidad {
 
@@ -1337,7 +1335,7 @@ func (c *AprobacionPagoController) GetDependencias() {
 	var dep models.DependenciasContrato
 	doc_ordenador := c.GetString(":docordenador")
 
-	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"dependencias_sic/"+doc_ordenador, &temp); err == nil {
+	if err := getJsonWSO2(beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"dependencias_sic/"+doc_ordenador, &temp); err == nil {
 		json_dependencias, error_json := json.Marshal(temp)
 		if error_json == nil {
 			if err := json.Unmarshal(json_dependencias, &dependen); err == nil {
@@ -1379,7 +1377,7 @@ func (c *AprobacionPagoController) AprobarMultiplesSolicitudesContratistas() {
 
 			pagos_mensuales = append(pagos_mensuales, pago_mensual)
 		}
-		if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/tr_aprobacion_masiva_soportes_contratistas", "POST", &response, pagos_mensuales); err == nil {
+		if err := sendJson(beego.AppConfig.String("UrlcrudAdmin")+"/tr_aprobacion_masiva_soportes_contratistas", "POST", &response, pagos_mensuales); err == nil {
 			c.Data["json"] = "OK"
 		} else {
 			fmt.Println(err)
@@ -1412,7 +1410,7 @@ func (c *AprobacionPagoController) AprobarMultiplesPagosContratistas() {
 
 			pagos_mensuales = append(pagos_mensuales, pago_mensual)
 		}
-		if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/tr_aprobacion_masiva_pagos", "POST", &response, pagos_mensuales); err == nil {
+		if err := sendJson(beego.AppConfig.String("UrlcrudAdmin")+"/tr_aprobacion_masiva_pagos", "POST", &response, pagos_mensuales); err == nil {
 			c.Data["json"] = "OK"
 		} else {
 			fmt.Println(err)
@@ -1454,11 +1452,11 @@ func (c *AprobacionPagoController) CertificacionCumplidosContratistas() {
 
 	for _, cd := range contrato_dependencia.Contratos.Contrato {
 
-		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/pago_mensual/?query=EstadoPagoMensual.CodigoAbreviacion.in:AS|AP,NumeroContrato:"+cd.NumeroContrato+",VigenciaContrato:"+cd.Vigencia+",Mes:"+strconv.Itoa(nmes)+",Ano:"+anio, &pagos_mensuales); err == nil {
+		if err := getJson(beego.AppConfig.String("UrlcrudAdmin")+"/pago_mensual/?query=EstadoPagoMensual.CodigoAbreviacion.in:AS|AP,NumeroContrato:"+cd.NumeroContrato+",VigenciaContrato:"+cd.Vigencia+",Mes:"+strconv.Itoa(nmes)+",Ano:"+anio, &pagos_mensuales); err == nil {
 
 			for v := range pagos_mensuales {
 
-				if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pagos_mensuales[v].Persona, &contratistas); err == nil {
+				if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/informacion_proveedor/?query=NumDocumento:"+pagos_mensuales[v].Persona, &contratistas); err == nil {
 
 					var contrato models.InformacionContrato
 					contrato = GetContrato(pagos_mensuales[v].NumeroContrato, strconv.FormatFloat(pagos_mensuales[v].VigenciaContrato, 'f', 0, 64))
@@ -1499,7 +1497,7 @@ func GetRP(numero_cdp string, vigencia_cdp string) (rp models.InformacionCdpRp) 
 	var temp map[string]interface{}
 	var temp_cdp_rp models.InformacionCdpRp
 
-	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudFinanciera")+"/"+"cdprp/"+numero_cdp+"/"+vigencia_cdp+"/01", &temp); err == nil {
+	if err := getJsonWSO2(beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudFinanciera")+"/"+"cdprp/"+numero_cdp+"/"+vigencia_cdp+"/01", &temp); err == nil {
 		json_cdp_rp, error_json := json.Marshal(temp)
 
 		if error_json == nil {
@@ -1526,7 +1524,7 @@ func GetContratosPersona(num_documento string) (contratos_persona models.Informa
 	var temp map[string]interface{}
 	var contratos models.InformacionContratosPersona
 
-	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contratos_persona/"+num_documento, &temp); err == nil {
+	if err := getJsonWSO2(beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contratos_persona/"+num_documento, &temp); err == nil {
 		json_contratos, error_json := json.Marshal(temp)
 
 		if error_json == nil {
@@ -1554,7 +1552,7 @@ func GetContrato(num_contrato_suscrito string, vigencia string) (informacion_con
 
 	var temp map[string]interface{}
 
-	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contrato/"+num_contrato_suscrito+"/"+vigencia, &temp); err == nil {
+	if err := getJsonWSO2(beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contrato/"+num_contrato_suscrito+"/"+vigencia, &temp); err == nil {
 		json_contrato, error_json := json.Marshal(temp)
 
 		if error_json == nil {
@@ -1581,7 +1579,7 @@ func GetInformacionContratoContratista(num_contrato_suscrito string, vigencia st
 
 	var temp map[string]interface{}
 
-	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"informacion_contrato_contratista/"+num_contrato_suscrito+"/"+vigencia, &temp); err == nil {
+	if err := getJsonWSO2(beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"informacion_contrato_contratista/"+num_contrato_suscrito+"/"+vigencia, &temp); err == nil {
 		json_contrato, error_json := json.Marshal(temp)
 
 		if error_json == nil {
@@ -1608,7 +1606,7 @@ func GetContratosDependencia(dependencia string, fecha string) (contratos_depend
 
 	var temp map[string]interface{}
 
-	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contratos_dependencia/"+dependencia+"/"+fecha+"/"+fecha, &temp); err == nil {
+	if err := getJsonWSO2(beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contratos_dependencia/"+dependencia+"/"+fecha+"/"+fecha, &temp); err == nil {
 		json_contrato, error_json := json.Marshal(temp)
 		if error_json == nil {
 			if err := json.Unmarshal(json_contrato, &contratos_dependencia); err == nil {
@@ -1632,7 +1630,7 @@ func GetContratosDependenciaFiltro(dependencia string, fecha_inicio string, fech
 
 	var temp map[string]interface{}
 
-	if err := getJsonWSO2("http://"+beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contratos_dependencia/"+dependencia+"/"+fecha_fin+"/"+fecha_inicio, &temp); err == nil {
+	if err := getJsonWSO2(beego.AppConfig.String("UrlcrudWSO2")+"/"+beego.AppConfig.String("NscrudAdministrativa")+"/"+"contratos_dependencia/"+dependencia+"/"+fecha_fin+"/"+fecha_inicio, &temp); err == nil {
 		json_contrato, error_json := json.Marshal(temp)
 		if error_json == nil {
 			if err := json.Unmarshal(json_contrato, &contratos_dependencia); err == nil {
@@ -1654,7 +1652,7 @@ func GetContratosDependenciaFiltro(dependencia string, fecha_inicio string, fech
 
 func GetContratosOrdenadorDependencia(dependencia string, fechaInicio string, fechaFin string) (contratos_ordenador_dependencia models.ContratoOrdenadorDependencia) {
 
-	r := httplib.Get("http://" + beego.AppConfig.String("UrlcrudWSO2") + "/" + beego.AppConfig.String("NscrudAdministrativa") + "/" + "contratos_ordenador_dependencia/" + dependencia + "/" + fechaInicio + "/" + fechaFin)
+	r := httplib.Get(beego.AppConfig.String("UrlcrudWSO2") + "/" + beego.AppConfig.String("NscrudAdministrativa") + "/" + "contratos_ordenador_dependencia/" + dependencia + "/" + fechaInicio + "/" + fechaFin)
 	r.Header("Accept", "application/json")
 	if err := r.ToJSON(&contratos_ordenador_dependencia); err == nil {
 	} else {

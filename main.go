@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/url"
-	
 	"time"
 
 	_ "github.com/udistrital/administrativa_mid_api/routers"
@@ -12,45 +11,52 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/plugins/cors"
 	_ "github.com/lib/pq"
-	"github.com/udistrital/utils_oas/apiStatusLib"
+	apistatus "github.com/udistrital/utils_oas/apiStatusLib"
+	"github.com/udistrital/utils_oas/auditoria"
+	"github.com/udistrital/utils_oas/database"
+	"github.com/udistrital/utils_oas/security"
+	"github.com/udistrital/utils_oas/xray"
 )
 
 func init() {
 	orm.DefaultTimeLoc = time.UTC
-	//orm.Debug = true
+	flyway, err := database.BuildPostgresConnectionString()
+	if err != nil {
+		logs.Error("error consultando la cadena de conexión: %v", err)
+		panic(err)
+	}
+
+	err = orm.RegisterDataBase("flywayAdmin", "postgres", flyway+"&timezone=UTC")
+	if err != nil {
+		logs.Error("error al conectarse a la base de datos: %v", err)
+		panic(err)
+	}
+
 	amazon := "postgres://" + beego.AppConfig.String("UsercrudAgora") + ":" + url.QueryEscape(beego.AppConfig.String("PasscrudAgora")) + "@" + beego.AppConfig.String("HostcrudAgora") + "/" + beego.AppConfig.String("BdcrudAgora") + "?sslmode=disable&search_path=" + beego.AppConfig.String("SchcrudAgora") + "&timezone=UTC"
-	flyway := "postgres://" + beego.AppConfig.String("UsercrudAdmin") + ":" + url.QueryEscape(beego.AppConfig.String("PasscrudAdmin")) + "@" + beego.AppConfig.String("HostcrudAdmin") + "/" + beego.AppConfig.String("BdcrudAdmin") + "?sslmode=disable&search_path=" + beego.AppConfig.String("SchcrudAdmin") + "&timezone=UTC"
-
-	if err := orm.RegisterDataBase("amazonAdmin", "postgres", amazon); err != nil {
-		panic(err)
-	}
-
-	if err := orm.RegisterDataBase("flywayAdmin", "postgres", flyway); err != nil {
-		panic(err)
-	}
-
 	if err := orm.RegisterDataBase("default", "postgres", amazon); err != nil {
 		panic(err)
 	}
 }
 
 func main() {
-	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
-		AllowOrigins: []string{"*"},
-		AllowMethods: []string{"PUT", "PATCH", "GET", "POST", "OPTIONS", "DELETE"},
-		AllowHeaders: []string{"Origin", "x-requested-with",
-			"content-type",
-			"accept",
-			"origin",
-			"authorization",
-			"x-csrftoken"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-	}))
-	if beego.BConfig.RunMode == "dev" {
+	allowedOrigins := []string{"*.udistrital.edu.co"}
+	if beego.BConfig.RunMode == beego.DEV {
+		allowedOrigins = []string{"*"}
 		beego.BConfig.WebConfig.DirectoryIndex = true
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	}
+
+	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
+		AllowOrigins: allowedOrigins,
+		AllowMethods: []string{"GET", "POST", "OPTIONS"},
+		AllowHeaders: []string{
+			"Accept",
+			"Authorization",
+			"Content-Type",
+			"User-Agent"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
 
 	// Custom JSON error pages
 	beego.ErrorHandler("400", badRequestJSONPage)
@@ -58,10 +64,10 @@ func main() {
 	beego.ErrorHandler("404", notFoundJSONPage)
 	beego.ErrorHandler("233", notValidJSONPage)
 
-	if err := logs.SetLogger(logs.AdapterFile, `{"filename":"/var/log/beego/administrativa_mid_api.log"}`); err != nil {
-		beego.Info(err)
-	}
-
 	apistatus.Init()
+	auditoria.InitMiddleware()
+	security.SetSecurityHeaders()
+	xray.Init()
+
 	beego.Run()
 }

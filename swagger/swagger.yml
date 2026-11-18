@@ -1,7 +1,8 @@
 swagger: "2.0"
 info:
   title: beego Test API
-  description: beego has a very cool tools to autogenerate documents for your API
+  description: |
+    beego has a very cool tools to autogenerate documents for your API
   version: 1.0.0
   termsOfService: http://beego.me/
   contact:
@@ -15,7 +16,9 @@ paths:
     post:
       tags:
       - aprobacion_pago
-      description: create AprobarMultiplesSolicitudes
+      description: |-
+        create AprobarMultiplesSolicitudes
+        <br>
       operationId: AprobacionPagoController.AprobarMultiplesSolicitudes
       responses:
         "201":
@@ -26,7 +29,9 @@ paths:
     post:
       tags:
       - aprobacion_pago
-      description: create AprobarMultiplesPagos
+      description: |-
+        create AprobarMultiplesPagos
+        <br>
       operationId: AprobacionPagoController.AprobarMultiplesPagos
       responses:
         "201":
@@ -37,7 +42,9 @@ paths:
     post:
       tags:
       - aprobacion_pago
-      description: create AprobarMultiplesPagosContratistas
+      description: |-
+        create AprobarMultiplesPagosContratistas
+        <br>
       operationId: AprobacionPagoController.AprobarMultiplesPagosContratistas
       responses:
         "201":
@@ -48,7 +55,9 @@ paths:
     post:
       tags:
       - aprobacion_pago
-      description: create AprobarMultiplesSolicitudesContratistas
+      description: |-
+        create AprobarMultiplesSolicitudesContratistas
+        <br>
       operationId: AprobacionPagoController.AprobarMultiplesSolicitudesContratistas
       responses:
         "201":
@@ -59,7 +68,9 @@ paths:
     get:
       tags:
       - aprobacion_pago
-      description: get certificacion_cumplidos_contratistas
+      description: |-
+        get certificacion_cumplidos_contratistas
+        <br>
       operationId: AprobacionPagoController.certificacion_cumplidos_contratistas
       parameters:
       - in: query
@@ -86,7 +97,9 @@ paths:
     get:
       tags:
       - aprobacion_pago
-      description: create CertificacionDocumentosAprobados
+      description: |-
+        create CertificacionDocumentosAprobados
+        <br>
       operationId: AprobacionPagoController.CertificacionDocumentosAprobados
       parameters:
       - in: query
@@ -116,7 +129,9 @@ paths:
     get:
       tags:
       - aprobacion_pago
-      description: create CertificacionVistoBueno
+      description: |-
+        create CertificacionVistoBueno
+        <br>
       operationId: AprobacionPagoController.CertificacionVistoBueno
       parameters:
       - in: query
@@ -162,7 +177,9 @@ paths:
     get:
       tags:
       - aprobacion_pago
-      description: create ObtenerDependenciaOrdenador
+      description: |-
+        create ObtenerDependenciaOrdenador
+        <br>
       operationId: AprobacionPagoController.ObtenerDependenciaOrdenador
       parameters:
       - in: query
@@ -175,11 +192,26 @@ paths:
           description: ""
         "403":
           description: :docordenador is empty
+  /aprobacion_pago/dependencias_sic:
+    get:
+      tags:
+      - aprobacion_pago
+      description: |-
+        create GetDependencias
+        <br>
+      operationId: AprobacionPagoController.GetDependencias
+      responses:
+        "201":
+          description: ""
+        "403":
+          description: ""
   /aprobacion_pago/get_contratos_docente/{numDocumento}:
     get:
       tags:
       - aprobacion_pago
-      description: create  GetContratosDocente
+      description: |-
+        create  GetContratosDocente
+        <br>
       operationId: AprobacionPagoController.GetContratosDocente
       parameters:
       - in: query
@@ -193,14 +225,16 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/.ContratosDocentes'
+              $ref: '#/definitions/models.ContratosDocentes'
         "403":
           description: body is empty
   /aprobacion_pago/informacion_coordinador/{id_dependencia_oikos}:
     get:
       tags:
       - aprobacion_pago
-      description: create ObtenerInfoCoordinador
+      description: |-
+        create ObtenerInfoCoordinador
+        <br>
       operationId: AprobacionPagoController.ObtenerInfoCoordinador
       parameters:
       - in: query
@@ -218,7 +252,9 @@ paths:
     get:
       tags:
       - aprobacion_pago
-      description: create ObtenerInfoOrdenador
+      description: |-
+        create ObtenerInfoOrdenador
+        <br>
       operationId: AprobacionPagoController.ObtenerInfoOrdenador
       parameters:
       - in: query
@@ -242,7 +278,9 @@ paths:
     get:
       tags:
       - aprobacion_pago
-      description: create PagoAprobado
+      description: |-
+        create PagoAprobado
+        <br>
       operationId: AprobacionPagoController.PagoAprobado
       parameters:
       - in: query
@@ -278,7 +316,9 @@ paths:
     get:
       tags:
       - aprobacion_pago
-      description: create GetSolicitudesCoordinador
+      description: |-
+        create GetSolicitudesCoordinador
+        <br>
       operationId: AprobacionPagoController.GetSolicitudesCoordinador
       parameters:
       - in: query
@@ -295,7 +335,9 @@ paths:
     get:
       tags:
       - aprobacion_pago
-      description: create GetSolicitudesOrdenador
+      description: |-
+        create GetSolicitudesOrdenador
+        <br>
       operationId: AprobacionPagoController.GetSolicitudesOrdenador
       parameters:
       - in: query
@@ -312,7 +354,28 @@ paths:
     get:
       tags:
       - aprobacion_pago
-      description: create GetSolicitudesOrdenadorContratistas
+      description: |-
+        create GetSolicitudesOrdenadorContratistas
+        <br>
+      operationId: AprobacionPagoController.GetSolicitudesOrdenadorContratistas
+      parameters:
+      - in: query
+        name: docordenador
+        description: Número del documento del supervisor
+        required: true
+        type: string
+      responses:
+        "201":
+          description: ""
+        "403":
+          description: :docordenador is empty
+  /aprobacion_pago/solicitudes_ordenador_contratistas_dependencia/{docordenador}/{cod_dependencia}:
+    get:
+      tags:
+      - aprobacion_pago
+      description: |-
+        create GetSolicitudesOrdenadorContratistasDependencia
+        <br>
       operationId: AprobacionPagoController.GetSolicitudesOrdenadorContratistas
       parameters:
       - in: query
@@ -329,7 +392,9 @@ paths:
     get:
       tags:
       - aprobacion_pago
-      description: create GetSolicitudesSupervisor
+      description: |-
+        create GetSolicitudesSupervisor
+        <br>
       operationId: AprobacionPagoController.GetSolicitudesSupervisor
       parameters:
       - in: query
@@ -346,7 +411,9 @@ paths:
     get:
       tags:
       - aprobacion_pago
-      description: create GetSolicitudesSupervisorContratistas
+      description: |-
+        create GetSolicitudesSupervisorContratistas
+        <br>
       operationId: AprobacionPagoController.GetSolicitudesSupervisorContratistas
       parameters:
       - in: query
@@ -363,7 +430,9 @@ paths:
     post:
       tags:
       - consultar_disponibilidades
-      description: create ListarApropiaciones
+      description: |-
+        create ListarApropiaciones
+        <br>
       operationId: GestionDisponibilidadController.ListarApropiaciones
       responses:
         "201":
@@ -374,7 +443,9 @@ paths:
     get:
       tags:
       - contrato_general
-      description: get Contrato_genral by id
+      description: |-
+        get Contrato_genral by id
+        <br>
       operationId: Contrato_generalController.GetContratoByContratoSuscritoId
       parameters:
       - in: path
@@ -391,14 +462,16 @@ paths:
         "200":
           description: ""
           schema:
-            $ref: '#/definitions/.Contrato_genral'
+            $ref: '#/definitions/models.Contrato_genral'
         "403":
           description: ""
   /contrato_general/ListaContratoContratoSuscrito/{vigencia}:
     get:
       tags:
       - contrato_general
-      description: get Disponibilidad by vigencia
+      description: |-
+        get Disponibilidad by vigencia
+        <br>
       operationId: Contrato_generalController.ListaContratoContratoSuscrito
       parameters:
       - in: query
@@ -440,7 +513,9 @@ paths:
     post:
       tags:
       - expedir_resolucion
-      description: create Cancelar
+      description: |-
+        create Cancelar
+        <br>
       operationId: ExpedirResolucionController.Cancelar
       responses:
         "201":
@@ -451,8 +526,23 @@ paths:
     post:
       tags:
       - expedir_resolucion
-      description: create Expedir
+      description: |-
+        create Expedir
+        <br>
       operationId: ExpedirResolucionController.Expedir
+      responses:
+        "201":
+          description: '{int} models.ExpedicionResolucion'
+        "403":
+          description: body is empty
+  /expedir_resolucion/expedirModificacion:
+    post:
+      tags:
+      - expedir_resolucion
+      description: |-
+        create ExpedirModificacion
+        <br>
+      operationId: ExpedirResolucionController.ExpedirModificacion
       responses:
         "201":
           description: '{int} models.ExpedicionResolucion'
@@ -462,7 +552,9 @@ paths:
     post:
       tags:
       - expedir_resolucion
-      description: create ValidarDatosExpedicion
+      description: |-
+        create ValidarDatosExpedicion
+        <br>
       operationId: ExpedirResolucionController.ValidarDatosExpedicion
       responses:
         "201":
@@ -473,8 +565,23 @@ paths:
     post:
       tags:
       - gestion_desvinculaciones
-      description: create ActualizarVinculaciones
+      description: |-
+        create ActualizarVinculaciones
+        <br>
       operationId: GestionDesvinculacionesController.ActualizarVinculaciones
+      responses:
+        "201":
+          description: '{string}'
+        "403":
+          description: body is empty
+  /gestion_desvinculaciones/actualizar_vinculaciones_cancelacion:
+    post:
+      tags:
+      - gestion_desvinculaciones
+      description: |-
+        create ActualizarVinculacionesCancelacion
+        <br>
+      operationId: GestionDesvinculacionesController.ActualizarVinculacionesCancelacion
       responses:
         "201":
           description: '{string}'
@@ -484,7 +591,9 @@ paths:
     post:
       tags:
       - gestion_desvinculaciones
-      description: create AdicionarHoras
+      description: |-
+        create AdicionarHoras
+        <br>
       operationId: GestionDesvinculacionesController.AdicionarHoras
       responses:
         "201":
@@ -495,7 +604,9 @@ paths:
     post:
       tags:
       - gestion_desvinculaciones
-      description: create AnularAdicionDocente
+      description: |-
+        create AnularAdicionDocente
+        <br>
       operationId: GestionDesvinculacionesController.AnularAdicionDocente
       responses:
         "201":
@@ -506,8 +617,36 @@ paths:
     post:
       tags:
       - gestion_desvinculaciones
-      description: create AnularDesvinculacionDocente
+      description: |-
+        create AnularDesvinculacionDocente
+        <br>
       operationId: GestionDesvinculacionesController.AnularDesvinculacionDocente
+      responses:
+        "201":
+          description: '{string}'
+        "403":
+          description: body is empty
+  /gestion_desvinculaciones/anular_modificaciones:
+    post:
+      tags:
+      - gestion_desvinculaciones
+      description: |-
+        create AnularModificaciones
+        <br>
+      operationId: GestionDesvinculacionesController.AnularModificaciones
+      responses:
+        "201":
+          description: '{string}'
+        "403":
+          description: body is empty
+  /gestion_desvinculaciones/consultar_categoria:
+    post:
+      tags:
+      - gestion_desvinculaciones
+      description: |-
+        create ConsultarCategoria
+        <br>
+      operationId: GestionDesvinculacionesController.ConsultarCategoria
       responses:
         "201":
           description: '{string}'
@@ -517,7 +656,9 @@ paths:
     get:
       tags:
       - gestion_desvinculaciones
-      description: create ListarDocentesCancelados
+      description: |-
+        create ListarDocentesCancelados
+        <br>
       operationId: GestionDesvinculacionesController.ListarDocentesCancelados
       parameters:
       - in: query
@@ -533,7 +674,9 @@ paths:
     get:
       tags:
       - gestion_desvinculaciones
-      description: create ListarDocentesDesvinculados
+      description: |-
+        create ListarDocentesDesvinculados
+        <br>
       operationId: GestionDesvinculacionesController.ListarDocentesDesvinculados
       parameters:
       - in: query
@@ -545,11 +688,26 @@ paths:
           description: '{int} models.VinculacionDocente'
         "403":
           description: body is empty
+  /gestion_desvinculaciones/validar_saldo_cdp:
+    post:
+      tags:
+      - gestion_desvinculaciones
+      description: |-
+        create ValidarSaldoCDP
+        <br>
+      operationId: GestionDesvinculacionesController.ValidarSaldoCDP
+      responses:
+        "201":
+          description: '{string}'
+        "403":
+          description: body is empty
   /gestion_desvinculaciones/vinculaciones_agrupadas_canceladas/{id_resolucion}:
     get:
       tags:
       - gestion_desvinculaciones
-      description: Get de vinculaciones agrupadas canceladas para el PDF
+      description: |-
+        Get de vinculaciones agrupadas canceladas para el PDF
+        <br>
       operationId: GestionDesvinculacionesController.GetVinculacionesAgrupadasCanceladas
       parameters:
       - in: path
@@ -570,7 +728,9 @@ paths:
     get:
       tags:
       - gestion_documento_resolucion
-      description: create GetContenidoResolucion
+      description: |-
+        create GetContenidoResolucion
+        <br>
       operationId: GestionDocumentoResolucionController.ListarDocentesCargaHoraria
       parameters:
       - in: query
@@ -592,7 +752,9 @@ paths:
     post:
       tags:
       - gestion_previnculacion
-      description: create InsertarPrevinculaciones
+      description: |-
+        create InsertarPrevinculaciones
+        <br>
       operationId: GestionPrevinculacionesController.InsetarPrevinculaciones
       responses:
         "201":
@@ -603,7 +765,9 @@ paths:
     post:
       tags:
       - gestion_previnculacion
-      description: createCalcular_total_de_salarios_seleccionados
+      description: |-
+        createCalcular_total_de_salarios_seleccionados
+        <br>
       operationId: GestionPrevinculacionesController.Calcular_total_de_salarios_seleccionados
       responses:
         "201":
@@ -614,7 +778,9 @@ paths:
     get:
       tags:
       - gestion_previnculacion
-      description: create ListarDocentesCargaHoraria
+      description: |-
+        create ListarDocentesCargaHoraria
+        <br>
       operationId: GestionPrevinculacionesController.ListarDocentesCargaHoraria
       parameters:
       - in: query
@@ -641,14 +807,16 @@ paths:
         "201":
           description: ""
           schema:
-            $ref: '#/definitions/.Docentes_x_Carga'
+            $ref: '#/definitions/models.Docentes_x_Carga'
         "403":
           description: body is empty
   /gestion_previnculacion/Precontratacion/insertar_previnculaciones:
     post:
       tags:
       - gestion_previnculacion
-      description: create InsertarPrevinculaciones
+      description: |-
+        create InsertarPrevinculaciones
+        <br>
       operationId: GestionPrevinculacionesController.InsetarPrevinculaciones
       responses:
         "201":
@@ -659,7 +827,9 @@ paths:
     get:
       tags:
       - gestion_previnculacion
-      description: create ListarDocentesPrevinculados
+      description: |-
+        create ListarDocentesPrevinculados
+        <br>
       operationId: GestionPrevinculacionesController.ListarDocentesPrevinculados
       parameters:
       - in: query
@@ -675,7 +845,9 @@ paths:
     get:
       tags:
       - gestion_previnculacion
-      description: create ListarDocentesPrevinculadosAll
+      description: |-
+        create ListarDocentesPrevinculadosAll
+        <br>
       operationId: GestionPrevinculacionesController.ListarDocentesPrevinculadosAll
       parameters:
       - in: query
@@ -687,21 +859,51 @@ paths:
           description: '{int} models.VinculacionDocente'
         "403":
           description: body is empty
+  /gestion_previnculacion/rp_docente/{num_vinculacion}/{vigencia}/{identificacion}:
+    get:
+      tags:
+      - gestion_previnculacion
+      description: |-
+        Get RPs de la vinculacion docente
+        <br>
+      operationId: GestionPrevinculacionesController.GetCdpRpDocente
+      parameters:
+      - in: query
+        name: num_vinculacion
+        description: Número de la vinculación del docente
+        required: true
+        type: string
+      - in: query
+        name: vigencia
+        description: Vigencia de la vinculación del docente
+        required: true
+        type: string
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.RpDocente'
+        "403":
+          description: :vigencia is empty
   /gestion_resoluciones/get_resoluciones_aprobadas:
     get:
       tags:
       - gestion_resoluciones
-      description: create  getResolucionesAprobadas
+      description: |-
+        create  getResolucionesAprobadas
+        <br>
       operationId: GestionResolucionesController.getResolucionesAprobadas
       parameters:
       - in: query
         name: limit
         description: Limit the size of result set. Must be an integer
-        type: string
+        type: integer
+        format: int64
       - in: query
         name: offset
         description: Start position of result set. Must be an integer
-        type: string
+        type: integer
+        format: int64
       - in: query
         name: query
         description: Filter. e.g. col1:v1,col2:v2 ...
@@ -719,7 +921,9 @@ paths:
     get:
       tags:
       - gestion_resoluciones
-      description: create  getResolucionesInscritas
+      description: |-
+        create  getResolucionesInscritas
+        <br>
       operationId: GestionResolucionesController.getResolucionesInscritas
       parameters:
       - in: query
@@ -739,18 +943,41 @@ paths:
     post:
       tags:
       - gestion_resoluciones
-      description: create InsertarResolucionCompleta
+      description: |-
+        create InsertarResolucionCompleta
+        <br>
       operationId: GestionResolucionesController.InsertarResolucionCompleta
       responses:
         "201":
           description: '{int} models.Resolucion'
         "403":
           description: body is empty
+  /solicitud_necesidad/fuente_apropiacion_necesidad/{id_necesidad}:
+    get:
+      tags:
+      - solicitud_necesidad
+      description: |-
+        create FuentesApropiacionNecesidad
+        <br>
+      operationId: SolicitudNecesidadController.FuentesApropiacionNecesidad
+      parameters:
+      - in: path
+        name: id_necesidad
+        description: necesidad a consultar
+        required: true
+        type: string
+      responses:
+        "201":
+          description: '{int} models.FuenteApropiacionNecesidad'
+        "403":
+          description: body is empty
   /validar_contrato/{dedicacion}/{numHoras}:
     get:
       tags:
       - validar_contrato
-      description: create ValidarContrato
+      description: |-
+        create ValidarContrato
+        <br>
       operationId: ValidarContratoController.ValidarContrato
       responses:
         "201":
@@ -761,7 +988,9 @@ paths:
     post:
       tags:
       - validarCambioEstado
-      description: create ValidarCambiosEstado
+      description: |-
+        create ValidarCambiosEstado
+        <br>
       operationId: CambioEstadoContratoValidoController.ValidarCambiosEstado
       responses:
         "201":
@@ -769,16 +998,6 @@ paths:
         "403":
           description: body is empty
 definitions:
-  .Contrato_genral:
-    type: object
-  .ContratosDocentes:
-    type: object
-  .Docentes_x_Carga:
-    type: object
-  .NullInt64:
-    type: object
-  .NullString:
-    type: object
   models.Articulo:
     title: Articulo
     type: object
@@ -795,6 +1014,30 @@ definitions:
           $ref: '#/definitions/models.Paragrafo'
       Texto:
         type: string
+  models.CdpRp:
+    title: CdpRp
+    type: object
+    properties:
+      cdp:
+        type: string
+      rp:
+        type: string
+      vigencia:
+        type: string
+  models.CdpRpDocente:
+    title: CdpRpDocente
+    type: object
+    properties:
+      cdp_rp:
+        type: array
+        items:
+          $ref: '#/definitions/models.CdpRp'
+  models.Contrato_genral:
+    title: Contrato_genral
+    type: object
+  models.ContratosDocentes:
+    title: ContratosDocentes
+    type: object
   models.Dedicacion:
     title: Dedicacion
     type: object
@@ -819,6 +1062,9 @@ definitions:
       Vigencia:
         type: number
         format: double
+  models.Docentes_x_Carga:
+    title: Docentes_x_Carga
+    type: object
   models.OrdenadorGasto:
     title: OrdenadorGasto
     type: object
@@ -855,6 +1101,8 @@ definitions:
           $ref: '#/definitions/models.Articulo'
       Consideracion:
         type: string
+      CuadroResponsabilidades:
+        type: string
       Id:
         type: integer
         format: int64
@@ -882,12 +1130,17 @@ definitions:
       Facultad:
         type: integer
         format: int64
+      FacultadFirmaNombre:
+        type: string
       FacultadNombre:
         type: string
       FechaExpedicion:
         type: string
-        format: string
+        format: datetime
       Id:
+        type: integer
+        format: int64
+      IdDependenciaFirma:
         type: integer
         format: int64
       NivelAcademico:
@@ -900,9 +1153,15 @@ definitions:
       Periodo:
         type: integer
         format: int64
+      PeriodoCarga:
+        type: integer
+        format: int64
       TipoResolucion:
         type: string
       Vigencia:
+        type: integer
+        format: int64
+      VigenciaCarga:
         type: integer
         format: int64
   models.ResolucionVinculacionDocente:
@@ -919,6 +1178,12 @@ definitions:
         format: int64
       NivelAcademico:
         type: string
+  models.RpDocente:
+    title: RpDocente
+    type: object
+    properties:
+      cdp_rp_docente:
+        $ref: '#/definitions/models.CdpRpDocente'
   models.VinculacionDocente:
     title: VinculacionDocente
     type: object
@@ -935,9 +1200,15 @@ definitions:
         format: int64
       Estado:
         type: boolean
+      FechaInicio:
+        type: string
+        format: datetime
+      FechaInicioNueva:
+        type: string
+        format: datetime
       FechaRegistro:
         type: string
-        format: string
+        format: datetime
       Id:
         type: integer
         format: int64
@@ -967,6 +1238,9 @@ definitions:
       NumeroDisponibilidad:
         type: integer
         format: int64
+      NumeroHorasModificacion:
+        type: integer
+        format: int64
       NumeroHorasNuevas:
         type: integer
         format: int64
@@ -975,12 +1249,28 @@ definitions:
         format: int64
       NumeroMeses:
         type: string
+      NumeroMesesNuevos:
+        type: string
+      NumeroRp:
+        type: integer
+        format: int64
       NumeroSemanas:
+        type: integer
+        format: int64
+      NumeroSemanasNuevas:
+        type: integer
+        format: int64
+      NumeroSemanasRestantes:
         type: integer
         format: int64
       Periodo:
         type: integer
         format: int64
+      PeriodoCarga:
+        type: integer
+        format: int64
+      ProyectoNombre:
+        type: string
       TipoDocumento:
         type: string
       ValorContrato:
@@ -988,8 +1278,27 @@ definitions:
         format: double
       ValorContratoFormato:
         type: string
+      ValorContratoInicial:
+        type: number
+        format: double
+      ValorContratoInicialFormato:
+        type: string
+      ValorModificacionFormato:
+        type: string
       Vigencia:
         $ref: '#/definitions/sql.NullInt64'
+      VigenciaCarga:
+        type: integer
+        format: int64
+      VigenciaRp:
+        type: integer
+        format: int64
+  sql.NullInt64:
+    title: NullInt64
+    type: object
+  sql.NullString:
+    title: NullString
+    type: object
 tags:
 - name: gestion_previnculacion
   description: |
@@ -1018,3 +1327,6 @@ tags:
 - name: aprobacion_pago
   description: |
     AprobacionPagoController operations for AprobacionPago
+- name: solicitud_necesidad
+  description: |
+    SolicitudNecesidadController operations for SolicitudNecesidad
