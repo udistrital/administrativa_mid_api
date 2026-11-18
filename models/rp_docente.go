@@ -1,13 +1,15 @@
 package models
 
-
 type RpDocente struct {
-	CdpRpDocente struct {
-		CdpRp []struct {
-			Cdp 		string `json:"cdp"`
-			Vigencia  string `json:"vigencia"`
-			Rp  string `json:"rp"`
+	CdpRpDocente CdpRpDocente `json:"cdp_rp_docente"`
+}
 
-		} `json:"cdp_rp"`
-	} `json:"cdp_rp_docente"`
+type CdpRpDocente struct {
+	CdpRp []CdpRp `json:"cdp_rp"`
+}
+
+type CdpRp struct {
+	Cdp      string `json:"cdp"`
+	Vigencia string `json:"vigencia"`
+	Rp       string `json:"rp"`
 }

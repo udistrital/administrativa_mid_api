@@ -12,7 +12,7 @@ import (
 	"github.com/udistrital/administrativa_mid_api/models"
 )
 
-//GestionResolucionesController operations for Preliquidacion
+// GestionResolucionesController operations for Preliquidacion
 type GestionResolucionesController struct {
 	beego.Controller
 }
@@ -36,7 +36,7 @@ func (c *GestionResolucionesController) GetResolucionesInscritas() {
 	query := c.GetStrings("query")
 	limit, _ := c.GetInt("limit")
 	offset, _ := c.GetInt("offset")
-	r := httplib.Get(beego.AppConfig.String("ProtocolAdmin") + "://" + beego.AppConfig.String("UrlcrudAdmin") + "/" + beego.AppConfig.String("NscrudAdmin") + "/resolucion_vinculacion")
+	r := httplib.Get(beego.AppConfig.String("UrlcrudAdmin") + "/resolucion_vinculacion")
 	r.Param("offset", strconv.Itoa(offset))
 	r.Param("limit", strconv.Itoa(limit))
 	for _, v := range query {
@@ -74,7 +74,7 @@ func (c *GestionResolucionesController) GetResolucionesAprobadas() {
 	limit, _ := c.GetInt("limit")
 	offset, _ := c.GetInt("offset")
 
-	if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion/Aprobada"+"?query="+query+"&offset="+strconv.Itoa(offset)+"&limit="+strconv.Itoa(limit), &resolucion_vinculacion_aprobada); err == nil {
+	if err := getJson(beego.AppConfig.String("UrlcrudAdmin")+"/resolucion_vinculacion/Aprobada"+"?query="+query+"&offset="+strconv.Itoa(offset)+"&limit="+strconv.Itoa(limit), &resolucion_vinculacion_aprobada); err == nil {
 		for x, pos := range resolucion_vinculacion_aprobada {
 			resolucion_vinculacion_aprobada[x].FacultadNombre = BuscarNombreFacultad(pos.Facultad)
 			resolucion_vinculacion_aprobada[x].FacultadFirmaNombre = BuscarNombreFacultad(pos.IdDependenciaFirma)
@@ -105,7 +105,7 @@ func (c *GestionResolucionesController) InsertarResolucionCompleta() {
 		//****MANEJO DE TRANSACCIONES!***!//
 
 		//Se trae cuerpo de resolución según tipo
-		if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/contenido_resolucion/ResolucionTemplate/"+
+		if err2 := getJson(beego.AppConfig.String("UrlcrudAdmin")+"/contenido_resolucion/ResolucionTemplate/"+
 			v.ResolucionVinculacionDocente.Dedicacion+"/"+v.ResolucionVinculacionDocente.NivelAcademico+"/"+strconv.Itoa(v.Resolucion.Periodo)+"/"+strconv.Itoa(v.Resolucion.IdTipoResolucion.Id), &texto_resolucion); err2 == nil {
 			v.Resolucion.ConsideracionResolucion = texto_resolucion.Consideracion
 		} else {
@@ -202,14 +202,14 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 	if temp.IdTipoResolucion.Id != 1 {
 		temp.VigenciaCarga = resVieja.VigenciaCarga
 		temp.PeriodoCarga = resVieja.PeriodoCarga
-		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion/"+strconv.Itoa(resolucion.ResolucionVieja), &resVieja); err == nil {
+		if err := getJson(beego.AppConfig.String("UrlcrudAdmin")+"/resolucion/"+strconv.Itoa(resolucion.ResolucionVieja), &resVieja); err == nil {
 			temp.Titulo = "“Por la cual se Modifica la resolución " + resVieja.NumeroResolucion + " de " + cambiarString(resVieja.FechaExpedicion.Month().String()) + " del " + strconv.Itoa(resVieja.FechaExpedicion.Year()) + " en cuanto a carga académica y valor del vínculo para el " + cambiarString(strconv.Itoa(temp.PeriodoCarga)) + " Periodo Académico de " + strconv.Itoa(temp.VigenciaCarga) + " en la modalidad de Docentes de " + cambiarString(resolucion.ResolucionVinculacionDocente.Dedicacion) + " (Vinculación Especial) para la " + resolucion.NomDependencia + " en " + resolucion.ResolucionVinculacionDocente.NivelAcademico + ".”"
 		} else {
 			fmt.Println("Error al consultar resolución vieja", err)
 		}
 	}
 	temp.PreambuloResolucion = "El Decano(a) de la " + resolucion.NomDependencia + " de la Universidad Distrital Francisco José de Caldas, en uso de sus facultades legales y estatutarias, en particular, de las conferidas por el artículo " + articulo + " de la Resolución de Rectoría 004 de 6 de enero de 2023, y"
-	if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion", "POST", &respuesta, &temp); err == nil {
+	if err := sendJson(beego.AppConfig.String("UrlcrudAdmin")+"/resolucion", "POST", &respuesta, &temp); err == nil {
 		id_creada = respuesta.Id
 		cont = true
 	} else {
@@ -222,7 +222,7 @@ func InsertarResolucion(resolucion models.ObjetoResolucion) (contr bool, id_cre 
 			ResolucionAnterior: resolucion.ResolucionVieja,
 			ResolucionNueva:    id_creada,
 		}
-		if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/modificacion_resolucion", "POST", &respuesta_modificacion_res, &objeto_modificacion_res); err == nil {
+		if err := sendJson(beego.AppConfig.String("UrlcrudAdmin")+"/modificacion_resolucion", "POST", &respuesta_modificacion_res, &objeto_modificacion_res); err == nil {
 			cont = true
 		} else {
 			fmt.Println("error al insertar en modificacion resolucion", err)
@@ -245,7 +245,7 @@ func InsertarResolucionEstado(id_res int) (contr bool) {
 		Resolucion:    &models.Resolucion{Id: id_res},
 	}
 
-	if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_estado", "POST", &respuesta, &temp); err == nil {
+	if err := sendJson(beego.AppConfig.String("UrlcrudAdmin")+"/resolucion_estado", "POST", &respuesta, &temp); err == nil {
 		cont = true
 	} else {
 		cont = false
@@ -261,7 +261,7 @@ func InsertarResolucionVinDocente(id_res int, resvindoc *models.ResolucionVincul
 	var cont bool
 	temp.Id = id_res
 
-	if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/resolucion_vinculacion_docente", "POST", &respuesta, &temp); err == nil {
+	if err := sendJson(beego.AppConfig.String("UrlcrudAdmin")+"/resolucion_vinculacion_docente", "POST", &respuesta, &temp); err == nil {
 
 		cont = true
 	} else {
@@ -283,7 +283,7 @@ func InsertarArticulos(id_resolucion int, articulos []models.Articulo) {
 			ResolucionId:   &models.Resolucion{Id: id_resolucion},
 			Texto:          pos.Texto,
 			TipoComponente: "Articulo"}
-		if err := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/componente_resolucion", "POST", &respuesta, &temp); err == nil {
+		if err := sendJson(beego.AppConfig.String("UrlcrudAdmin")+"/componente_resolucion", "POST", &respuesta, &temp); err == nil {
 			for y, pos2 := range pos.Paragrafos {
 				temp2 := models.ComponenteResolucion{
 					Numero:          y + 1,
@@ -292,7 +292,7 @@ func InsertarArticulos(id_resolucion int, articulos []models.Articulo) {
 					TipoComponente:  "Paragrafo",
 					ComponentePadre: &models.ComponenteResolucion{Id: respuesta.Id},
 				}
-				if err2 := sendJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/componente_resolucion", "POST", &respuesta2, &temp2); err == nil {
+				if err2 := sendJson(beego.AppConfig.String("UrlcrudAdmin")+"/componente_resolucion", "POST", &respuesta2, &temp2); err == nil {
 
 				} else {
 					fmt.Println("error al insertar parágrafos", err2)
@@ -310,7 +310,7 @@ func BuscarNombreFacultad(id_facultad int) (nombre_facultad string) {
 
 	var facultad []models.Facultad
 	var nom string
-	if err2 := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudOikos")+"/"+beego.AppConfig.String("NscrudOikos")+"/dependencia?query=Id:"+strconv.Itoa(id_facultad), &facultad); err2 == nil {
+	if err2 := getJson(beego.AppConfig.String("UrlcrudOikos")+"/dependencia?query=Id:"+strconv.Itoa(id_facultad), &facultad); err2 == nil {
 		nom = facultad[0].Nombre
 	} else {
 		nom = "N/A"

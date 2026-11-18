@@ -6,7 +6,7 @@ type ContratoOrdenadorDependencia struct {
 			Documento         string `json:"Documento"`
 			NombreContratista string `json:"NombreContratista"`
 			NumeroContrato    string `json:"NumeroContrato"`
-			Vigencia 		  string `json:"Vigencia"`
+			Vigencia          string `json:"Vigencia"`
 		} `json:"informacion_contratos"`
 	} `json:"contratos_ordenador_dependencia"`
 }

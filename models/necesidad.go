@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-//Necesidad modelo completo de la necesidad
+// Necesidad modelo completo de la necesidad
 type Necesidad struct {
 	Id                        int
 	Numero                    int

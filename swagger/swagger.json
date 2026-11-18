@@ -2,7 +2,7 @@
     "swagger": "2.0",
     "info": {
         "title": "beego Test API",
-        "description": "beego has a very cool tools to autogenerate documents for your API",
+        "description": "beego has a very cool tools to autogenerate documents for your API\n",
         "version": "1.0.0",
         "termsOfService": "http://beego.me/",
         "contact": {
@@ -13,14 +13,14 @@
             "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
         }
     },
-    "basePath": "/administrativa_mid_api/v1",
+    "basePath": "/v1",
     "paths": {
         "/aprobacion_pago/aprobar_documentos": {
             "post": {
                 "tags": [
                     "aprobacion_pago"
                 ],
-                "description": "create AprobarMultiplesSolicitudes",
+                "description": "create AprobarMultiplesSolicitudes\n\u003cbr\u003e",
                 "operationId": "AprobacionPagoController.AprobarMultiplesSolicitudes",
                 "responses": {
                     "201": {
@@ -37,7 +37,7 @@
                 "tags": [
                     "aprobacion_pago"
                 ],
-                "description": "create AprobarMultiplesPagos",
+                "description": "create AprobarMultiplesPagos\n\u003cbr\u003e",
                 "operationId": "AprobacionPagoController.AprobarMultiplesPagos",
                 "responses": {
                     "201": {
@@ -54,7 +54,7 @@
                 "tags": [
                     "aprobacion_pago"
                 ],
-                "description": "create AprobarMultiplesPagosContratistas",
+                "description": "create AprobarMultiplesPagosContratistas\n\u003cbr\u003e",
                 "operationId": "AprobacionPagoController.AprobarMultiplesPagosContratistas",
                 "responses": {
                     "201": {
@@ -71,7 +71,7 @@
                 "tags": [
                     "aprobacion_pago"
                 ],
-                "description": "create AprobarMultiplesSolicitudesContratistas",
+                "description": "create AprobarMultiplesSolicitudesContratistas\n\u003cbr\u003e",
                 "operationId": "AprobacionPagoController.AprobarMultiplesSolicitudesContratistas",
                 "responses": {
                     "201": {
@@ -88,7 +88,7 @@
                 "tags": [
                     "aprobacion_pago"
                 ],
-                "description": "get certificacion_cumplidos_contratistas",
+                "description": "get certificacion_cumplidos_contratistas\n\u003cbr\u003e",
                 "operationId": "AprobacionPagoController.certificacion_cumplidos_contratistas",
                 "parameters": [
                     {
@@ -128,7 +128,7 @@
                 "tags": [
                     "aprobacion_pago"
                 ],
-                "description": "create CertificacionDocumentosAprobados",
+                "description": "create CertificacionDocumentosAprobados\n\u003cbr\u003e",
                 "operationId": "AprobacionPagoController.CertificacionDocumentosAprobados",
                 "parameters": [
                     {
@@ -171,7 +171,7 @@
                 "tags": [
                     "aprobacion_pago"
                 ],
-                "description": "create CertificacionVistoBueno",
+                "description": "create CertificacionVistoBueno\n\u003cbr\u003e",
                 "operationId": "AprobacionPagoController.CertificacionVistoBueno",
                 "parameters": [
                     {
@@ -239,7 +239,7 @@
                 "tags": [
                     "aprobacion_pago"
                 ],
-                "description": "create ObtenerDependenciaOrdenador",
+                "description": "create ObtenerDependenciaOrdenador\n\u003cbr\u003e",
                 "operationId": "AprobacionPagoController.ObtenerDependenciaOrdenador",
                 "parameters": [
                     {
@@ -260,12 +260,29 @@
                 }
             }
         },
+        "/aprobacion_pago/dependencias_sic": {
+            "get": {
+                "tags": [
+                    "aprobacion_pago"
+                ],
+                "description": "create GetDependencias\n\u003cbr\u003e",
+                "operationId": "AprobacionPagoController.GetDependencias",
+                "responses": {
+                    "201": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/aprobacion_pago/get_contratos_docente/{numDocumento}": {
             "get": {
                 "tags": [
                     "aprobacion_pago"
                 ],
-                "description": "create  GetContratosDocente",
+                "description": "create  GetContratosDocente\n\u003cbr\u003e",
                 "operationId": "AprobacionPagoController.GetContratosDocente",
                 "parameters": [
                     {
@@ -282,7 +299,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/.ContratosDocentes"
+                                "$ref": "#/definitions/models.ContratosDocentes"
                             }
                         }
                     },
@@ -297,7 +314,7 @@
                 "tags": [
                     "aprobacion_pago"
                 ],
-                "description": "create ObtenerInfoCoordinador",
+                "description": "create ObtenerInfoCoordinador\n\u003cbr\u003e",
                 "operationId": "AprobacionPagoController.ObtenerInfoCoordinador",
                 "parameters": [
                     {
@@ -324,7 +341,7 @@
                 "tags": [
                     "aprobacion_pago"
                 ],
-                "description": "create ObtenerInfoOrdenador",
+                "description": "create ObtenerInfoOrdenador\n\u003cbr\u003e",
                 "operationId": "AprobacionPagoController.ObtenerInfoOrdenador",
                 "parameters": [
                     {
@@ -359,7 +376,7 @@
                 "tags": [
                     "aprobacion_pago"
                 ],
-                "description": "create PagoAprobado",
+                "description": "create PagoAprobado\n\u003cbr\u003e",
                 "operationId": "AprobacionPagoController.PagoAprobado",
                 "parameters": [
                     {
@@ -410,7 +427,7 @@
                 "tags": [
                     "aprobacion_pago"
                 ],
-                "description": "create GetSolicitudesCoordinador",
+                "description": "create GetSolicitudesCoordinador\n\u003cbr\u003e",
                 "operationId": "AprobacionPagoController.GetSolicitudesCoordinador",
                 "parameters": [
                     {
@@ -436,7 +453,7 @@
                 "tags": [
                     "aprobacion_pago"
                 ],
-                "description": "create GetSolicitudesOrdenador",
+                "description": "create GetSolicitudesOrdenador\n\u003cbr\u003e",
                 "operationId": "AprobacionPagoController.GetSolicitudesOrdenador",
                 "parameters": [
                     {
@@ -462,7 +479,33 @@
                 "tags": [
                     "aprobacion_pago"
                 ],
-                "description": "create GetSolicitudesOrdenadorContratistas",
+                "description": "create GetSolicitudesOrdenadorContratistas\n\u003cbr\u003e",
+                "operationId": "AprobacionPagoController.GetSolicitudesOrdenadorContratistas",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "docordenador",
+                        "description": "Número del documento del supervisor",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": ":docordenador is empty"
+                    }
+                }
+            }
+        },
+        "/aprobacion_pago/solicitudes_ordenador_contratistas_dependencia/{docordenador}/{cod_dependencia}": {
+            "get": {
+                "tags": [
+                    "aprobacion_pago"
+                ],
+                "description": "create GetSolicitudesOrdenadorContratistasDependencia\n\u003cbr\u003e",
                 "operationId": "AprobacionPagoController.GetSolicitudesOrdenadorContratistas",
                 "parameters": [
                     {
@@ -488,7 +531,7 @@
                 "tags": [
                     "aprobacion_pago"
                 ],
-                "description": "create GetSolicitudesSupervisor",
+                "description": "create GetSolicitudesSupervisor\n\u003cbr\u003e",
                 "operationId": "AprobacionPagoController.GetSolicitudesSupervisor",
                 "parameters": [
                     {
@@ -514,7 +557,7 @@
                 "tags": [
                     "aprobacion_pago"
                 ],
-                "description": "create GetSolicitudesSupervisorContratistas",
+                "description": "create GetSolicitudesSupervisorContratistas\n\u003cbr\u003e",
                 "operationId": "AprobacionPagoController.GetSolicitudesSupervisorContratistas",
                 "parameters": [
                     {
@@ -540,7 +583,7 @@
                 "tags": [
                     "consultar_disponibilidades"
                 ],
-                "description": "create ListarApropiaciones",
+                "description": "create ListarApropiaciones\n\u003cbr\u003e",
                 "operationId": "GestionDisponibilidadController.ListarApropiaciones",
                 "responses": {
                     "201": {
@@ -557,7 +600,7 @@
                 "tags": [
                     "contrato_general"
                 ],
-                "description": "get Contrato_genral by id",
+                "description": "get Contrato_genral by id\n\u003cbr\u003e",
                 "operationId": "Contrato_generalController.GetContratoByContratoSuscritoId",
                 "parameters": [
                     {
@@ -579,7 +622,7 @@
                     "200": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/.Contrato_genral"
+                            "$ref": "#/definitions/models.Contrato_genral"
                         }
                     },
                     "403": {
@@ -593,7 +636,7 @@
                 "tags": [
                     "contrato_general"
                 ],
-                "description": "get Disponibilidad by vigencia",
+                "description": "get Disponibilidad by vigencia\n\u003cbr\u003e",
                 "operationId": "Contrato_generalController.ListaContratoContratoSuscrito",
                 "parameters": [
                     {
@@ -657,7 +700,7 @@
                 "tags": [
                     "expedir_resolucion"
                 ],
-                "description": "create Cancelar",
+                "description": "create Cancelar\n\u003cbr\u003e",
                 "operationId": "ExpedirResolucionController.Cancelar",
                 "responses": {
                     "201": {
@@ -674,8 +717,25 @@
                 "tags": [
                     "expedir_resolucion"
                 ],
-                "description": "create Expedir",
+                "description": "create Expedir\n\u003cbr\u003e",
                 "operationId": "ExpedirResolucionController.Expedir",
+                "responses": {
+                    "201": {
+                        "description": "{int} models.ExpedicionResolucion"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/expedir_resolucion/expedirModificacion": {
+            "post": {
+                "tags": [
+                    "expedir_resolucion"
+                ],
+                "description": "create ExpedirModificacion\n\u003cbr\u003e",
+                "operationId": "ExpedirResolucionController.ExpedirModificacion",
                 "responses": {
                     "201": {
                         "description": "{int} models.ExpedicionResolucion"
@@ -691,7 +751,7 @@
                 "tags": [
                     "expedir_resolucion"
                 ],
-                "description": "create ValidarDatosExpedicion",
+                "description": "create ValidarDatosExpedicion\n\u003cbr\u003e",
                 "operationId": "ExpedirResolucionController.ValidarDatosExpedicion",
                 "responses": {
                     "201": {
@@ -708,8 +768,25 @@
                 "tags": [
                     "gestion_desvinculaciones"
                 ],
-                "description": "create ActualizarVinculaciones",
+                "description": "create ActualizarVinculaciones\n\u003cbr\u003e",
                 "operationId": "GestionDesvinculacionesController.ActualizarVinculaciones",
+                "responses": {
+                    "201": {
+                        "description": "{string}"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/gestion_desvinculaciones/actualizar_vinculaciones_cancelacion": {
+            "post": {
+                "tags": [
+                    "gestion_desvinculaciones"
+                ],
+                "description": "create ActualizarVinculacionesCancelacion\n\u003cbr\u003e",
+                "operationId": "GestionDesvinculacionesController.ActualizarVinculacionesCancelacion",
                 "responses": {
                     "201": {
                         "description": "{string}"
@@ -725,7 +802,7 @@
                 "tags": [
                     "gestion_desvinculaciones"
                 ],
-                "description": "create AdicionarHoras",
+                "description": "create AdicionarHoras\n\u003cbr\u003e",
                 "operationId": "GestionDesvinculacionesController.AdicionarHoras",
                 "responses": {
                     "201": {
@@ -742,7 +819,7 @@
                 "tags": [
                     "gestion_desvinculaciones"
                 ],
-                "description": "create AnularAdicionDocente",
+                "description": "create AnularAdicionDocente\n\u003cbr\u003e",
                 "operationId": "GestionDesvinculacionesController.AnularAdicionDocente",
                 "responses": {
                     "201": {
@@ -759,8 +836,42 @@
                 "tags": [
                     "gestion_desvinculaciones"
                 ],
-                "description": "create AnularDesvinculacionDocente",
+                "description": "create AnularDesvinculacionDocente\n\u003cbr\u003e",
                 "operationId": "GestionDesvinculacionesController.AnularDesvinculacionDocente",
+                "responses": {
+                    "201": {
+                        "description": "{string}"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/gestion_desvinculaciones/anular_modificaciones": {
+            "post": {
+                "tags": [
+                    "gestion_desvinculaciones"
+                ],
+                "description": "create AnularModificaciones\n\u003cbr\u003e",
+                "operationId": "GestionDesvinculacionesController.AnularModificaciones",
+                "responses": {
+                    "201": {
+                        "description": "{string}"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/gestion_desvinculaciones/consultar_categoria": {
+            "post": {
+                "tags": [
+                    "gestion_desvinculaciones"
+                ],
+                "description": "create ConsultarCategoria\n\u003cbr\u003e",
+                "operationId": "GestionDesvinculacionesController.ConsultarCategoria",
                 "responses": {
                     "201": {
                         "description": "{string}"
@@ -776,7 +887,7 @@
                 "tags": [
                     "gestion_desvinculaciones"
                 ],
-                "description": "create ListarDocentesCancelados",
+                "description": "create ListarDocentesCancelados\n\u003cbr\u003e",
                 "operationId": "GestionDesvinculacionesController.ListarDocentesCancelados",
                 "parameters": [
                     {
@@ -801,7 +912,7 @@
                 "tags": [
                     "gestion_desvinculaciones"
                 ],
-                "description": "create ListarDocentesDesvinculados",
+                "description": "create ListarDocentesDesvinculados\n\u003cbr\u003e",
                 "operationId": "GestionDesvinculacionesController.ListarDocentesDesvinculados",
                 "parameters": [
                     {
@@ -821,12 +932,29 @@
                 }
             }
         },
+        "/gestion_desvinculaciones/validar_saldo_cdp": {
+            "post": {
+                "tags": [
+                    "gestion_desvinculaciones"
+                ],
+                "description": "create ValidarSaldoCDP\n\u003cbr\u003e",
+                "operationId": "GestionDesvinculacionesController.ValidarSaldoCDP",
+                "responses": {
+                    "201": {
+                        "description": "{string}"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
         "/gestion_desvinculaciones/vinculaciones_agrupadas_canceladas/{id_resolucion}": {
             "get": {
                 "tags": [
                     "gestion_desvinculaciones"
                 ],
-                "description": "Get de vinculaciones agrupadas canceladas para el PDF",
+                "description": "Get de vinculaciones agrupadas canceladas para el PDF\n\u003cbr\u003e",
                 "operationId": "GestionDesvinculacionesController.GetVinculacionesAgrupadasCanceladas",
                 "parameters": [
                     {
@@ -858,7 +986,7 @@
                 "tags": [
                     "gestion_documento_resolucion"
                 ],
-                "description": "create GetContenidoResolucion",
+                "description": "create GetContenidoResolucion\n\u003cbr\u003e",
                 "operationId": "GestionDocumentoResolucionController.ListarDocentesCargaHoraria",
                 "parameters": [
                     {
@@ -892,7 +1020,7 @@
                 "tags": [
                     "gestion_previnculacion"
                 ],
-                "description": "create InsertarPrevinculaciones",
+                "description": "create InsertarPrevinculaciones\n\u003cbr\u003e",
                 "operationId": "GestionPrevinculacionesController.InsetarPrevinculaciones",
                 "responses": {
                     "201": {
@@ -909,7 +1037,7 @@
                 "tags": [
                     "gestion_previnculacion"
                 ],
-                "description": "createCalcular_total_de_salarios_seleccionados",
+                "description": "createCalcular_total_de_salarios_seleccionados\n\u003cbr\u003e",
                 "operationId": "GestionPrevinculacionesController.Calcular_total_de_salarios_seleccionados",
                 "responses": {
                     "201": {
@@ -926,7 +1054,7 @@
                 "tags": [
                     "gestion_previnculacion"
                 ],
-                "description": "create ListarDocentesCargaHoraria",
+                "description": "create ListarDocentesCargaHoraria\n\u003cbr\u003e",
                 "operationId": "GestionPrevinculacionesController.ListarDocentesCargaHoraria",
                 "parameters": [
                     {
@@ -964,7 +1092,7 @@
                     "201": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/.Docentes_x_Carga"
+                            "$ref": "#/definitions/models.Docentes_x_Carga"
                         }
                     },
                     "403": {
@@ -978,7 +1106,7 @@
                 "tags": [
                     "gestion_previnculacion"
                 ],
-                "description": "create InsertarPrevinculaciones",
+                "description": "create InsertarPrevinculaciones\n\u003cbr\u003e",
                 "operationId": "GestionPrevinculacionesController.InsetarPrevinculaciones",
                 "responses": {
                     "201": {
@@ -995,7 +1123,7 @@
                 "tags": [
                     "gestion_previnculacion"
                 ],
-                "description": "create ListarDocentesPrevinculados",
+                "description": "create ListarDocentesPrevinculados\n\u003cbr\u003e",
                 "operationId": "GestionPrevinculacionesController.ListarDocentesPrevinculados",
                 "parameters": [
                     {
@@ -1020,7 +1148,7 @@
                 "tags": [
                     "gestion_previnculacion"
                 ],
-                "description": "create ListarDocentesPrevinculadosAll",
+                "description": "create ListarDocentesPrevinculadosAll\n\u003cbr\u003e",
                 "operationId": "GestionPrevinculacionesController.ListarDocentesPrevinculadosAll",
                 "parameters": [
                     {
@@ -1040,25 +1168,63 @@
                 }
             }
         },
+        "/gestion_previnculacion/rp_docente/{num_vinculacion}/{vigencia}/{identificacion}": {
+            "get": {
+                "tags": [
+                    "gestion_previnculacion"
+                ],
+                "description": "Get RPs de la vinculacion docente\n\u003cbr\u003e",
+                "operationId": "GestionPrevinculacionesController.GetCdpRpDocente",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "num_vinculacion",
+                        "description": "Número de la vinculación del docente",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "vigencia",
+                        "description": "Vigencia de la vinculación del docente",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.RpDocente"
+                        }
+                    },
+                    "403": {
+                        "description": ":vigencia is empty"
+                    }
+                }
+            }
+        },
         "/gestion_resoluciones/get_resoluciones_aprobadas": {
             "get": {
                 "tags": [
                     "gestion_resoluciones"
                 ],
-                "description": "create  getResolucionesAprobadas",
+                "description": "create  getResolucionesAprobadas\n\u003cbr\u003e",
                 "operationId": "GestionResolucionesController.getResolucionesAprobadas",
                 "parameters": [
                     {
                         "in": "query",
                         "name": "limit",
                         "description": "Limit the size of result set. Must be an integer",
-                        "type": "string"
+                        "type": "integer",
+                        "format": "int64"
                     },
                     {
                         "in": "query",
                         "name": "offset",
                         "description": "Start position of result set. Must be an integer",
-                        "type": "string"
+                        "type": "integer",
+                        "format": "int64"
                     },
                     {
                         "in": "query",
@@ -1088,7 +1254,7 @@
                 "tags": [
                     "gestion_resoluciones"
                 ],
-                "description": "create  getResolucionesInscritas",
+                "description": "create  getResolucionesInscritas\n\u003cbr\u003e",
                 "operationId": "GestionResolucionesController.getResolucionesInscritas",
                 "parameters": [
                     {
@@ -1119,11 +1285,37 @@
                 "tags": [
                     "gestion_resoluciones"
                 ],
-                "description": "create InsertarResolucionCompleta",
+                "description": "create InsertarResolucionCompleta\n\u003cbr\u003e",
                 "operationId": "GestionResolucionesController.InsertarResolucionCompleta",
                 "responses": {
                     "201": {
                         "description": "{int} models.Resolucion"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/solicitud_necesidad/fuente_apropiacion_necesidad/{id_necesidad}": {
+            "get": {
+                "tags": [
+                    "solicitud_necesidad"
+                ],
+                "description": "create FuentesApropiacionNecesidad\n\u003cbr\u003e",
+                "operationId": "SolicitudNecesidadController.FuentesApropiacionNecesidad",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id_necesidad",
+                        "description": "necesidad a consultar",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{int} models.FuenteApropiacionNecesidad"
                     },
                     "403": {
                         "description": "body is empty"
@@ -1136,7 +1328,7 @@
                 "tags": [
                     "validarCambioEstado"
                 ],
-                "description": "create ValidarCambiosEstado",
+                "description": "create ValidarCambiosEstado\n\u003cbr\u003e",
                 "operationId": "CambioEstadoContratoValidoController.ValidarCambiosEstado",
                 "responses": {
                     "201": {
@@ -1153,7 +1345,7 @@
                 "tags": [
                     "validar_contrato"
                 ],
-                "description": "create ValidarContrato",
+                "description": "create ValidarContrato\n\u003cbr\u003e",
                 "operationId": "ValidarContratoController.ValidarContrato",
                 "responses": {
                     "201": {
@@ -1167,21 +1359,6 @@
         }
     },
     "definitions": {
-        ".Contrato_genral": {
-            "type": "object"
-        },
-        ".ContratosDocentes": {
-            "type": "object"
-        },
-        ".Docentes_x_Carga": {
-            "type": "object"
-        },
-        ".NullInt64": {
-            "type": "object"
-        },
-        ".NullString": {
-            "type": "object"
-        },
         "models.Articulo": {
             "title": "Articulo",
             "type": "object",
@@ -1204,6 +1381,41 @@
                     "type": "string"
                 }
             }
+        },
+        "models.CdpRp": {
+            "title": "CdpRp",
+            "type": "object",
+            "properties": {
+                "cdp": {
+                    "type": "string"
+                },
+                "rp": {
+                    "type": "string"
+                },
+                "vigencia": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CdpRpDocente": {
+            "title": "CdpRpDocente",
+            "type": "object",
+            "properties": {
+                "cdp_rp": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.CdpRp"
+                    }
+                }
+            }
+        },
+        "models.Contrato_genral": {
+            "title": "Contrato_genral",
+            "type": "object"
+        },
+        "models.ContratosDocentes": {
+            "title": "ContratosDocentes",
+            "type": "object"
         },
         "models.Dedicacion": {
             "title": "Dedicacion",
@@ -1238,6 +1450,10 @@
                     "format": "double"
                 }
             }
+        },
+        "models.Docentes_x_Carga": {
+            "title": "Docentes_x_Carga",
+            "type": "object"
         },
         "models.OrdenadorGasto": {
             "title": "OrdenadorGasto",
@@ -1289,6 +1505,9 @@
                 "Consideracion": {
                     "type": "string"
                 },
+                "CuadroResponsabilidades": {
+                    "type": "string"
+                },
                 "Id": {
                     "type": "integer",
                     "format": "int64"
@@ -1328,14 +1547,21 @@
                     "type": "integer",
                     "format": "int64"
                 },
+                "FacultadFirmaNombre": {
+                    "type": "string"
+                },
                 "FacultadNombre": {
                     "type": "string"
                 },
                 "FechaExpedicion": {
                     "type": "string",
-                    "format": "string"
+                    "format": "datetime"
                 },
                 "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "IdDependenciaFirma": {
                     "type": "integer",
                     "format": "int64"
                 },
@@ -1353,10 +1579,18 @@
                     "type": "integer",
                     "format": "int64"
                 },
+                "PeriodoCarga": {
+                    "type": "integer",
+                    "format": "int64"
+                },
                 "TipoResolucion": {
                     "type": "string"
                 },
                 "Vigencia": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "VigenciaCarga": {
                     "type": "integer",
                     "format": "int64"
                 }
@@ -1382,6 +1616,15 @@
                 }
             }
         },
+        "models.RpDocente": {
+            "title": "RpDocente",
+            "type": "object",
+            "properties": {
+                "cdp_rp_docente": {
+                    "$ref": "#/definitions/models.CdpRpDocente"
+                }
+            }
+        },
         "models.VinculacionDocente": {
             "title": "VinculacionDocente",
             "type": "object",
@@ -1403,9 +1646,17 @@
                 "Estado": {
                     "type": "boolean"
                 },
+                "FechaInicio": {
+                    "type": "string",
+                    "format": "datetime"
+                },
+                "FechaInicioNueva": {
+                    "type": "string",
+                    "format": "datetime"
+                },
                 "FechaRegistro": {
                     "type": "string",
-                    "format": "string"
+                    "format": "datetime"
                 },
                 "Id": {
                     "type": "integer",
@@ -1448,6 +1699,10 @@
                     "type": "integer",
                     "format": "int64"
                 },
+                "NumeroHorasModificacion": {
+                    "type": "integer",
+                    "format": "int64"
+                },
                 "NumeroHorasNuevas": {
                     "type": "integer",
                     "format": "int64"
@@ -1459,13 +1714,35 @@
                 "NumeroMeses": {
                     "type": "string"
                 },
+                "NumeroMesesNuevos": {
+                    "type": "string"
+                },
+                "NumeroRp": {
+                    "type": "integer",
+                    "format": "int64"
+                },
                 "NumeroSemanas": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "NumeroSemanasNuevas": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "NumeroSemanasRestantes": {
                     "type": "integer",
                     "format": "int64"
                 },
                 "Periodo": {
                     "type": "integer",
                     "format": "int64"
+                },
+                "PeriodoCarga": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "ProyectoNombre": {
+                    "type": "string"
                 },
                 "TipoDocumento": {
                     "type": "string"
@@ -1477,10 +1754,36 @@
                 "ValorContratoFormato": {
                     "type": "string"
                 },
+                "ValorContratoInicial": {
+                    "type": "number",
+                    "format": "double"
+                },
+                "ValorContratoInicialFormato": {
+                    "type": "string"
+                },
+                "ValorModificacionFormato": {
+                    "type": "string"
+                },
                 "Vigencia": {
                     "$ref": "#/definitions/sql.NullInt64"
+                },
+                "VigenciaCarga": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "VigenciaRp": {
+                    "type": "integer",
+                    "format": "int64"
                 }
             }
+        },
+        "sql.NullInt64": {
+            "title": "NullInt64",
+            "type": "object"
+        },
+        "sql.NullString": {
+            "title": "NullString",
+            "type": "object"
         }
     },
     "tags": [
@@ -1519,6 +1822,10 @@
         {
             "name": "aprobacion_pago",
             "description": "AprobacionPagoController operations for AprobacionPago\n"
+        },
+        {
+            "name": "solicitud_necesidad",
+            "description": "SolicitudNecesidadController operations for SolicitudNecesidad\n"
         }
     ]
 }
