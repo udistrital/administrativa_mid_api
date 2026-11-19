@@ -31,7 +31,7 @@ func (c *Contrato_generalController) GetContratoByContratoSuscritoId() {
 	vigenciaStr := c.Ctx.Input.Param(":vigencia")
 	var infoContrato []map[string]interface{}
 	if _, err := strconv.Atoi(vigenciaStr); err == nil {
-		if err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_general?query=Vigencia:"+vigenciaStr+",ContratoSuscrito.Vigencia:"+vigenciaStr+",ContratoSuscrito.Id:"+idStr, &infoContrato); err == nil {
+		if err = getJson(beego.AppConfig.String("UrlcrudAgora")+"/contrato_general?query=Vigencia:"+vigenciaStr+",ContratoSuscrito.Vigencia:"+vigenciaStr+",ContratoSuscrito.Id:"+idStr, &infoContrato); err == nil {
 
 			if infoContrato != nil {
 				c.Data["json"] = infoContrato[0]
@@ -50,12 +50,12 @@ func (c *Contrato_generalController) GetContratoByContratoSuscritoId() {
 	c.ServeJSON()
 }
 
-//funcion para armar info de los contratos de contratistas.
+// funcion para armar info de los contratos de contratistas.
 func FormatoInfoContratoContratoSuscrito(contratoIntfc interface{}, params ...interface{}) (res interface{}) {
 	if infoContrato, e := contratoIntfc.(map[string]interface{}); e {
 		idContratista := infoContrato["Contratista"].(float64)
 		var infoContratista map[string]interface{}
-		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/informacion_proveedor/"+strconv.Itoa(int(idContratista)), &infoContratista); err == nil {
+		if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/informacion_proveedor/"+strconv.Itoa(int(idContratista)), &infoContratista); err == nil {
 			infoContrato["Contratista"] = infoContratista
 			return infoContrato
 		} else {
@@ -122,7 +122,7 @@ func (c *Contrato_generalController) ListaContratoContratoSuscrito() {
 	vigenciaStr := c.Ctx.Input.Param(":vigencia")
 	_, err1 := strconv.Atoi(vigenciaStr)
 	if err1 == nil { //&& err2 == nil {
-		if err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAgora")+"/"+beego.AppConfig.String("NscrudAgora")+"/contrato_general?limit="+strconv.FormatInt(limit, 10)+"&offset="+strconv.FormatInt(offset, 10)+"&query=VigenciaContrato:"+vigenciaStr+",ContratoSuscrito.Vigencia:"+vigenciaStr+query, &infoContrato); err == nil {
+		if err := getJson(beego.AppConfig.String("UrlcrudAgora")+"/contrato_general?limit="+strconv.FormatInt(limit, 10)+"&offset="+strconv.FormatInt(offset, 10)+"&query=VigenciaContrato:"+vigenciaStr+",ContratoSuscrito.Vigencia:"+vigenciaStr+query, &infoContrato); err == nil {
 			if infoContrato != nil {
 				done := make(chan interface{})
 				defer close(done)

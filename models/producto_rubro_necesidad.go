@@ -1,6 +1,6 @@
 package models
 
-//ProductoRubroNecesidad modelo de la aplicación necesidades que relaciona los productos con la necesidad asociada
+// ProductoRubroNecesidad modelo de la aplicación necesidades que relaciona los productos con la necesidad asociada
 type ProductoRubroNecesidad struct {
 	Id                int
 	ProductoRubro     int

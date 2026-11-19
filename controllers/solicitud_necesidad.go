@@ -31,7 +31,7 @@ func (c *SolicitudNecesidadController) FuentesApropiacionNecesidad() {
 
 	//Devuelve las fuentes de financiamiento asociadas a la necesidad
 	query := "?limit=-1&query=Necesidad:" + idNecesidad
-	err := getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/fuente_financiacion_rubro_necesidad"+query, &fuentes)
+	err := getJson(beego.AppConfig.String("UrlcrudAdmin")+"/fuente_financiacion_rubro_necesidad"+query, &fuentes)
 	if err != nil {
 		beego.Error(err)
 		c.Abort("400")
@@ -43,7 +43,7 @@ func (c *SolicitudNecesidadController) FuentesApropiacionNecesidad() {
 		apropiacionID := strconv.Itoa(pos)
 		//Consulta la información de cada apropiación en financiera
 		query = "?&query=Id:" + apropiacionID
-		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/apropiacion"+query, &apropiacion)
+		err = getJson(beego.AppConfig.String("UrlcrudKronos")+"/apropiacion"+query, &apropiacion)
 		if err != nil {
 			beego.Error(err)
 			c.Abort("400")
@@ -51,7 +51,7 @@ func (c *SolicitudNecesidadController) FuentesApropiacionNecesidad() {
 
 		//Consulta las fuentes asociadas a la necesidad y a cada apropiación
 		query = "?limit=-1&query=Necesidad:" + idNecesidad + ",Apropiacion:" + apropiacionID
-		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/fuente_financiacion_rubro_necesidad"+query, &fuentes)
+		err = getJson(beego.AppConfig.String("UrlcrudAdmin")+"/fuente_financiacion_rubro_necesidad"+query, &fuentes)
 		if err != nil {
 			beego.Error(err)
 			c.Abort("400")
@@ -61,7 +61,7 @@ func (c *SolicitudNecesidadController) FuentesApropiacionNecesidad() {
 			montoFuentes += fuente.MontoParcial
 			//Consulta la información de cada fuente en financiera
 			query = "?&query=Id:" + strconv.Itoa(fuente.FuenteFinanciamiento)
-			err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/fuente_financiamiento"+query, &fuentes[x].InfoFuente)
+			err = getJson(beego.AppConfig.String("UrlcrudKronos")+"/fuente_financiamiento"+query, &fuentes[x].InfoFuente)
 			if err != nil {
 				beego.Error(err)
 				c.Abort("400")
@@ -70,7 +70,7 @@ func (c *SolicitudNecesidadController) FuentesApropiacionNecesidad() {
 
 		//Consulta los productos asociados a la necesidad y a cada apropiación
 		query = "?limit=-1&query=Necesidad:" + idNecesidad + ",Apropiacion:" + apropiacionID
-		err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudAdmin")+"/"+beego.AppConfig.String("NscrudAdmin")+"/producto_rubro_necesidad"+query, &productos)
+		err = getJson(beego.AppConfig.String("UrlcrudAdmin")+"/producto_rubro_necesidad"+query, &productos)
 		if err != nil {
 			beego.Error(err)
 			c.Abort("400")
@@ -79,7 +79,7 @@ func (c *SolicitudNecesidadController) FuentesApropiacionNecesidad() {
 		for x, producto := range productos {
 			//Consulta la información de cada producto en financiera
 			query = "?&query=Id:" + strconv.Itoa(producto.ProductoRubro)
-			err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("UrlcrudKronos")+"/"+beego.AppConfig.String("NscrudKronos")+"/producto_rubro"+query, &productos[x].ProductoRubroInfo)
+			err = getJson(beego.AppConfig.String("UrlcrudKronos")+"/producto_rubro"+query, &productos[x].ProductoRubroInfo)
 			if err != nil {
 				beego.Error(err)
 				c.Abort("400")

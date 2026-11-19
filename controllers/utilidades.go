@@ -118,12 +118,12 @@ func diff(a, b time.Time) (year, month, day int) {
 	return
 }
 
-//CargarReglasBase general
+// CargarReglasBase general
 func CargarReglasBase(dominio string) (reglas string, err error) {
 	//carga de reglas desde el ruler
 	var reglasbase string = ``
 	var v []models.Predicado
-	err = getJson(beego.AppConfig.String("ProtocolAdmin")+"://"+beego.AppConfig.String("Urlruler")+"/"+beego.AppConfig.String("Nsruler")+"/predicado/?query=Dominio.Nombre:"+dominio+"&limit=-1", &v)
+	err = getJson(beego.AppConfig.String("Urlruler")+"/predicado/?query=Dominio.Nombre:"+dominio+"&limit=-1", &v)
 	if err != nil {
 		return
 	}

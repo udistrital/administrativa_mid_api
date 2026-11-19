@@ -1,6 +1,6 @@
 package models
 
-//EstadoNecesidad relaciona la información del estado de la necesidad
+// EstadoNecesidad relaciona la información del estado de la necesidad
 type EstadoNecesidad struct {
 	Id                int
 	Nombre            string
